@@ -1,0 +1,336 @@
+[Swedish version of UAE FAQ.]
+Några vanligt ställta frågor. Läs noggrant om du har problem.
+
+
+** VANLIGA PROBLEM
+Frågor och Svar:
+
+F:  Ibland, efter att UAE avslutats, så fungerar inte tangentbordsteckenupprepningen!
+S:  Skriv "xset r on" (händer bara i X, tydligen mest bara på Solaris maskiner. Vet ej 
+    varför). [Bör vara fixat tills nu. Observera att detta alltid händer när UAE kraschar.]
+
+F:  När UAE startar säger det "Illegal instruction: 4e7b". Varför?
+S:  Helt normalt. Det är Kickstart som försöker avgöra vad för CPU du har.
+
+F:  När UAE startar säger det "Illegal instruction: 00f8" (många gånger). Varför?
+S:  För att ditt Kickstart ROM kompilerats för 68020. (Kan också hända om
+    det är en bug i UAE.)
+
+F:  När UAE laddar <ditt favvospel> står det "Non-standard sync".
+S:  Ditt favorit-spel är kopieringsskyddat. Det finns sätt att överföra
+    sådana diskar, men det är komplicerat och skulle ta alldeles för lång
+    tid att försöka knäcka alla möjliga olika typer av kopierings-skydds-
+    scheman. Jag hoppas att det kommer att finnas en generell lösning
+    någon dag, men tills vidare får du vara olycklig.
+
+F:  Medan det kompilerar, säger den "xxx illegals generated" eller
+    "16 mismatches". Är detta ett problem?
+S:  Nej. Jag kan däremot använda denna information för att avgöra
+    om det är ett problem eller ej.
+
+F:  Hur gör jag ett @ (eller någon annan symbol)? På mitt PC-tangentbord
+    är det AltGr+Q, men det fungerar inte.
+S:  Ta en titt på ditt riktiga Amiga-tangentbord. Använd sedan samma 
+    tangentbordkombination som du skulle ha gjort där. Dessa kombinationer
+    skiljer sig från land till land, så se till att rätt tangentbordsschema
+    är laddat i AmigaOS. (T ex i Sverige, se till så det står "setmap s" i
+    din startup-sequence.) Du kan troligtvis skapa ett @ genom att trycka
+    Alt+2, eller Shift+2.
+
+
+
+** INKOMPABILITETER
+
+F:  UAE fungerar inte med mitt Kickstart 1.2 ROM.
+S:  Du kan behöva få slå av hårddisk och fastmem emuleringen med
+    "-a". Kickstart 1.2 stöder inte autoboot, vilket hårddiskemuleringen 
+    kräver.
+    Om UAE ger dig meddelandet "filesys_bput called", så lider du helt
+    sannolikt av detta problem.
+
+F:  Vad gör jag om ett spel/demo/program inte fungerar?
+S:  Om du föröker köra ett spel eller demo, aktivera lite slow RAM
+    och försök igen. En del äldre mjukvara har kompabilitetsproblem
+    som slow RAM ibland fixar. Om det är ett nyttoprogram, kolla efter
+    självklara anledningar som minimikraven för Kickstartversion, RAM
+    m m. Kolla också att programmet du försöker köra inte är avsett 
+    för AGA-bestyckade maskiner.
+
+
+** AMIGA DISKETTER, DISKBILDFILER, HÅRDDISKAR, CD-ROMar
+
+F:  Är det möjligt att läsa Amigadisketter i en PC?
+S:  Fråga det i comp.emulators.misc :-) Svaret är NEJ! Om du inte
+    uppfinner och bygger en del extra hårdvara själv (ritningar finnes
+    under namnet "Amiga Floppy Reader" - AFR, och är en liten låda som 
+    tillåter dig att koppla en extern amigadiskdrive till din skrivar-
+    port). Det hela liknar väldigt mycket tillvägagångsättet som brukas
+    för att koppla in X1541 diskdrivar för C64 emulatorer.
+    Några personer har också påpekat att det finns en kontroller kallad
+    "Catwealsl" som tydligen skall klara att läsa alla typer av disketter
+    i en PC, inklusive Amigadisketter. Jag skulle uppskatta om du inte
+    frågar om några detaljer beträffande några av dessa. Jag har dem inte
+    och vet inte hur, om eller varför de (eventuellt) fungerar.
+
+F:  Kan jag inte helt enkelt koppla in Amigans diskdrive till min PC
+    på något sätt, och använda den för att läsa Amigadiskar?
+S:  Visst kan du koppla in din Amigadiskdrive (Double Density) till din
+    PC, eftersom den är helt identisk med PCdiskdrivar, men det kommer
+    inte att hjälpa dig eftersom det är PC:ns floppykontroller som
+    är begränsningen, inte diskdriven. Så enkelt är det.
+
+F:  Men PC:n kan läsa 11-sektorers format!
+S:  JA, men de sektorerna ser aningen annorlunda ut för hårdvaran.
+
+F:  Men Amigan kan ju läsa PC-disketter!
+S:  Än sen då?
+
+F:  Men PC:n kan ju läsa Atari ST-disketter!
+S:  Jaha, vad har det med saken att göra?
+
+F:  Men....
+S:  Nej inte på något sätt och vis! Om du fortfarande är helt
+    övertygad om att det måste gå, bevisa det. Skriv ett program
+    för att läsa Amigadiskar med en standard PC kontroller och
+    jag skall offentligt be om ursäkt.
+
+F:  Hur kan jag använda DMS-filer?
+S:  Kör DMS under UAE och gör precis som du skulle ha gjort på en riktig 
+    Amiga. Uppackning av en DMS-fil till DF0: kommer att skriva över den
+    .adf som för tillfället används för att emulera df0:.
+
+F:  Hur kan jag överföra de icke-DOS-disketter som används av många demos?
+S: Kort förklaring: Med transdisk. Det faktum att AmigaDOS finner dem oläsliga
+    innebär inte att de är oläsliga också för transdisk.
+   Lång förklaring: Det finns två saker att tänka på när man talar om
+    formatet på en disk. Först lågnivå-formatet som delar upp spåren i
+    sektorer på ett speciellt sätt. De flesta Amigadiskar är i standard
+    Amiga-format vilket innebär 11 sektorer per spår med 512 byte i varje,
+    vilket totalt blir 880 Kb per diskett. Det finns även en del extra
+    information utanför sektorerna så att kontrollern kan hitta sektorerna.
+    PC:n använder att annat format vilket är anledningen till att PC:n
+    inte kan läsa Amigadisketter. Om en diskett är formaterad på detta vis
+    kan det kopieras med det normala AmigaDOS diskcopy eller Workbenchs
+    motsvarighet till det samma, och transdisk kan läsa det.
+    Kopierningsskyddade disketter har en annan spår-layout (ibland
+    delar de inte upp spåren i sektorer över huvudtaget, eller använder
+    fler sektorer, eller lägger annan information mellan sektorerna). 
+    Sådant klarar inte diskcopy eller transdisk av.
+    Det andra att tänka på angående formatet på disken är diskens
+    filsystem. Om du vill lägga filer och kataloger på en disk så måste
+    du skriva speciell information på en del av sektorerna på disken.
+    Bland denna information inkluderas (t ex) diskens namn 
+    (t ex "Workbench 1.3"), och vilka filer den innehåller. Denna 
+    information kallas filsystem. Amigan känner till många olika 
+    filsystem: Amigans ursprungliga filsystem kallat OFS (Original File 
+    System), och det nyare snabbare filsystemet kallat FFS (Fast File 
+    System) som intrudocerades med Kickstart 1.3.
+    Om du inte lägger ett filsystem på disken så kan fortfarande de
+    data som lagrats i sektorerna läsas av program som diskcopy och
+    transdisk, men datan betyder inget för dem. Poängen är att det 
+    inte spelar någon roll. Det spelar bara roll för Workbench som
+    skall försöka läsa vilka filer som finns på disken. Om Workbench
+    inte kan hitta ett filsystem som det känner till på disken, så
+    kommer disken att visas som "non-DOS" (i motsats till "unreadable" 
+    vilket diskar med ett annat lågnivåformat än standard visas som).
+
+F:  Hur byter jag diskettbildfil (disk image file)?
+S:  Din version av UAE kan ha ett användargränssnitt som tillåter dig
+    att göra detta (X11-versionen till exempel). Läs din systemspecifika
+    README-fil för detaljer. Du kan också använda "uaectrl" programmen
+    som ligger i underkatalogen "amiga".
+
+F:  Varför är diskettemuleringen så långsam, diskfilen ligger ju i alla
+    fall på hårddisken?
+S:  Därför att diskdrivens rotationshastighet också emuleras. Detta är
+    nödvändigt. Använd hårddiskemulering så mycket som möjligt.
+
+F:  <Här lägger du in ditt favoritproblem angående hårddiskemulering med s k
+    "hardfiles".>
+S:  Använd ingen hårddiskfil. Använd filsystemsemulering istället med "-m".
+
+F:  Hur läser jag Amiga CD-ROMmar?
+S:  Med hårddiskemuleringen. Ge UAE parametern "-M CD:/cdrom" om du använder
+    ett linux-system med CD:n monterad vid /cdrom, eller "-m CD:D:\" om du
+    använder DOS och D: är din CD-spelare (och om du har ett annat system så
+    bör du väl kunna räkna ut vad du skall göra).
+
+F:  Är det möjligt att läsa Amiga-hårddiskar på PC:n?
+S:  Ja. Linux 2.0 kommer med ett filsystem som sägs kunna läsa Amigans OFS/FFS 
+    filsystem. Fråga mig inte om detaljer, jag skrev det inte och jag änvänder det
+    inte (än). Jag har dock använt det för att läsa .adf filer.
+
+
+** FRAMTIDA PLANER
+
+F:  När kommer nästa version ut, och vad kommer det att innehålla?
+S:  Den kommer när den är färdig.
+
+F:  Kommer det att bli en shareware-version eller någon typ av registrerings-
+    avgift för framtida versioner av UAE?
+S:  Nej.
+
+F:  Skulle du inte kunna använda ARDIs CPU-emulering för att öka hastigheten?
+S:  UAE är gratis mjukvara. Källkoden medföljer. ARDIs Executor är kopieringsskyddat
+    och säljs kommersiellt. ARDI har ingen som helst anleding att ge bort
+    sin källkod gratis, för då skulle de ju inte längre tjäna några pengar.
+    (Ja, jag får faktiskt såna här frågor! Jag fattar inte vart folk för sina
+    idéer ifrån).
+
+
+
+** UAE HASTIGHET
+
+F:  Jag får inget sammanhängande ljud! Jag har bara en 486DX40, kan det
+    ha med det att göra?
+S:  Försök med en Pentium II 300, dessa har rapporterats göra bättre ifrån sig.
+
+F:  Skulle det vara möjligt att snabba upp emuleringen genom att köra
+    koden direkt (native) på t ex en 68k Mac?
+S:  Jag betvivlar det. UAE måste kunna avbryta CPU-emuleringen när som helst
+    för att utföra uppgifter nödvändiga för att kunna emulera resten av 
+    hårdvaran. Så du kan inte bara låten den köras helt för sig själv.
+
+F:  Skulle det vara möjligt att snabba upp saker genom att använda
+    en grafikaccelerator, t ex blittern i S3 chips?
+S:  Det tror jag inte. Jag är ingen PC-grafikkortsexpert, men troligtvis
+    är det enda som S3 blitter och Amiga blitter har gemensamt sju stycken
+    gemener. Även om de är lika så skulle det betyda att man var tvungen
+    att ha hela Amigans chip-RAM i grafikkortets minne, vilket antagligen
+    skulle göra det hela outhärdligt långsamt.
+
+F:  Skulle man inte kunna lägga till specialstöd för GUS/andra wavetable-
+    kort som använder hårdvaru-funktioner för att snabba upp ljudemuleringen?
+S:  Återigen, p g a skillnader i Amigans och PC:ns hårdvara (i detta fallet
+    GUS), så är det inte praktiskt möjligt. Man kanske skulle få något
+    sådant att fungera i några speciella fall (ProTracker moddar kanske
+    skulle kunna vara ett sådant fall då det skulle funka), men jag
+    tror inte att du kan hitta något som emulerar hela Amigans ljud-
+    hårdvara.
+    Problemet är att man inte bara genom att undersöka de värden ett
+    program skriver i hårdvaruregistren kan lista ut vad ett program försöker
+    göra, eller vad det kommer att göra i framtiden. I kontrast till det
+    så är det enkelt att skriva en SoundTracker mod-spelare för GUS-kort
+    eftersom du vet exakt vad och när du spelar, och hur du måste göra det.
+    (Detta betyder inte att du inte kan använda GUS för ljudutmatning;
+    bara att du inte kan använda det för att _snabba upp_ ljudutmatingen.)
+
+F:  Att emulera all hårdvara är en kass idé. Varför inte bara emulera
+    AmigaOS? När allt kommer omkring så är det ju det som gör Amigan till
+    en Amiga.
+S:  Kort svar: Jag håller inte med.
+    Långt svar: Operativsystemet är hälften av det som gör en Amiga till
+    en Amiga. Det är ett väldigt trevligt OS, och det finns en del saker
+    som jag saknar i andra OS, men det är också väldigt kasst på (till 
+    exempel) minnes-skydd och filsystemsprestanda.
+    Den andra halvan som gjorde Amigan speciell på 1980-talet är den
+    speciella chip arkitekturen. Om du tittar i gamla (1985) dator-
+    tidningar så kommer du att märka att AmigaOS speciella egenskaper
+    bara nämns snabbt förbigående, eftersom folk inte förstod att det
+    var revolutionerande för att vara en hemdator. Vad de visste var att
+    Amigan kunde visa 4096 färger samtidigt, och att den hade en blitter
+    och en copper som kunde göra allt möjligt kul, till exempel studsa
+    bollar, så jag tror att det var hårdvarans överlägsenhet som gjorde
+    Amigan till en sådan stor framgång.
+    Jag ser UAE som ett program liknande C64-emulatorer: det tillåter
+    dig att köra en del gamla spel och andra program som du inte kan
+    ersätta med bättre liknande på PC:n. Den kan till exempel redan
+    köra icke-action-spel (som Monkey Island och Bard's Tale) i en
+    tillfredställande hastighet. Snabbare CPU:er kommer eventuellt
+    göra det möjligt att köra action-spel, precis som snabbare CPU:er
+    har gjort det möjligt att emulera C64:ans ursprungliga hastighet.
+    UAE är inte (primärt) avsett för "PowerUsers" av Amigan som i vanliga
+    fall kör tungrodda program på sin A4000 med 68060-kort, utan för folk
+    som mig som bytte från A500 till PC för ett par år sedan eftersom de
+    ville tjäna pengar på att utveckla mjukvara.
+    Dessutom är det mycket svårare att emulera ett operativsystem än
+    hårdvaran. Speciellt om plattformen är helt annorlunda än platt-
+    formen som skall emuleras. Du kommer att få brottas med en otalig,
+    aldrig sinade ström av konverteringar och andra mardrömmar.
+    Dessutom är inte AmigaOS utvecklat med målsättningen att det lätt
+    skall kunna portas.
+
+F:  Hur snabbt är UAE?
+S:  Beror på.
+    För att packa filer med PowerPacker är UAE 17 ggr snabbare än min
+    A500 på min K6-233.
+    Att spela Turrican I går ungefär i full hastighet (med ljud).
+    Att spela Turrican III går aningen långsammare än på A500.
+    För många demos (inte alla), går det en bra bit långsammare än
+    en A500.
+    Tumregel: Ljudemulering tar tid; liksom copper-effekter och
+    scrollning. Om du inte behöver nåt av det, så är det lungt.
+
+F:  Hur kan jag få det att gå fortare?
+S:  Kör emulatorn i lägsta möjliga upplösning (320x200), i 256 färger,
+    se till att "aspect correction" är avstängt, ställ "frame rate" till
+    varje 3:dje ruta. Slutligen, stäng av ljudet (om du har en version
+    som tillåter dig att kompilera din egen körbara fil, ställ 
+    "DONT_WANT_SOUND" i config.h). Det kommer inte att se så trevligt
+    ut, men det kommer att gå så fort som din maskin tillåter.
+    Om du kör X-versionen, lägg till växeln "-T". Att inte använda denna
+    växel är "säkrare", men kan vara en hel del långsammare. Ännu bättre,
+    när du konfigurerar, skriv "configure --enable-dga" om din X-server
+    (XFree86 3.2 eller högre) tillåter det.
+    Det är speciellt viktigt att du inte använder 24-bit eller 32-bit
+    färgdjup om du vill att det skall gå snabbare.
+
+
+** ANNAT
+
+F:  Måste jag ha en riktig Amiga för att kunna använda detta program?
+S:  Ja, om du inte har något annat sätt att lagligt få tag på ROM-filerna
+    och system-mjukvaran, som t ex Cloanto Amiga Forever CD.
+
+F:  Vart kan jag ladda ner Kickstart ROM/Amiga spel?
+S:  Läs dokumentationen igen. Det kan du inte. Det är olagligt att lägga
+    en kopia av ett ROM eller någon annan copyrightskyddad data på nätet.
+    (Ja till och med om du en gång köpt ett spel och sedan sålt det med
+    datorn så är det olagligt att ladda ner det från nätet. Tyvärr.)
+
+F:  Fungerar UAE på DEC Alpha/Sparcstations/SGIs/vad som?
+S:  UAE bör gå att köra på alla Unix-system som har minst X11R5 och en
+    ordentlig C-kompilator installerad. Så svaret är antagligen ja.
+    Bara använd källkoden avsedd för Unix och följ instruktionerna i
+    README.UNIX när du kompilerar.
+
+F:  Varför är det ett tomt fält på vänster sida av skrärmen?
+S:  Amigan kan visa grafik här, men gör oftast inte det eftersom det
+    skulle stänga av vissa sprites. Denna area används huvudsakligen
+    bara av vissa demos som använder sig av sk overscan. Normalt är
+    bilden inte centrerad. Jag tänker inte göra något åt detta. Om
+    du inte kan stå ut med detta kan du försöka ändra upplösningen
+    till 320x200 eller 640x480, eftersom dessa kommer att försöka
+    att centrera bilden. Detta är nära på stört omöjligt att få helt
+    rätt för alla program. Om bilden inte får plats på skärmen i de
+    lägre upplösningarna, försök med 800x600.
+
+F:  Vart finns det en komplett lista över alla kommandorads-växlar?
+S:  I LÄS_MIG.TXT. Du kan också generera listan själv genom att skriva
+    uae -h > uaehelp.txt.
+
+F:  Benchmarkprogrammet <favvo-benchmark-program> ger mysko reslutat.
+S:  Amiga-program som körs i emulatorn tror att de kan använda Amigans
+    timer för att beräkna verklig tid, när de i verkligheten endast
+    får fram "emulerad tid". Sysinfo, t ex, ger samma resultat på alla
+    maskiner, så att köra benchmarks för att få fram emulatorns hastighet
+    är helt meningslöst.
+    En del benchmark-progam använder korta loopar med instuktionerna DIV 
+    och MUL för att mäta CPU-hastighet, men i "emulerad tid" tar dessa
+    instruktioner precis lika lång tid som alla andra instruktioner, och
+    du kommer att få alldeles för höga reslutat.
+    Bara om du aktiverat "HAVE_RDTSC" kan det vara någon mening med att
+    köra ett benchmark-test. Men ändå inte, eftersom det finns ett minimi-
+    värde som varje benchmark ger, så ju snabbare dator du har, desto 
+    bättre kommer reslutaten att stämma.
+
+F:  Kallades inte UAE för "The Unusable Amiga Emulator"?
+S:  Ja, men ingen tyckte att namnet var så lämpligt längre. Det stämde 
+    egentligen bara för version 0.1, som inte ens kunde boota.
+
+
+
+Översatt till svenska av:  Jonas Holm Pileborg (pileborg@algonet.se)
+Ladda gärna ner mina (och mina kompisars) kassa berättelser från min 
+extremdåliga hemsida (jag har gjort bakgrunderna själv):
+http://www.algonet.se/~pileborg/

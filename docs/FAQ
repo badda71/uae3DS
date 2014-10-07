@@ -1,0 +1,314 @@
+Some Frequently Asked Questions. Please read this carefully if you have
+problems.
+
+** COMMON PROBLEMS
+
+Q: Sometimes, after UAE exits, there is no autorepeat for the keys!
+A: Do "xset r on" (happens only in X, apparently mainly on Solaris boxes.
+   Dunno why.). [Should be fixed by now. Note that this always happens when
+   UAE crashes]
+
+Q: When UAE starts up, it says "Illegal instruction: 4e7b". Why?
+A: That's normal, it's just the Kickstart CPU type test.
+
+Q: When UAE starts up, it says "Illegal instruction: 00f8" (many times). Why?
+A: That's because your Kickstart ROM was compiled for the 68020.
+   (could also happen when there's a bug in UAE)
+
+Q: When UAE loads <insert your favourite game> it says "Non-standard sync".
+A: Your favourite game is copy-protected. There are ways to transfer such
+   disks, but it's complicated and I won't help you because it would be much
+   too time-consuming to figure out all sorts of copy-protection schemes.
+   I hope there will be a general solution some day, but for now you're
+   unlucky.
+
+Q: While it compiles, it says "xxx illegals generated" or "16 mismatches".
+   Is this a problem?
+A: No. I can use this information to tell whether there is a problem, and
+   there isn't.
+
+Q: How can I produce an @ symbol (or any other sign)? On my PC keyboard it's 
+   AltGr+Q, but that doesn't seem to work.
+A: Look at the keyboard of your Amiga. Use the same combination that you would
+   need on a real Amiga. These combinations differ across countries. Make sure
+   you have loaded the right keyboard translation table for AmigaOS (e.g. in
+   Germany, make sure there's a "setmap de" command in the startup-sequence)
+   You can probably create a @ sign by pressing Alt+2, or Shift+2.
+
+Q: On Linux, the Alt and right control keys aren't working.
+A: I found out that on my SuSE installation, there's a file called ".Xmodmap"
+   in my home directory which remaps these two keys so that UAE no longer
+   recognizes them.  That file has two lines; change those to read
+	keycode 64 = Alt_L
+	keycode 0x6D = Control_R
+   This doesn't seem to be a problem anymore with SuSE 6.4 (or at least
+   they're shipping a different .Xmodmap file).
+
+Q: On my Linux system, all the key combinations that involve F12 don't work.
+A: Known problem - don't use the window manager that comes with KDE2.
+
+
+** INCOMPATIBILITIES
+
+Q: UAE does not work with my Kickstart 1.2 image.
+A: You may need to turn off the harddisk and fastmem emulation with the "-a"
+   parameter. Kick 1.2 doesn't support the autoboot features that the harddisk
+   emulation requires.
+   You can tell that you are suffering from this problem if UAE gives you the
+   message "filesys_bput called".
+
+Q: What do I do if a game/demo/application doesn't work?
+A: If you're trying to run a game or a demo, enable some slow RAM, and try
+   running it again.  Some older software has compatability problems which 
+   slow RAM can sometimes fix.  If it's an application, check for obvious
+   things like Kickstart version requirements, RAM, etc.  Also make sure the
+   software you're trying to run isn't for AGA equipped machines.
+   You can also try changing various other options, like the CPU type. For
+   games, sometimes "-C0c" will make it work.
+
+
+** AMIGA DISKS, DISK IMAGES, HARDDISKS, CDROMS
+
+Q: Is it possible to read Amiga disks with a PC?
+A: No, and yes. No, with a standard PC it's impossible. However, with some
+   additional hardware (e.g. a new floppy controller or a second floppy
+   drive) it is possible. I currently know of four solutions, the AFR
+   package which consists of a small parallel port interface that you have
+   to build yourself and some software, the Catweasel controller which is
+   available as an ISA card and comes with DOS software that can create
+   disk files, and the Disk2FDI program (see below). I have a Catweasel
+   here, and it does in fact work.
+
+Q: Couldn't I attach an Amiga floppy drive to the PC somehow, and use that to 
+   read Amiga disks?
+A: In theory Amiga drives and PC drives are identical, so you can attach them,
+   but this doesn't buy you anything, because the problem is not the drive,
+   but the PC floppy controller.  It has also been reported that Amiga drives
+   don't behave very well when attached to the PC, so trying it is
+   discouraged.
+
+Q: But the PC can read 11-sector formats!
+A: Yes, but those sectors look a little different to the hardware.
+
+Q: But the Amiga can read PC disks!
+A: So what?
+
+Q: But the PC can read Atari ST disks!
+A: So what?
+
+Q: What if I use two disk drives?
+A: What an odd question.  Interestingly, you can read Amiga disks with a
+   program called disk2fdi, provided you have two 3.5" floppies connected
+   to the same floppy controller in your PC.  See the "Links" section.
+   It still doesn't allow writing, though.
+
+Q: How can I use DMS images?
+A: Run DMS under UAE and use it just like you would on a real Amiga.
+   Decompressing a DMS file to DF0: will overwrite the .adf file that is
+   currently used to emulate df0:.
+
+Q: How can I transfer non-DOS disks that are used by many demos?
+A: With transdisk. The fact that they are unreadable by AmigaDOS does not
+   mean they are unreadable by transdisk.
+   Long explanation: There are two things to consider when talking about the
+   "format" of a disk. First, the low-level format which divides each track
+   into sectors in a special way. Most Amiga disks are in the standard Amiga
+   format which has 11 sectors with 512 bytes each per track, with a total of 
+   880K per disk. There's also some extra information outside the sectors so
+   that the floppy controller can find the sectors. PC disks use a different 
+   format, which is the reason why a PC controller can't read Amiga disks.
+   If a disk is formatted this way, it can be copied with the normal AmigaDOS
+   diskcopy program or the Workbench equivalent, and transdisk can handle it.
+   Copy-protected disks have a different track layout (sometimes, they don't
+   divide the tracks into sectors at all, or use more sectors, or put
+   different things between the sectors. This type of thing can't be handled
+   by diskcopy or by transdisk.
+   Now, the second part of the "format" of a disk is the filesystem. If you
+   want to put files and directories on a disk, you have to write some special
+   information into some of the sectors on the disk. That information includes
+   (for example) the name of the disk (e.g. "Workbench1.3"), and what files it
+   contains. This information is called a "filesystem". The Amiga knows about
+   several filesystems: There is the original filesystem (called OFS), and the
+   newer Fast Filesystem (FFS) which was introduced with Kickstart 1.3.
+   If you don't put a filesystem on the disk, the data in the sectors can still
+   be read by programs like transdisk or diskcopy, but the data makes no sense
+   to them. The point is, it doesn't have to. It only has to make sense for
+   the Workbench which tries to determine what files there are on a disk. If
+   the Workbench can't find a filesystem it knows about on the disk, it will
+   be marked as a non-DOS disk (as opposed to an "unreadable" disk which you
+   get if the low-level format is different from the standard).
+
+Q: How can I change diskfiles?
+A: Your version of UAE may have a user interface (the X11 version does) which
+   enables you to do this. Read your system-specific README file for details.
+   You can also use the "uaectrl" programs from the "amiga" subdirectory.
+
+Q: Why is the floppy emulation so slow, after all the disk image is on a
+   harddisk?
+A: Because the disk rotation is emulated. This is necessary. Use the harddisk
+   emulation wherever possible.
+
+Q: <insert your favourite problem with the hardfile emulation here>
+A: Don't use the hardfile. Use the filesystem emulation ("-m" option).
+
+Q: How can I read Amiga CD-ROMs?
+A: With the harddisk emulation. Give UAE the parameter "-M CD:/cdrom" if you
+   are using a Linux system with the CD mounted at /cdrom, or "-m CD:D:\" if
+   you are using DOS and D: is your CD-ROM drive (and if you have a different
+   system you should be able to figure out what to do)
+
+Q: Is it possible to read Amiga harddisks with a PC?
+A: Yes. Linux 2.0 has an Amiga filesystem that can reportedly read Amiga
+   OFS/FFS harddisks. Please don't ask for details, I didn't write the thing,
+   and I don't use it (yet). I did use it to read .adf disk images, though.
+
+
+** FUTURE PLANS
+
+Q: When will the next version come out, and what will be in it?
+A: It will come out when it's done.
+
+Q: Will there be a shareware version or some registration fee for future
+   versions of UAE?
+A: No.
+
+Q: Couldn't you use ARDI's CPU emulation to speed it up?
+A: UAE is free software. It comes with sourcecode. ARDI's Executor is
+   proprietary and sold commercially. ARDI has no reason at all to give away
+   their code for free, because they wouldn't make any more money if they did.
+   (yes, I really get asked this kind of thing! I don't know where people take
+   these ideas from).
+
+
+** UAE SPEED
+
+Q: I don't get steady sound output! I only have a 486DX40, could this be
+   related?
+A: Try a Pentium-II-300, these things are reported to do better.
+
+Q: Would it be possible to speed it up by emulating the CPU native on, say,
+   a 68k Mac?
+A: I doubt it. UAE needs to be able to interrupt the CPU emulation anytime to
+   perform tasks necessary for emulating the hardware. So you can't just let
+   it run all by itself.
+
+Q: Would it be possible to speed it up by using graphics accelerator boards
+   for example by using the blitter in S3 chips?
+A: I doubt it. I'm no PC graphics card expert, but probably the only thing the
+   S3 blitter and the Amiga blitter have in common are seven lowercase
+   letters. Even if they were similar you'd have to keep all Amiga chip
+   RAM in the graphics memory and that would most likely make everything
+   painfully slow.
+
+Q: How about adding special support for the GUS/other wavetable boards that 
+   uses hardware features to speed up the sound emulation?
+A: Again, due to the differences in Amiga and PC (in this case: GUS) hardware,
+   this isn't really feasible. You _might_ get something like this to work in
+   some special cases (ProTracker modules might be a case that could be made
+   to work), but I don't think you can come up with something that emulates
+   all of the Amiga sound hardware.
+   The problem is that by just examining the values a program writes into the
+   audio hardware registers, you can hardly figure out what a program is
+   trying to do, and what it is going to do in the future. In contrast to
+   that, it's easy to write a SoundTracker module player for GUS cards because
+   you know exactly what you are playing, and how you have to do it.
+   (That doesn't mean you can't use the GUS for sound output; you just can't
+   use it to _speed up_ the sound output)
+
+Q: Emulating all the hardware is a bad idea. Why don't you just emulate the
+   OS? After all, that's what makes the Amiga the Amiga.
+A: Short answer: I disagree. 
+   Long answer: The OS is half of what makes the Amiga the Amiga. It is a very
+   nice OS, and there are some features that I miss in any other OS, but it is
+   also severely lacking in terms of (for example) memory protection and
+   filesystem performance. 
+   The other thing that made the Amiga special back in the 1980s is the custom 
+   chip architecture. If you look into old (1985) computer magazines, you will 
+   find that the capabilites of the Amiga OS are only mentioned as a side
+   note, because people were not aware that it was revolutionary for a home 
+   computer. They were aware, though, that the Amiga could display 4096 colors 
+   at the same time and that it had a blitter and a copper that could do all
+   sorts of stuff, like bouncing balls for instance. And I think it was the
+   superiority of the hardware that made the Amiga a success.
+   I see UAE as a program that is similar to C64 emulators: it allows you to
+   run some old games and other programs that you can't replace with better
+   equivalents on the PC. UAE is not (primarily) meant for the Amiga PowerUser
+   who is running high quality applications on his A4000 with a 68060 board,
+   but for people like me who switched from an A500 to the PC a few years ago
+   for whatever reason.
+   Besides, emulating an OS is far more difficult IMHO. Especially if the
+   platform you are emulating it on is completely different than the platform
+   that is being emulated. You'd have to mess with endianness conversions and
+   other nightmares. The AmigaOS wasn't designed with portability in mind 
+   either.
+
+Q: How fast is it?
+A: It depends.
+   For crunching files with PowerPacker, UAE is 17 times faster than my A500
+   on my K6-233.
+   For playing Turrican I, it's running at about full speed (with sound).
+   For playing Turrican III, it is slightly slower than the A500.
+   For some (not many) demos, it's a fair bit slower than the A500.
+   Rule of thumb: Sound emulation really takes time; so do copper effects and
+   scrolling. If you don't need either, you're fine.
+
+Q: How can I make it faster?
+A: Run the emulator in the lowest screen mode (320x200), set it to 256 colors,
+   make sure aspect correction is disabled, and set the frame rate to every 3rd
+   frame.  Finally, disable sound (if you have a version that lets you compile
+   your own executable, set "DONT_WANT_SOUND" in config.h). It won't look very
+   nice, but it will run as fast as your machine allows.
+   If you are running the X version, make sure you use the "-T" option. Not
+   using this option is "safer", but makes the emulator very slow. Even better,
+   when you run configure, say "configure --enable-dga" if your X server
+   (XFree86 3.2 or higher) supports it.
+   It's especially important that you don't use 24 bit or 32 bit color modes.
+
+
+** MISCELLANEOUS
+
+Q: Do I need a real Amiga to use this program?
+A: Yes, unless you have some other way of legally getting ROM files and system
+   software, such as the Cloanto Amiga Forever CD.
+
+Q: Where can I download a Kickstart ROM/Amiga games?
+A: Read the docs again. You can't. It would be illegal to put a ROM image or
+   other copyrighted software on the net (yes, even if you once bought a
+   specific Amiga game and sold it together with the computer, downloading the
+   same game now would still be illegal. Sorry.)
+
+Q: Does UAE run on the DEC Alpha/Sparcstations/SGIs/whatever?
+A: UAE should run on all Unix systems that have at least X11R5 and a decent
+   C compiler installed. So the answer is probably yes. Just use the generic
+   Unix source and follow the instructions in README.UNIX to compile it.
+   However, using GCC and the GNU binutils can improve your chances.
+
+Q: Why is there a blank area on the left side of the screen?
+A: The Amiga can display graphics there, but usually doesn't because this
+   would disable some sprites. The area is only used by some overscan demos.
+   Normal screens are off-center. I'm not going to do anything about that.
+   If you can't stand it, you can try to use 320x200 or 640x480 resolution,
+   which will attempt to center the screen. This is near impossible to get
+   right for every program. If your screen doesn't fit in lower resolutions,
+   use 800x600.
+
+Q: Where is a complete summary of all command line switches ?
+A: In the README files. You can also generate it yourself by typing:
+   uae -h > uae-help.txt
+
+Q: Benchmark program <insert your favourite benchmark> gives weird results.
+A: Amiga programs run by the emulator think the Amiga timers can be used to
+   measure real time. But in UAE, they only measure "emulation time". Sysinfo,
+   for example, gives the same results on all machines. So don't run
+   benchmarks to test the emulator speed.
+   Some benchmarks also use tight loops of DIV or MUL instructions to measure
+   CPU speed, and in "emulation time" these instructions take as much time
+   as any other instructions, and you'll get much too high values.
+   If you enabled the "HAVE_RDTSC" option, running benchmarks makes some more
+   sense. Still not a lot, since there is a minimum speed that the benchmark
+   will report on every machine. The faster the machine, the more accurate
+   will your results be.
+
+Q: Wasn't this called the Unusable Amiga Emulator?
+A: Yes. But no one thought the name was very fitting anymore, though. It was
+   only really appropriate for v0.1, which couldn't even boot.

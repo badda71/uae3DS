@@ -1,0 +1,119 @@
+This file documents the details relevant to the BeOS versions of UAE. General
+information can be found in the file "README"
+
+System requirements
+===================
+
+UAE will run on any System with BeOS PR2/R3.
+
+
+Compilation
+===========
+
+If you want to rebuild UAE, unpack the source archive to an appropriate
+directory (e.g. /boot/home). The simple way to proceed is to type "configure;
+make". After that has completed you should have a working BeOS version
+of UAE. Ignore warnings if you get them.
+
+However, you should probably have a look at some of the compile-time options
+found in "config.h" before you do this. There are some things you can change
+there so that the resulting executable will perform better on your machine.
+Each of the options in that file has a description. You can edit config.h to
+suit your needs; and then do "configure; make" afterwards.
+
+
+Graphics
+========
+
+The BeOS version of UAE currently only supports a color depth of 8 bits.
+You should set the color depth of the workspace you're running UAE in to
+8 bits/pixel for maximum speed.
+
+
+Sound
+=====
+
+The sound currently doesn't work very well. You must start UAE with "-S 2"
+or "-S 3" to get sound.
+
+
+Keyboard
+========
+
+Some special keys of the Amiga keyboard are mapped as follows:
+
+  (Amiga)   -> (Be)
+  Help      -> Insert
+  Amiga     -> Alt
+  Alt       -> Wind*ws keys
+  Left Alt  -> End
+  Right Alt -> Right Control, Page Down
+  '(' (NP)  -> Home
+  ')' (NP)  -> Page Up
+
+
+Mouse and joystick emulation
+============================
+
+The BeOS version has one problem: There are two mouse pointers, the
+X mouse pointer and the Y mouse pointer. You can work that way, but you get
+confused quickly.
+
+The solution in previous (0.6.8 and before) versions of UAE was a small piece
+of code that looked at the position of sprite 0 on the screen and tried to
+generate mouse movements in an emulated hardware port. That worked reasonably
+well, but had several problems.
+
+The new solution is to use a small Amiga program which is called "mousehack".
+You will find this in the "amiga" subdirectory. Put it into the directory that
+you use for harddisk emulation so that you can run it from the emulator. Then
+put the command "run >NIL: mousehack" at the top of your startup-sequence. UAE
+will detect when this program is running and use the improved mouse pointer
+positioning method (don't run this program on old versions of UAE).
+
+If the program is not running, you get the old behaviour - almost. By default,
+the emulator will no longer try to keep Amiga and BeOS mouse pointers at the same
+position, because that led to problems in the past. You can toggle this
+behaviour with F12.
+
+(If you just added "run mousehack" to your startup-sequence, that would have
+the effect that the initial CLI window would be impossible to close.
+Unfortunately, redirecting output to >NIL: disables all error messages that
+mousehack can give you - so if it does not work, try running it by hand
+without the >NIL: redirection.)
+
+If you find a program in which the mouse pointer does not move at all if you
+use the BeOS version, start that program with mousehack _not_ running
+(Magnetic Scrolls adventures are known to need this, for example).
+
+A joystick in port 1 (the lower port) is supported. UAE calibrates the
+joystick automatically. Turn it a few times on startup to get the calibration
+done. 
+
+
+Harddisk emulation
+==================
+
+Please read the appropriate sections in the file "README" on how to use the
+filesystem emulation. There are a few BeOS-specific things about it, though.
+
+If you want to execute files located on a native filesystem, they need to have
+the x permission bit set. That can be done in the Bash by "chmod +x file" or
+in AmigaDOS with "protect file rwed".
+
+You should set aside a whole directory tree for AmigaOS files, and not use it
+from BeOS in any way if you can avoid it. Changing permissions/owners,
+creating symbolic links and doing other stuff that AmigaOS does not know about
+is a good way to confuse the emulator and the emulated software. E.g. it's
+possible to have a symlink pointing at a mounted CD-ROM. The emulator would
+see that as a directory inside which it gets "read only filesystem" errors,
+and wouldn't know what to do about it. Avoid this sort of thing. It's best to
+start with an empty harddisk emulation directory and install software there
+only from within the emulation.
+
+The following setup can also lead to problems:
+
+  -m dh0:/foo -m dh1:/foo/bar
+
+Please take care that the filesystems you mount don't overlap each other
+(another great reason not to use symbolic links within them).

@@ -1,0 +1,164 @@
+TARGET = uae4all
+
+USE_DC_SQ = YES
+
+KOS_CFLAGS+= -I$(KOS_BASE)/addons/include -I$(KOS_BASE)/addons/include/SDL -DDREAMCAST
+
+KOS_CFLAGS+= -O3 -fomit-frame-pointer -ffast-math
+#-frename-registers -ftracer -funit-at-a-time -funswitch-loops
+
+KOS_CFLAGS+= -Isrc/ -Isrc/include/ -Isrc/menu -Isrc/vkbd
+
+KOS_CFLAGS+= -Wno-unused -Wno-format -DUSE_SDL -DGCCCONSTFUNC="__attribute__((const))" -DUSE_UNDERSCORE -fno-exceptions -DUNALIGNED_PROFITABLE -DREGPARAM="__attribute__((regparm(3)))" -DOPTIMIZED_FLAGS -D__inline__=__inline__ -DSHM_SUPPORT_LINKS=0 -DOS_WITHOUT_MEMORY_MANAGEMENT -DVKBD_ALWAYS 
+
+KOS_CFLAGS+= -DROM_PATH_PREFIX="/cd/" -DDATA_PREFIX="/rd/" -DSAVE_PREFIX="/vmu/a1/"
+
+#KOS_CFLAGS+= -DUSE_MAYBE_BLIT
+#KOS_CFLAGS+= -DUSE_BLITTER_DELAYED
+#KOS_CFLAGS+= -DUSE_BLIT_FUNC
+#KOS_CFLAGS+= -DUSE_LARGE_BLITFUNC
+#KOS_CFLAGS+= -DUSE_VAR_BLITSIZE
+#KOS_CFLAGS+= -DUSE_SHORT_BLITTABLE
+KOS_CFLAGS+= -DUSE_BLIT_MASKTABLE
+#KOS_CFLAGS+= -DUSE_RASTER_DRAW
+#KOS_CFLAGS+= -DUSE_ALL_LINES
+#KOS_CFLAGS+= -DUSE_LINESTATE
+#KOS_CFLAGS+= -DUSE_DISK_UPDATE_PER_LINE
+#KOS_CFLAGS+= -DUAE4ALL_NO_USE_RESTRICT
+#KOS_CFLAGS+= -DNO_SOUND
+KOS_CFLAGS+= -DNO_THREADS
+KOS_CFLAGS+= -DMENU_MUSIC
+KOS_CFLAGS+= -DDOUBLEBUFFER
+KOS_CFLAGS+= -DUSE_ZFILE
+#KOS_CFLAGS+= -DNO_SAVE_MENU
+
+KOS_CFLAGS+= -DFAME_INTERRUPTS_PATCH
+
+#KOS_CFLAGS+= -DUAE_MEMORY_ACCESS
+#KOS_CFLAGS+= -DSAFE_MEMORY_ACCESS
+
+#KOS_CFLAGS+= -DDEBUG_UAE4ALL
+#KOS_CFLAGS+= -DDEBUG_UAE4ALL_FFLUSH
+#KOS_CFLAGS+= -DDEBUG_M68K
+#KOS_CFLAGS+= -DDEBUG_INTERRUPTS
+#KOS_CFLAGS+= -DDEBUG_CIA
+#KOS_CFLAGS+= -DDEBUG_SOUND
+#KOS_CFLAGS+= -DDEBUG_MEMORY
+#KOS_CFLAGS+= -DDEBUG_DISK
+#KOS_CFLAGS+= -DDEBUG_CUSTOM
+#KOS_CFLAGS+= -DDEBUG_GFX -DDEBUG_BLITTER
+#KOS_CFLAGS+= -DSTART_DEBUG=200
+#KOS_CFLAGS+= -DAUTOEVENTS
+#KOS_CFLAGS+= -DMAX_AUTOEVENTS=300
+#KOS_CFLAGS+= -DAUTO_RUN
+
+#KOS_CFLAGS+= -DDEBUG_FRAMERATE
+#KOS_CFLAGS+= -DAUTO_FRAMERATE=2000
+#KOS_CFLAGS+= -DMAX_AUTO_FRAMERATE=5000
+#KOS_CFLAGS+= -DAUTO_FRAMERATE_SOUND
+#KOS_CFLAGS+= -DAUTO_FRAMERATE_THROTTLE
+
+#KOS_CFLAGS+= -DPROFILER_UAE4ALL
+#KOS_CFLAGS+= -DAUTO_PROFILER=1600
+#KOS_CFLAGS+= -DMAX_AUTO_PROFILER=3000
+#KOS_CFLAGS+= -DAUTO_PROFILER=3600
+#KOS_CFLAGS+= -DMAX_AUTO_PROFILER=5000
+#KOS_CFLAGS+= -DAUTO_PROFILER_SOUND
+#KOS_CFLAGS+= -DAUTO_PROFILER_THROTTLE
+
+ifdef USE_DC_SQ
+KOS_CFLAGS+= -DDC_SQ -falign-functions=32 -falign-labels=32 -falign-loops=32 -falign-jumps=32 
+endif
+
+KOS_CPPFLAGS = $(KOS_CFLAGS)
+
+all: $(TARGET).bin
+
+include $(KOS_BASE)/Makefile.rules
+
+FAME_CORE=1
+#FAME_CORE_C=1
+
+OBJS =	\
+	src/savestate.o \
+	src/main.o \
+	src/audio.o \
+	src/autoconf.o \
+	src/blitfunc.o \
+	src/blittable.o \
+	src/blitter.o \
+	src/cia.o \
+	src/savedisk.o \
+	src/compiler.o \
+	src/custom.o \
+	src/disk.o \
+	src/drawing.o \
+	src/ersatz.o \
+	src/gfxutil.o \
+	src/keybuf.o \
+	src/md-support.o \
+	src/memory.o \
+	src/missing.o \
+	src/gui.o \
+	src/od-joy.o \
+	src/sound.o \
+	src/sdlgfx.o \
+	src/writelog.o \
+	src/zfile.o \
+	src/menu/fade.o \
+	src/menu/menu.o \
+	src/menu/menu_load.o \
+	src/menu/menu_save.o \
+	src/menu/menu_main.o \
+	src/vkbd/vkbd.o \
+	romdisk.o
+
+ifdef FAME_CORE
+ifdef FAME_CORE_C
+KOS_CFLAGS+=-DUSE_FAME_CORE -DUSE_FAME_CORE_C
+src/m68k/fame/famec.o: src/m68k/fame/famec.cpp
+OBJS += src/m68k/fame/famec.o
+else
+KOS_CFLAGS+=-DUSE_FAME_CORE
+OBJS += src/m68k/fame/fame.o
+endif
+OBJS += src/m68k/fame/m68k_intrf.o
+else
+OBJS += \
+	src/m68k/uae/newcpu.o \
+	src/m68k/uae/readcpu.o \
+	src/m68k/uae/cpudefs.o \
+	src/m68k/uae/fpp.o \
+	src/m68k/uae/cpustbl.o \
+	src/m68k/uae/cpuemu.o
+
+endif
+
+
+clean:
+	rm -f $(OBJS) $(TARGET).elf $(TARGET).bin  romdisk.o romdisk.img example.iso
+
+$(TARGET).elf: $(OBJS)
+	$(KOS_CC) $(KOS_CFLAGS) $(KOS_LDFLAGS) -o $(TARGET).elf $(KOS_START) \
+	$(OBJS) $(OBJEXTRA) -lSDL_mixer_126 -lSDL_1213 -lz_123 -lm $(KOS_LIBS)
+
+$(TARGET).bin: $(TARGET).elf
+	$(KOS_OBJCOPY) -R .stack -O binary $(TARGET).elf $(TARGET).bin
+
+romdisk.o: romdisk.img
+	$(KOS_BASE)/utils/bin2o/bin2o romdisk.img romdisk romdisk.o
+#	bin2odc romdisk.img romdisk.o
+
+romdisk.img:
+	$(KOS_GENROMFS) -f romdisk.img -d data -v
+
+example.iso: example
+	mkisofs -joliet-long -l -o example.iso -graft-points /=example/
+
+
+run: $(TARGET).bin example.iso
+	$(KOS_LOADER) $(TARGET).bin -i example.iso
+#	$(KOS_LOADER) $(TARGET).bin 
+#	$(KOS_LOADER) $(TARGET).bin -n
+
+

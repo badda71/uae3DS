@@ -1,0 +1,731 @@
+File LEGGIMI per la versione 0.8.x di UAE, l'Ultimate Amiga Emulator
+
+(c) 1995-1998 Bernd Schmidt   <crux@pool.informatik.rwth-aachen.de>
+
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+Traduzione ed aggiunte a cura di Fulvio Leonardi, Copyright (c) 1998.
+
+Home Page italiana di UAE : http://www.panservice.it/uae/
+
+E-mail                    : uae@mbox.panservice.it
+
+Tutti i diritti sono riservati. E' concessa la distribuzione di questo
+documento in qualsiasi forma, a patto che avvenga gratuitamente. NON sono
+autorizzate modifiche di alcun tipo senza l'espresso consenso dell'autore,
+ne' tantomeno diverse attribuzioni di provenienza. Se parti di questo
+documento o l'intero documento stesso vengono inclusi in mezzi di
+informazione (come siti web o articoli di riviste), e' richiesta una
+citazione dell'autore, della sua e-mail ed eventualmente del suo sito. Per
+qualsiasi tipo di diffusione che vada al di la' della normale distribuzione
+del software di Pubblico Dominio, contattare l'autore.
+
+All trademarks used in this document are property of respective owners.
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+
+
+Licenza d'uso
+°°°°°°°°°°°°°
+
+UAE e' distribuito sotto le condizioni della GNU General Public License.
+Questo significa che e' software gratuito: e' ben accetta la distribuzione
+di sue copie e/o la modifica del suo codice sorgente, sotto determinate
+condizioni. Cio' comporta anche che non ci sono garanzie di alcun tipo per
+UAE.
+
+Leggi il file "COPYING" che puoi trovare nella directory principale di
+questo archivio per maggiori dettagli.
+
+
+Sguardo d'insieme
+°°°°°°°°°°°°°°°°°
+
+Un emulatore e' un programma che ti permette di eseguire sul tuo computer
+software per una macchina che ha hardware e sistema operativo proprietari.
+UAE ti da' la possibilita' di utilizzare la maggior parte del parco software
+Amiga disponibile. E' un'emulazione software, e questo significa che non e'
+necessario hardware aggiuntivo o speciale. L'hardware di un Amiga e' emulato
+accuratamente, cosi' il software Amiga viene ingannato e crede di girare su
+una macchina "reale", con lo schermo, la tastiera, l'hard disk ed il mouse
+del tuo computer che recitano il ruolo delle loro controparti emulate.
+
+UAE e' stato sviluppato per sistemi tipo Unix. Nel frattempo, e' stato
+portato in ambienti Mac, DOS, BeBox, NextStep, XFree86/OS2 ed Amiga (d'ora in
+poi potra' eseguire se stesso). Dovresti aver ricevuto diversi altri file
+insieme a questo documento con istruzioni su come installare ed utilizzare la
+versione per il tuo sistema operativo.
+
+Questa sezione e' giusto cio' che si propone di essere: uno sguardo
+d'insieme. Per favore leggi _tutto_ questo file, in particolar modo se hai
+problemi. UAE ha un sacco di caratteristiche ed allo stesso modo un sacco di
+opzioni di configurazione. Se non le conosci, e' come se UAE non facesse per
+te, oppure non funzionasse al meglio delle sue possibilita'.
+
+Per favore leggi anche il file "FAQ.ita", che contiene alcune domande
+ricorrenti (assieme alle risposte!). Dovresti ricercare anche un documento
+(eventualmente tradotto in italiano) che descriva le opzioni specifiche di
+UAE relative al sistema operativo che stai usando, ad esempio "BeOS/LEGGIMI"
+o "DOS/LEGGIMI".
+
+Alcune persone si sono lamentate del fatto che la documentazione di UAE
+contenga solo "gergo misterioso". Mi spiace. Malgrado cio' che ti venga detto
+dalla MessySoft e dalla Tomato, i programmi per computer non sempre sono
+facili da usare. UAE ha bisogno di un po' d'aiuto da te ed in ogni caso
+dovresti avere una base minima d'informatica. Dopotutto, sei un fan di Amiga,
+cosi' dovresti conoscere cos'e' il Workbench, non credi?
+
+
+Caratteristiche
+°°°°°°°°°°°°°°°
+
+Questa versione di UAE emula:
+
+- Una CPU 68000, 68010 o 68020, opzionalmente con la FPU 6881;
+- Chipset grafico OCS, con big blits dell'ECS;
+- Fino a 2Mb di Chip RAM e fino a 8 Mb di Fast RAM, o 8 Mb di Chip RAM senza
+  Fast RAM;
+- Fino a 64 Mb di Fast RAM Zorro III, indipendentemente dal quantitativo di
+  Chip RAM (solo con CPU 68020);
+- Fino ad 1 Mb di Slow RAM, per estendere la compatibilita' a software
+  "ostico";
+- Fino ad 8 Mb di memoria sulla scheda video, utilizzabile da software che
+  supporti schede grafiche compatibili Picasso96;
+- 4 floppy disk drive da 3 pollici e mezzo (DF0:, DF1:, DF2: e DF3:). Non e'
+  possibile leggere direttamente i dischetti Amiga, cosi' vengono emulati
+  tramite disk file;
+- Un hard disk: sia tramite immagine su file hard disk, sia condividendo
+  unita' del filesystem nativo;
+- Supporto joystick (con opzione di rimapparlo sul tasterino numerico);
+- Supporto mouse;
+- Possibilita' di essere lanciato in diverse risoluzioni (per una migliore
+  corrispondenza dell'immagine o per una maggiore velocita');
+- Pieno supporto sonoro stereo, costituito da 4 canali ad 8 bit;
+- Supporto a porte seriali e parallele (ancora sperimentale);
+- altre cose che non funzionano cosi' bene da meritare di essere ricordate
+  qui...
+
+
+Richieste (IMPORTANTE! LEGGI QUI!) / Limitazioni
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Non sono emulate:
+- Le collisioni tra sprite e playfield (la collisione tra sprite funziona);
+- La MMU (una sezione delle CPU 68030/040, ad eccezione di quelle usate dalla
+  Commodore). Questo significa che non potrai utilizzare sistemi di memoria
+  virtuale o veri sistemi operativi, come Linux o BSD;
+- Il chipset AGA (A4000/A1200). Questo chipset ha funzionalita' avanzate per
+  gestire fino a 256 colori in tutte le risoluzioni;
+- L'emulazione della porta seriale esiste ma non funziona troppo bene
+  (qualcuno mi dica quando non e' piu' vero, non la uso).
+
+Dato che il controller del floppy disk drive del PC non puo' leggere i
+dischetti Amiga (gia', questo e' un dato di fatto), l'accesso ai dischi deve
+essere gestito in maniera diversa: i floppy sono emulati per mezzo di disk
+file che contengono un'immagine "grezza" del floppy disk che vuoi emulare. Un
+disk file e' un'immagine della struttura base di un floppy disk Amiga,
+contiene 901120 bytes (880 Kb), che e' la capacita' standard di un dischetto
+Amiga.
+
+Attualmente, per eseguire un programma hai bisogno di installare un'immagine
+delle ROM del tuo Amiga. Non puoi lanciare UAE se non hai quest'immagine. Non
+e' inclusa perche' e' software coperto da copyright. Non chiedetemi di
+inviarvene una copia. Non lo faro'. Se non possiedi un Amiga e vuoi comunque
+eseguire UAE, devi prima comprartene uno o quantomeno acquistare il software
+di sistema (ROM + Workbench).
+L'immagine del Kickstart puo' essere sia di 256 Kb che di 512 Kb. Il suo nome
+predefinito deve essere "kick.rom".
+
+Leggi la sezione "Accessori", piu' sotto, per istruzioni su come creare
+immagini delle ROM e dei dischi.
+
+Se non hai un file col Kickstart, potresti comunque avviare alcuni giochi o
+demo. L'emulatore include un primitivo codice d'avvio che cerchera' di
+leggere ed eseguire il bootblock del disk file che stai usando e se quel
+bootblock utilizza solo quel paio di funzioni supportate dal "Kickstart di
+rimpiazzo", il tuo programma partira'. Non aspettarti chissacche', in ogni
+caso.
+
+In piu' hai bisogno di un po' di software da caricare - per quale altro
+motivo dovresti voler emulare un Amiga? Ci sono diversi modi di rendere i
+programmi accessibili ad UAE, per mezzo di file con immagini dei dischetti o
+attraverso l'emulazione di un hard disk. Dovresti fare un'immagine del disco
+Workbench dell'Amiga ed installarlo come "df0.adf" (adf = Amiga Disk File),
+quando usi UAE per la prima volta. Ulteriori ragguagli su come creare questi
+file al paragrafo "Trasferimento del software".
+
+Per utilizzare l'emulazione Picasso96 hai bisogno delle librerie Picasso96,
+che non sono incluse. Possono essere reperite, per esempio, su AmiNet.
+
+
+Lanciare UAE
+°°°°°°°°°°°°
+
+Per prima cosa, leggi la documentazione su come avviare UAE relativa al tuo
+sistema. Dovresti avere un programma eseguibile chiamato "uae". Puoi
+semplicemente lanciarlo, oppure puoi eventualmente fornirgli una o piu' delle
+seguenti opzioni:
+
+[Please refer to the English documentation for this section.  The option
+handling has changed and the translated docs were incorrect]
+
+Whew. Probabilmente devi fare un po' di esercizi per sentirti a tuo agio con
+questi parametri!
+
+UAE puo' scegliere di ignorare/rifiutare alcune combinazioni di questi due
+parametri. Alcune modalita' potrebbero inoltre rifiutarsi di funzionare sul
+tuo sistema.
+
+Puoi anche definire queste opzioni in un file di configurazione nella tua
+directory principale. Semplicemente, crea un file ~/.uaerc e mettici dentro
+alcune opzioni. Su sistemi non-Unix, il file e' chiamato uae.rc e dovrebbe
+trovarsi nella directory corrente.
+
+
+Scelta dell'aspetto dello schermo e dei colori
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Come descritto nel paragrafo precedente, UAE puo' essere lanciato con
+risoluzioni e colori molto differenti. Comunque, poche opzioni riguardanti la
+profondita' del colore sono disponibili se usi la versione X11 di UAE,
+poiche' e' il Server X che determina quanti colori sono utilizzabili. Se stai
+eseguendo un Server X a 256 colori, puoi usare il parametro "-H 3" per dire
+ad UAE di attivare il dithering sui colori per risultati migliori.
+
+Dovrai sperimentare quale modalita' ti offre il compromesso migliore tra
+qualita' dell'immagine e velocita'. Nota che il processo di dithering consuma
+del tempo, cosi' anche se i 256 colori con dithering appaiono migliori che i
+256 colori senza, ricorda che UAE sara' piu' lento in quel modo.
+
+La risoluzione raccomandata e' la 800x600. Nei modi Lores, alcune immagini in
+Overscan che l'Amiga tenta di mostare potrebbero non entrare completamente
+nello schermo, altre potrebbero essere decentrate ed alcuni effetti grafici
+potrebbero apparire strani. Per migliori risultati, usa la 800x600 con almeno
+32768 colori. Per la velocita', usa la 400x300 in bassa risoluzione con
+256 colori.
+
+_Non_ usare profondita' di colore a 24 o 32 bit, finche' non devi farlo per
+forza. Sono troppo lente per essere utilizzabili.
+
+
+Emulazione dell'hard disk
+°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Poiche' utilizzare disk file e' scocciante, e' necessario emulare un hard
+disk. Ci sono due modi per utilizzare grandi quantitativi di dati con UAE:
+file hard disk e directory condivise.
+
+1. File hard disk
+=================
+
+I file hard disk sono grandi file che contengono l'immagine di un filesystem
+Amiga. Funzionano per una buona percentuale come i disk file. Puoi
+semplicemente creare un grande file vuoto e dire ad UAE di usarlo come hard
+disk file, ma hai bisogno di formattarlo dall'interno dell'emulazione prima
+di cominciare ad usarlo.
+
+Sotto Unix, puoi creare un hard disk file (non formattato) col comando:
+
+ dd if=/dev/zero of=hardfile bs=512 count=16384
+
+che creera' un file da 8 Mb. Versioni di UAE per altri SO potrebbero essere
+fornite di un'utility chiamata "makedisk" o di altri modi per creare tale
+file.
+
+Per comunicare all'emulatore che vuoi utilizzare un determinato file come
+hard disk file, usa l'opzione "-W", per esempio:
+
+ uae -W 32:1:2:hardfile
+
+I primi tre numeri sono informazioni geometriche che comunicano ad AmigaOS la
+organizzazione del file. Il primo numero (32) e' il numero dei settori per
+traccia; il secondo numero (1) e' il numero delle testine o superfici; il
+terzo numero (2) e' quello dei blocchi riservati. Se usi tagli "normali"
+(multipli di due, come 32 Mb), dovrebbe andarti bene l'utilizzo degli stessi
+parametri mostrati nell'esempio. L'utilizzo di altri parametri dovrebbe aver
+senso se trasferisci l'immagine di un hard disk Amiga reale che adopera una
+geometria differente. L'ultimo campo del parametro "-W" riguarda il nome del
+file hard disk.
+
+Se utilizzi il Kickstart 1.3 o precedenti i file hard disk non possono essere
+al momento montati all'avvio e percio' non puoi nemmeno eseguire il boot da
+questi. Dovrai avviare il sistema o da un disk file o da una directory
+condivisa (vedi oltre) e montare in seguito l'hardfile.device. Per far
+questo, aggiungi queste linee alla "mountlist" presente in "DEVS:":
+
+UAE0:     Device = uaehf.device
+	  Unit   = 0
+	  Flags  = 0
+	  Surfaces = 1
+	  BlocksPerTrack = 32
+	  Reserved = 1
+	  Interleave = 1
+	  LowCyl = 0 ; HighCyl = 511
+	  Buffers = 5
+	  DosType = 0x444F5300
+	  BufMemType = 1
+#
+
+(Potresti aver bisogno di aggiustare questi valori se specifichi una
+geometria differente e/o il tuo file hard disk ha un taglio maggiore di 8 Mb
+e/o il tuo file hard disk non e' montato come UAE0: perche' hai attivato
+altri hard disk prima).
+
+Quindi, batti "mount UAE0:" in una finestra AmigaShell (o metti questo
+comando nella tua startup-sequence) e dovresti essere in grado di accedervi.
+Non dimenticare di formattarlo con il comando format da una finestra Shell di
+AmigaDOS:
+
+ format drive uae0: name Mister_Willwink
+
+2. Directory condivise: ovvero come accedere a filesystem nativi
+   dall'emulatore
+================================================================
+
+Offrono maggiori vantaggi:
+- non hanno problemi col Kickstart 1.3;
+- sono piu' utili;
+- sono piu' veloci.
+
+Se adoperi i parametri -M o -m, potrai accedere al tuo filesystem nativo
+dall'emulatore. Se lanci UAE cosi':
+
+ uae -m sound:/usr/amiga/modules
+
+potrai disporre di tutti i file presenti nella directory /usr/amiga/modules
+attraverso il dispositivo AmigaDOS "SOUND:".
+(Utenti DOS: provate "uae -m dh0:C:\" per montare il vostro drive C:\ come
+DH0:).
+
+Puoi montare fino a 20 dispositivi, sia file hard disk che directory
+condivise, ripetendo queste opzioni piu' volte. I dispositivi verranno
+chiamati UAE0:, UAE1:, eccetera. UAE avviera' da UAE0: se non viene trovato
+un disk file per il floppy drive 0.
+Puoi usare inoltre il filesystem nativo per montare CD-ROM Amiga, o puoi
+usare l'emulazione hard disk per montare floppy disk:
+"uae -W 11:2:2:wb13.adf" montera' il disk file wb13.adf.
+
+
+Accessori / Trasferimento del software
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Come gia' dovresti sapere, hai bisogno di trasferire file tra il tuo Amiga e
+la macchina sulla quale fai girare UAE. Ci sono diversi modi per farlo.
+
+ - Utilizzando un cavo null modem ed eseguendo un programma di emulazione di
+   terminale su entrambe le macchine, puoi trasferire i file via
+   upload/download Zmodem. Gli Amiga equipaggiati col 68000 possono di solito
+   raggiungere approssimativamente i 3000 caratteri al secondo attraverso il
+   cavo null modem, utilizzando il serial.device standard Commodore.
+   Comunque, utilizzando il device sostitutivo BaudBandit.device si possono
+   ottenere circa i 5500 caratteri al secondo. Una seconda alternativa e'
+   usare il programma BASIC adfi.bas (accluso ad UAE) per trasferire un file
+   dall'Amiga al PC attraverso il cavo null modem.
+
+ - Se utilizzi il CrossDOS sul tuo Amiga, puoi comprimere l'immagine del
+   disco o del Kickstart usando LhA o un simile archiviatore PC compatibile e
+   copiarla su un floppy disk da 720 Kb. Ora puoi passare il disco al PC,
+   copiare il file compresso nella directory di UAE e decomprimerlo.
+   Se non hai il CrossDOS sull'Amiga, esiste un'utility freeware simile
+   chiamata Msh, che puo' essere reperita su Aminet o sui Fish disk 382 o
+   327.
+
+In ambo i casi, hai bisogno di leggere la documentazione acclusa al programma
+che adoperi per il trasferimento. L'uso di questi programmi non puo' essere
+spiegato in questo contesto.
+
+Nella sottodirectory "amiga" troverai due piccoli programmi Amiga che ti
+aiuteranno a generare i necessari file immagine. Si chiamano transrom e
+transdisk (se utilizzi MS-DOS transdisk verra' troncato in "transdis").
+Copiali sul tuo Amiga e rendili eseguibili (digitando "protect transrom
+rwed" e "protect transdisk rwed" in una finestra AmigaShell).
+Transrom riversera' il contenuto delle ROM del tuo Kickstart e transdisk
+trasferira' l'immagine di un floppy in uno dei drive. Tutti e due i programmi
+mandano i dati all'output standard (leggi: lo schermo), per cui hai bisogno
+di reindirizzarli. Da una finestra AmigaShell esegui:
+
+ transrom >ram:kick.rom
+
+per creare un file chiamato "kick.rom" nel RAM disk, e
+
+ transdisk >ram:df0.adf
+
+per creare un file chiamato "df0.adf" nel RAM disk. Questi file sono
+piuttosto grandi, 262144 o 524288 byte per l'immagine delle ROM e 901120 byte
+per l'immagine di un disco.
+
+Non eseguire MAI questi programmi dal Workbench. Apri sempre una finestra
+Shell o CLI per farlo.
+
+Transdisk accetta i seguenti parametri:
+
+ -d periferica unita' : Usa questa periferica al posto di DF0:.
+ -s n                 : Inizia il trasferimento dalla traccia n
+			(predefinito: 0).
+ -e n                 : Termina il trasferimento alla traccia n
+			(predefinito: 79).
+ -w file	      : Non legge dal floppy, ma scrive il contenuto del
+			"file" sul floppy.
+ -h                   : Tratta il dischetto come ad alta densita'. Le
+			immagini di dischetti HD non sono ancora supportate
+			da UAE, comunque. Nota che il file risultante sara'
+			grosso il doppio.
+
+Cosi', per traferire il disco nel drive DF1:, devi dare il comando:
+
+ transdisk >ram:df1.adf -d trackdisk 1
+
+Se non hai molta RAM e non puoi passare tutta l'immagine di un dischetto nel
+RAM disk, puoi suddividere il trasferimento in parti multiple con i parametri
+"-s" ed -e". Per trasferire il disco in quattro passate, dovrai usare i
+seguenti comandi:
+
+ transdisk >ram:df0_1.adf -s 0 -e 19
+ transdisk >ram:df0_2.adf -s 20 -e 39
+ transdisk >ram:df0_3.adf -s 40 -e 59
+ transdisk >ram:df0_4.adf -s 60 -e 79
+
+Di solito basta dividere l'immagine del dischetto in due parti con i
+parametri:
+
+ transdisk >ram:df0_1.adf -s 0 -e 39
+
+ e
+
+ transdisk >ram:df0_2.adf -s 40 -e 79
+
+Naturalmente, dovresti salvare ciascuno dei file in un altro posto prima di
+trasferire il successivo con transdisk, per creare spazio nella RAM.
+Quando hai tutti i file sul tuo PC, puoi battere questo comando sotto Unix:
+
+ cat df0_1.adf df0_2.adf df0_3.adf df0_4.adf >df0.adf
+
+o, sotto DOS:
+
+ COPY /B DF0_1.ADF+DF0_2.ADF+DF0_3.ADF+DF0_4.ADF DF0.ADF
+
+Naturalmente, se hai diviso il dischetto in due devi dare:
+
+ COPY /B DF0_1.ADF+DF0_2.ADF DF0.ADF
+
+DFx.ADF sono, ovviamente, nomi fittizi che puoi sostituire con cio' che ti
+pare piu' opportuno.
+
+Mi hanno detto che esistono i seguenti accessori per il Mac per concatenare
+file binari: "ChunkJoiner 2.1.2", che si puo' trovare nella directory <disk>
+di Info-Mac o "JoinFiles 1.0.1", nella directory <text> di Info-Mac.
+
+Il transdisk attuale puo' leggere solo dischetti in formato AmigaDOS
+standard. Questo significa che la maggior parte dei giochi che fanno
+affidamento su alcune forme di protezione dalla copia non possono essere
+trasferiti (ulteriori informazioni sui formati dei dischi nel file FAQ.ita).
+
+*****************************************************************************
+Se trasferisci software commerciale, non devi distribuire il file immagine
+risultante, poiche' sarebbe una violazione delle leggi sui diritti d'autore.
+Le ROM del Kickstart sono considerate software commerciale. Puoi usare solo
+il Kickstart del TUO Amiga e non puoi distribuire i file con le ROM del
+Kickstart. Per favore, leggi la licenza che e' acclusa al tuo software per
+ulteriori dettagli.
+*****************************************************************************
+
+
+Recuperare file da un'immagine di un dischetto
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Se hai un file immagine di un dischetto e vuoi recuperare i file ivi
+contenuti, puoi usare l'accessorio "readdisk". Viene compilato
+automaticamente dal "make". Se hai un file disk "df0.adf" di un dischetto
+chiamato "Workbench1.3D" e dai:
+
+ readdisk df0.adf
+
+l'intera struttura delle directory del file disk sara' registrata in una
+nuova sottodirectory chiamata "Workbench1.3D". Puoi opzionalmente fornire un
+secondo parametro per specificare la directory in cui ricreare l'output,
+piuttosto che la directory corrente.
+Readdisk legge solo il formato OFS (Old File System). I dischetti FFS (Fast
+File System) saranno allegramente classificati come illeggibili.
+Utilizza l'unixfs.device dall'interno dell'emulatore se vuoi trasferire file
+da dischetti FFS.
+
+
+Emulazione di schede grafiche Picasso96
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Per usare questa caratteristica, devi selezionare l'emulazione della CPU
+68020 con spazio d'indirizzamento della memoria a 32 bit ("-C 2" o "-C 3").
+Hai inoltre bisogno delle ROM del Kickstart 3.x.
+
+Devi usare l'opzione "-U" per specificare quanta memoria grafica devi
+emulare, per esempio "-U 4" per avere 4 Megabyte. Quindi, ti serve il
+software Picasso96 che non e' distribuito con UAE (ci sara' presto un link
+all'Home Page di Picasso96 sulla Web Page di UAE). E' raccomandata la
+versione 1.31 o successiva.
+Installa il software Picasso96 e sii certo di abilitare il driver "uaegfx".
+Dopo aver completato questo passo, riavvia e dovresti essere in grado di
+selezionare i nuovi modi video dal programma ScreenMode, nel cassetto Prefs.
+
+
+Il programma UAE_CONTROL
+°°°°°°°°°°°°°°°°°°°°°°°°
+
+Nella sottodirectory "amiga" troverai due programmi: uae_control ed uaectrl
+che forniscono le stesse funzionalita' della GUI X11. Uaectrl e' basato sulla
+Shell e funziona con ogni Kickstart, mentre uae_control ha bisogno della
+gadtools.library e di una versione recente della reqtools.library, cosi'
+funziona solo col Kickstart 2.0 e superiori. Copia questi due file nella
+directory che usi per l'emulazione dell'hard disk. Dovrebbero spiegarsi da
+soli.
+
+
+Veloce sguardo d'insieme dei comandi del debugger
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Alcune versioni di UAE (basate su sistemi a finestre) hanno un debugger
+integrato. Puoi premere in ogni istante la combinazione ^C (Control+C) per
+entrare in questo debugger.
+Ogni comando del debugger e' formato da una singola lettera ed
+occasionalmente da alcuni parametri.
+
+ g                      : Comincia l'esecuzione dall'indirizzo corrente.
+ c                      : Visualizza lo stato delle CIA e dei chip custom.
+ r                      : Visualizza lo stato della CPU.
+ m <indirizzo> <linee>  : Visualizza il contenuto della memoria
+			  dall'<indirizzo>.
+ d <indirizzo> <linee>  : Inizio del disassemblaggio dall'<indirizzo>.
+ t                      : Avanza di una istruzione.
+ z                      : Si muove all'interno di una istruzione - utile con
+			  JSR, DBRA, ecc.
+ f <indirizzo>          : Avanza sinche' il Program Counter == <indirizzo>.
+ q                      : Termina l'emulatore. Non dovresti aver bisogno di
+			  usare questo comando.
+ M                      : Va in cerca di moduli sonori.
+ S <nome file> <indirizzo> <lunghezza> :
+			  Salva un modulo sonoro.
+ C <valore>             : Cerca un <valore> come quello dell'energia o delle
+			  vite in un gioco.
+ W <indirizzo> <valore> : Scrive all'interno della memoria di Amiga.
+
+
+Sonoro
+°°°°°°
+
+Se la tua versione di UAE supporta il sonoro, puoi passare alla stringa di
+comando parametri quali la frequenza ed il numero di bit; se non ne
+specifichi alcuno, verrano usati valori predefiniti ragionevoli. Se viene
+abilitato l'output grafico contemporaneamente a quello sonoro, l'emulatore
+sara' troppo lento sulla maggior parte dei sistemi. Il sonoro non sara'
+continuo. Percio', e' stato previsto un trucchetto per bloccare
+l'aggiornamento dello schermo: premi il Bloc Scroll (o Scroll Lock, dipende
+dalle tastiere) per disabilitare la grafica, di nuovo per riattivarla.
+
+La qualita' dell'emulazione dipende dal settaggio dell'opzione "-S" sulla
+stringa di comando. Con "-S 3" l'hardware sonoro viene emulato completamente
+ed alcuni programmi (p.e. AIBB) si rifiuteranno di partire con altri
+parametri. "-S 2" dovrebbe fornire un suono buono come quello di "-S 3" e
+sara' piu' veloce per alcuni programmi. "-S 1" cerca di emulare la maggior
+parte dell'hardware sonoro, ma attualmente non produce alcun output. "-S 0"
+disabilita completamente il sonoro.
+
+
+Siti di riferimento
+°°°°°°°°°°°°°°°°°°°
+
+Ci sono pochi siti su Internet che contengano informazioni utili su UAE.
+
+La nuova pagina "ufficiale" di UAE e' collocata su:
+
+ http://www.freiburg.linux.de/~uae
+
+un ringraziamento a Stefan Reinauer che ora la sta mantenendo.
+
+Qui potrai trovare collegamenti ad altre pagine di UAE. Una che risulta
+particolarmente utile e' la "UAE Discussion Board" istituita da Gustavo
+Goedert, l'indirizzo e':
+
+ http://www.hephaestus.org/uae/uaeboard/
+
+Non e' valida come un newsgroup a causa del software di lettura (Ratscope)
+squilibrato, ma e' comunque una manna dal cielo.
+
+Si suppone che ci sia un newsgroup chiamato "alt.emulators.amiga", ma qui non
+sono riuscito a trovarlo.
+Il newsgroup "comp.sys.amiga.emulations" sembra essere un luogo appropriato
+per parlare di emulazione Amiga ma, detto tra noi, non e' il posto giusto.
+Luoghi piu' consoni sono "comp.emulators.misc" e, naturalmente, il forum di
+Gustavo.
+
+Petter Schau ha scritto un altro emulatore Amiga chiamato "Fellow". E'
+scritto per la maggior parte in assembly x86 e gira solo sotto DOS. E'
+piuttosto compatibile e generalmente piu' veloce di UAE. L'Home Page di
+Fellow e' a:
+
+ http://www.geocities.com/SiliconValley/Peaks/5244/
+
+
+Ringraziamenti & Riconoscimenti
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Un grazie a tutti coloro che mi hanno scritto finora, fornendomi rapporti di
+bachi e di tentativi riusciti/falliti di esecuzioni dell'emulatore su varie
+configurazioni hardware con differenti versioni del Kickstart. Un elenco di
+ogni persona che abbia contribuito al codice sorgente puo' essere trovato nel
+file CREDITS (stava diventando troppo grande per essere incluso ancora qui).
+
+Un ringraziamento particolare a:
+
+ - Jay Miner, Dale Luck, R.J. Mical e a tutti quegli altri che costruirono
+   l'Amiga;
+ - Felix Bardos, il cui Manuale di Riferimento dell'Hardware ho "preso in
+   prestito";
+ - Hetz Ben Hamo perche' scrisse a Peter Kittel della Commodore chiedendogli
+   il permesso di cedere il Kickstart 1.3. Sfortunatamente, la risposta fu
+   negativa;
+ - Stefan Reinauer, per aver ospitato la Web Page di UAE dopo che la mia
+   Universita' ha deciso che e' troppo pericoloso lasciare che gli studenti
+   abbiano una propria Home Page;
+ - Bruno Coste, Ed Hanway, Alessandro Soldo e Marko Nippula per aver fornito
+   dell'utile documentazione sull'Amiga;
+ - Fabio Ciucci (vincitore del premio "Miglior TrovaBachi") per il suo aiuto
+   nell'emulazione di linee col blitter ed in altre aree di problemi;
+ - Michele C. Battilana e la Cloanto Software, per tutto il loro supporto;
+ - Julian Eggebrecht dei Factor 5, per aver fornito diversi loro giochi ed
+   un sacco di utili suggerimenti.
+   I Factor 5 hanno programmato Katakis, uno dei classici giochi Amiga,
+   liberamente disponibile ad essere scaricato. C'e' ancora gente per bene a
+   questo mondo...
+ - Jens Schinfeld, inventore del controller Catweasl, per avermene donato
+   uno.
+
+
+Autori / Mantenitori
+°°°°°°°°°°°°°°°°°°°°
+
+Il mio indirizzo e' (per favore, leggi la sezione "Prima di spedire email"
+sotto):
+
+ crux@pool.informatik.rwth-aachen.de
+
+o, per posta "normale":
+
+ Bernd Schmidt
+ 21 St Stephen's Place
+ Cambridge CB3 0JE
+ UK
+
+Preferisco rispondere via posta elettronica e questo mezzo sara' senza dubbio
+il piu' veloce. Se puoi, evita di chiamarmi al telefono.
+Non voglio distribuire software, nemmeno commerciale o di Pubblico Dominio.
+Non mandarmi floppy disk senza almeno chiedermelo prima, non li riavrai
+indietro.
+
+Le seguenti persone hanno ricompilato UAE per diverse piattaforme; dovresti
+indirizzare a loro le domande specifiche ai vari sistemi:
+
+DOS:
+ Gustavo Goedert  <ggoedert@netrunner.com.br>
+ Disponibilita' : http://www.hephaestus.org/uae/dosuae/
+ Codice sorgente: Disponibile sulla pagina Web sopra citata, la gran parte e'
+		  inclusa nei sorgenti principali (con un po' di ritardo).
+
+Mac:
+ All'inizio     : Ernesto Corvi    <someone@imagina.com>
+ Ora            : Arnaud Blanchard <jblancha@pratique.fr>
+ Disponibilita' : http://www.pratique.fr/~jblancha/
+ Codice sorgente: Disponibile un archivio a parte. Alcuni pezzi sono nei
+		  sorgenti principali, ma nulla che tu possa compilare.
+
+BeBox:
+ Christian Bauer  <bauec002@goofy.zdv.uni-mainz.de>
+ Disponibilita' : La pagina Web principale di UAE (usa i sorgenti Unix).
+ Codice sorgente: Incluso nei sorgenti principali. La compilazione dovrebbe
+		  essere OK.
+ Nota           : Christian ha detto che non ha molto tempo da dedicare ad
+		  UAE, cosi' se qualcuno e' desideroso di aiutarlo a
+		  mantenere questa versione, per favore si faccia avanti.
+
+NextStep:
+ Ian Stephenson   <ians@cam-ani.co.uk>
+ Disponibilita' : La pagina Web principale di UAE (usa i sorgenti Unix).
+ Codice sorgente: Incluso nei sorgenti principali. La compilazione dovrebbe
+		  essere OK.
+ Nota           : Ian ha detto che non ha molto tempo da dedicare ad UAE,
+		  cosi' se qualcuno e' desideroso di aiutarlo a mantenere
+		  questa versione, per favore si faccia avanti.
+
+
+Amiga:
+ All'inizio     : Olaf 'Olsen' Barthel <olsen@sourcery.han.de>
+ Ora            : Samuel Devulder <devulder@info.unicaen.fr>
+ Disponibilita' : Non ancora del tutto certa. La pagina Web di Paul Liss ha i
+		  binari.
+ Codice sorgente: Incluso nei sorgenti principali. La compilazione dovrebbe
+		  essere OK.
+
+pOS:
+ Samuel Devulder  <devulder@info.unicaen.fr>
+ Disponibilita' : Non ancora del tutto certa.
+ Codice sorgente: Incluso nei sorgenti principali. La compilazione dovrebbe
+		  essere OK.
+
+XFree86/OS2:
+ Krister Bergman  <bellman@kuai.se>
+ Disponibilita' : http://www.kuai.se/~bellman/html/xfreeapps.html
+ Codice sorgente: Niente di speciale, apparentemente il materiale Unix viene
+		  compilato in maniera pulita (?).
+
+Win32:
+ Mathias Ortmann  <ortmann@informatik.tu-muenchen.de>
+ Brian King       <brian_king@codepoet.com>
+ Disponibilita' : http://www.uae.de/
+		  http://www.codepoet.com/UAE/
+ Codice sorgente: Ci stiamo lavorando.
+
+Acorn RISC PC:
+ Peter Teichmann  <sol@space.wh1.tu-dresden.de>
+ Disponibilita' : http://www.wh1.tu-dresden.de/~sol/acorn.shtml
+		  http://www.wh1.tu-dresden.de/~sol/acorne.shtml
+ Codice sorgente: Qualche parte e' inclusa nei sorgenti principali, ma
+		  poiche' i SO Acorn apparentemente non hanno una gestione
+		  decente dei file, non puoi nemmeno usare la stessa
+		  struttura dell'originale. Necessita inoltre di un sacco di
+		  file addizionali.
+
+Poiche' generalmente non ho la possibilita' di provare o migliorare queste
+versioni, e' una buona idea contattare i loro rispettivi autori se hai
+domande.
+
+
+Prima di spedire email...
+°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Prima di comunicarmi il problema che potresti avere, sii certo di aver letto
+_tutto_ quanto sopra. Per favore, leggi anche il file "FAQ.ita", che contiene
+un sacco di informazioni utili ed il README (eventualmente tradotto in
+italiano) relativo al tuo sistema.
+
+Non posso rispondere ad _ogni_ domanda. Se hai problemi nella comprensione di
+questo documento, sia perche' qualche punto ti e' risultato oscuro o perche'
+non hai molta esperienza coi computer, cerca di trovare qualche tuo amico che
+possa capire questo file e possa spiegartelo. Semplicemente, non posso
+spiegare (per esempio) come usare programmi di emulazione terminale o il
+CrossDOS poiche' non li uso ed in ogni caso ci vorrebbe troppo tempo. Questo
+file ed il FAQ.ita contengono quasi ogni tipo di informazione che io ti possa
+fornire. Cerco di aiutare le persone che hanno domande, ma qualche volta ci
+vuole troppo tempo.
+
+Per favore non chiedermi file con le ROM del Kickstart o altro software
+protetto da copyright. Non _mandarmi_ nemmeno roba come questa. Se vuoi
+mandarmi qualcos'altro che sia grosso (>= 50 Kb), chiedimelo prima o piazzalo
+da qualche parte nel Ciberspazio.
+Se ricevo 3 Mb di schermi catturati o di messaggi d'errore prodotti dal
+programma ("Non funziona, genera questo file"), potrei incavolarmi sul serio
+e lamentarmi col tuo Amministratore di Sistema: potresti perdere il tuo
+acesso ad Internet, pensaci bene.
+
+Mi infastidiro' terribilmente se mi manderai posta elettronica in formato
+HTML. Lotta contro questa piaga!
+
+Oh gia', un'altra cosa: se prometto di fare qualcosa (come implementare nuove
+caratteristiche) e me ne dimentico, torturatemi. Cio' accade di rado, e' un
+baco che so di avere nel mio cervello. Dovro' sostituirlo.
+

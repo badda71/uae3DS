@@ -1,0 +1,96 @@
+Incomplete list of programs that work with UAE. If you have something to add,
+mail me.
+Most Kickstart versions work. I think I've also had success reports about
+68020 Kickstarts. Some special A600 ones which apparently rely on an IDE
+interface or the PCMCIA port being present don't work properly.
+
+The following programs were tested by me:
+ - Powerpacker 2.3b
+ - DME, DICE (compiles at least transdisk and transrom)
+ - Turrican I: Works 100% now, unlike in previous versions.
+   In world 3 (the vertically scrolling levels) they achieve multi-level
+   scrolling by means of _awful_ copper and sprite tricks. It works, but these
+   levels are tremendously slow.
+ - Katakis (also known as Denaris)
+ - Zork Zero
+ - Corruption, Fish
+ - Holiday Lemmings 1994 (always nice to watch them blow up)
+ - Champions of Krynn (including harddisk installation on the unixfs.device)
+ - Cybernoid II works, sort of. It occasionally crashes.
+ - AmigaCPE (my CPC emulator :-)
+ - SimCPM (CP/M emulator, ran some Infocom adventures with it)
+ - DMS 1.11
+ - Lots of demos
+ - TheA64Package
+ - AIBB 5.5 and AIBB 6.5. These work, but you need the "-S 3" option for
+   maximum sound hardware compatibility (or start AIBB with the "-b" switch).
+   Otherwise, the stupid beep when pressing gadgets doesn't work and the
+   program gets into an endless loop.
+   Oh yes, and the CPU is detected as running at InfMHz :)
+ - AmigaBasic
+
+The following programs (among others) were tested by other people:
+ - Games: Silkworm I, BattleChess 2, Monkey Island, IK+, Giana Sisters,
+   Arkanoid, Team, Vertical Mayhem, The Faery Tale Adventure, various 
+   incarnations of The Bard's Tale, The Empire Strikes Back, Worms/OCS,
+   Shanghai, R-Type 1 & 2, Battle Squadron, The Sentinel, Elite II (Frontier)
+ - Directory Opus
+ - Deluxe Paint IV
+ - Devpac 3.04
+ - Maxon Assembler 1.1
+ - KinkWords
+ - FileMaster 2.2
+ - ImageFX 2.0
+ - Aegis Images
+ - Atari Lynx development tools
+ - CygnusED Prof.
+ - DiskMaster 1.4
+ - Several packers (PP 4.0, LHA, PKAZIP). Some of these don't like the unixfs.
+ - MUI
+ - Brilliance
+ - Several Cloanto programs have been by Michael C. Battilana from Cloanto
+   Software: Personal Paint, ColorType, Personal Fonts Maker and Personal Write
+   (all versions)
+ - Shapeshifter. This requires 68020 emulation, and apparently you need to use
+   "Prepareemul A1200". You may run into problems with the filesystem code, in
+   that case use the hardfile.
+ - others
+
+I've removed the incompatibility list, since these things vary a lot. There
+are still some programs that don't run.
+
+"Brokenness" notes
+==================
+Some programs only work on some Amigas, or with some configurations of UAE.
+If you have information about more programs, please tell me about it, because
+this could be very helpful for other users, too.
+Generally, everything that relies on exact timing won't be compatible with
+68020 and higher Amigas either.
+
+Incompatible with more than 512K chipram:
+ - Silents "ICE" demo (characters missing in sinusscroll part with more chip)
+ 
+Requires exception 3 and is therefore incompatible with 68020+ CPUs:
+ - Katakis (Denaris)
+ - Cybernoid II (this one relies rather heavily on all sorts of exception
+   related behaviour of the CPU).
+
+Requires slow memory (-s option), even if there's plenty other memory:
+ - Silents "Global Trash" demo
+ - Anarchy "Seeing is Believing" demo
+ - Andromeda "Decaying Paradise" demo
+ - Spaceballs "State of the Art" demo
+
+Requires exact timing of system componets (exact CPU or blitter timing, etc)
+ - Silents "Hardwired" demo (times multiplication instructions and refuses to
+   work if they are too fast)
+ - Andromeda "Multica" demo (directly processes blitter output without
+   waiting for the blitter)
+ - Phenomena "Enigma" demo: modifies data while blitter is working on it.
+ - Turrican I: Only the "Rainbow Arts" intro, it will abort too early and
+   continue loading if the CPU is faster than a 68000. Otherwise fine.
+
+Programs that set reserved bits in custom chip registers:
+ - Andromeda "Seven Seas" demo uses EHB and sets the AGA "KILLEHB" bit at the
+   same time... It almost seems as if it _wants_ to use EHB on OCS machines
+   and a regular 6 plane display on AGA machines.

@@ -1,0 +1,256 @@
+Note! This file only contains user-visible changes. There may be others. For a
+more detailed description of changes between releases, read src/ChangeLog, and
+for the full picture, make a diff between releases.
+
+User-visible changes in 0.8.22:
+  - Mostly bug fixes
+  - Extensive updates for the sprite emulation and blitter timing code.
+    Hopefully more accurate than before.
+
+User-visible changes in 0.8.21:
+  - Several bug fixes, including some serious filesystem emulation bugs.
+  - Support for A1000 boot ROMs.
+
+User-visible changes in 0.8.20:
+  - Bug fixes only
+
+User-visible changes in 0.8.19:
+  - A few bug fixes, especially in state-saving.
+  - Picasso screens now support panning.
+
+User-visible changes in 0.8.18:
+  - Numerous bug fixes.
+  - The gtk UI has more options; it also now behaves similar to the GUI found
+    in the Windows version in that it waits for the user to explicitly start
+    the emulation, thus allowing to select the desired options first.
+  - There's a track and LED display added to the bottom of the screen.
+
+User-visible changes in 0.8.17:
+  - AGA should be a bit faster.
+  - AGA sprites emulation added by Toni Wilen.
+  - Numerous bug fixes.
+  - In the Unix version, the gtk UI has a lot more options available.
+    There's a new option "Enable copper speedup code"; I'd be interested in
+    hearing whether there's any software out there that does not work (or
+    runs slower) if this option is enabled.
+  - Now supports image files of high density floppies (Dr. Adil Temel).
+  - Support for A1000 Kickstart disks (Gerald Schnabel).
+  - The option to disable autoconfig devices no longer exists; the emulator
+    automatically recognizes if the Kickstart version is too old.
+  - Numerous improvements for the integrated debugger.
+  - State save/restore implemented by Toni Wilen.  At the moment, this is
+    experimental, "use at your own risk" code.  It is not guaranteed that
+    future versions of the emulator will be able to read snapshots saved by
+    this version.  Test it and report bugs.
+
+User-visible changes in 0.8.16:
+  - AGA playfield support (again) (Toni Wilen)
+  - In addition to plain mono and stereo, there's a new sound setting "mixed".
+  - There's a new option to set CPU speeds more accurately, it's called
+    "finegrain_cpu_speed".
+  - Numerous bug fixes
+  - Graphics should be faster; optimized code was accidentally commented out
+    in the previous release.
+  
+User-visible changes in 0.8.15:
+  - A few changes in the core of the custom chip emulation; this should mean
+    more accuracy in general, but likely also a few new bugs in this version.
+    It may be a little slower as well.
+  - "68040" emulation.  Dedicated to all the clueless folks out there.
+    (with thanks to Christian Bauer)
+
+User-visible changes in 0.8.14:
+  - More bug fixes:
+    * CPU emulation problem that could have caused copy protection schemes to
+      malfunction has been fixed.
+    * Some AGA problems fixed (one of them visible in ECS modes).
+    * UAE should work again on non-x86 systems.
+  - By default the emulator will try to approximate an A500 in CPU speed.
+    This setting existed before, but it's a bit more accurate now and on by
+    default.
+  - There is a new option to control the number of emulated disk drives.
+  - Software autofire for the keyboard joystick replacements
+
+User-visible changes in 0.8.13:
+  - Bye bye GGI port
+  - Several bugs fixed, mostly in the filesystem code
+  - AGA updates
+
+User-visible changes in 0.8.12:
+  - Several bugfixes
+
+User-visible changes in 0.8.11:
+  - Finally, an accurate copper emulation, thanks to Sam Jordan.
+  - Sprite emulation fixes, also due to Sam Jordan.
+  - Some CPU emulation fixes (Keith Rollin, Toni Wilen, Lauri Pesonen)
+  - Old command line options actually work now.
+  - Some floppy related lockups removed.
+
+User-visible changes in 0.8.10:
+  - Audio interpolation
+  - Bugfixes for
+    * disk emulation
+    * FPU emulation
+    * CPU prefetch emulation (the "compatible" setting).
+    * some 2.0+ filesystem packets
+    * text-based UI (should compile again)
+    * some other parts
+  - People like me who liked the old command line options better can now use
+    (most of) them again.
+
+User-visible changes in 0.8.9:
+  - The filesystem emulation should be able to emulate an Amiga FS more
+    accurately.  Script/Pure bits and filenotes are kept.
+  - Patrick Ohly contributed SCSI support (currently Linux only) that allows
+    you to (e.g.) use CD writers with the emulator.
+
+User-visible changes in 0.8.8:
+  - I'm sure there were some.
+
+User-visible changes in 0.8.7:
+  - Commandline and configuration file handling has been redone. The old
+    options are now longer supported
+  - Hardfiles and filesystems are called DHx: instead of UAEx:
+  - Filesystem emulation supports more 2.0+ packets
+  - FPU works again
+
+User-visible changes in 0.8.6:
+  - Black scanlines implemented ('D' modifier for "-O" option)
+  - Should no longer crash when resetting the emulation
+  - DOS port update
+  - Improvements in X11 and ncurses user interfaces.
+  - Sound can be re-configured at run-time in the UI.
+
+User-visible changes in 0.8.5:
+  - Prettier gtk user interface
+  - Swedish documentation by Jonas Holm Pileborg
+  - Might compile with BSD make
+  - The 68000 MOVEP instruction works properly
+  - Many Win32 code updates - it _might_ compile out of the box for you if
+    your compiler setup is identical to mine
+
+User-visible changes in 0.8.4:
+  - The option "-O" has two new modifiers, 'a' and 'p'.
+
+User-visible changes in 0.8.3:
+  - Amiga and GGI ports updated
+  - X11 version supports DGA and windowed mode in one binary, hotkeys, and a
+    mouse grabbing mode
+
+User-visible changes in 0.8.2:
+  - Should compile on *BSD and on non-x86 systems again.
+  - Better gtk detection (hopefully)
+  - Fixed bugs that made the low bandwidth feature and dithered color output
+    unusable in the X11 version.
+  - The X11 driver can now display 8 bit Picasso screens even on truecolor X
+    displays.
+
+User-visible changes in 0.8.1:
+  - BeOS update (Christian Bauer)
+  - New copper code that should be more exact and maybe a little bit faster.
+  - Picasso bug fixed that caused corruption of window scrollbars.
+  - Fix for problems in interlace modes on line doubled displays.
+  - The CPU emulation can try to approximate the speed of a 7MHz A500.
+
+User-visible changes in 0.8.0:
+  - Better support for some BSD variants.
+  - Fixed a display bug that caused dual playfield displays in high resolution
+    to look wrong.
+  - The gtk UI no longer crashes when the "-G" option is used.
+
+User-visible changes in 0.7.0:
+  - Picasso96 graphics card emulation by Brian King.
+  - All CPU emulations (68000, 68010, 68020, 68020 + FPU, 68000 compatible)
+    are now compiled into one binary and selectable at run-time.
+  - Many changes in hardfile support. Now you can mount several hardfiles in
+    arbitrary order. You can specify the geometry for every hardfile.
+    The hardfile device has been renamed to "uaehf.device". Please adjust your
+    MountList entry.
+  - Stereo sound support
+  - UAE has been ported to pOS by Samuel Devulder
+  - New sound back-end that just writes sound to a file.
+  - Improved serial support
+  - The XFree86 VidMode extension is supported; if you use it, the X11 version
+    will switch to the video mode that is "closest" to what you specified on
+    the commandline.
+  - Many minor and major bugfixes
+
+User-visible changes in 0.6.9:
+  - The sprite code finally seems to work now (well, mostly :( )
+  - Sprite-to-sprite collisions implemented
+  - EHB and dual playfield modes are faster on x86 systems.
+  - Disk changes should be detected again.
+  - Believe it or not, I think the reset and quit buttons in the UI actually
+    work this time.
+  - POSIX_PENGUINS for Linux systems with glibc-2.0. There's now real hope
+    that it speeds things up on SMP machines (it still slows down single
+    processor machines if it's enabled, though).
+  - The filesystem code should be somewhat more robust. It can also be set up
+    to run multi-threaded. That makes sense even on single processor machines.
+  - The old follow-mouse hack for the X version is disabled. There is now a
+    new Amiga program named "mousehack". Please put it in the directory you
+    use for harddisk emulation and put the command "run >NIL: mousehack" in 
+    your startup-sequence.
+  - 4 or 8 MB chip memory are supported.
+  - Two joysticks are supported on Linux systems, as well as several
+    alternative keyboard "fake" joysticks (using two simultaneously is
+    possible). Also, two joystick buttons are now supported.
+  - The SVGAlib/DOS version user interface is a bit improved. It can now be
+    used during the emulation by pressing F11, e.g. for changing disks.
+  - For the non-DGA X11 version, the LOW_BANDWITH and DONT_WANT_SHM compile
+    options have been turned into the -L and -T run-time options.
+  - Linux/GGI port by Christian Schmitt/Stefan Reinauer (untested)
+
+User-visible changes in 0.6.8:
+  - This should contain all the necessary files...
+  - Bugfixes
+
+User-visible changes in 0.6.7:
+  - Some bugs in the new playfield code removed; some speed improvements
+  - New alternate user-interface for X (note the debugger doesn't completely
+    work yet). The Tk GUI is also improved. Note that I don't use either, so
+    there are no stability guarantees.
+  - The options "-d" and "-C" are replaced with "-O", which allows much better
+    control over the graphics display. The old options will continue to work
+    for a few more releases and will be removed after that.
+  - Yet Another Blitter Bug fixed (Sanity Arte demo)
+  - Blitter control by copper now works (would have worked before if I hadn't
+    forgotten the COPCON register)
+  - On Linux systems (running at least kernel version 1.3.something) UAE can
+    now be set up to run in two threads. That's only potentially useful on SMP
+    machines, it's a performance loss on other machines. It currently is most
+    probably a big performance loss even on SMP machines: The implementation
+    is very primitive. This is just to get started.
+
+User-visible changes in 0.6.6:
+  - Playfield hardware emulation almost completely rewritten. It _should_ be
+    somewhat more stable and bugfree, but there's no doubt that there are some
+    new fun and exciting bugs in this version.
+    Features: Interlace drawing merges two frames and should look better, plus
+      it now works with even frame skip values.
+      The copper is more accurate.
+      Sprite DMA works better (see Interference by Sanity)
+      Some other bugs removed.
+  - The spanish keyboard now has a "W".
+  - Nice pictures in the Tk GUI.
+  - The USER_PROGRAMS_BEHAVE compile-time option now "works" even if you don't
+    use the compiler.
+
+User-visible changes in 0.6.5:
+  - Bugfixes in the filesystem code and in the compiler
+  - There was some speed loss in 0.6.4, which should be fixed for the i386
+    versions. Actually, UAE won't run on a 386 anymore (uses the bswapl
+    instruction). It would be pointless anyway...
+  - The text user interface in the SVGAlib and DOS versions supports harddisks
+    better
+  - The XFree86 DGA extension is supported.
+  - Italian documentation by Paolo Besser.
+  - Spanish keyboard support for X; French keyboard updated
+  - I _hope_ that the X version UAE now always resets keyboard autorepeat.
+  - Option "-A" to control the accuracy of the emulation. Use "-A 0" to
+    restore the old behaviour, which is likely to be somewhat faster.
+  - Solaris sound should actually compile this time.
+  - The built-in debugger has a "M" command to search for sound modules.
+
+For versions earlier than 0.6.5, you'll have to read the ChangeLog to find out
+what's new.

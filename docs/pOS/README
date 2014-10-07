@@ -1,0 +1,201 @@
+                              UAE-0.6.9f
+                             pOS version
+                                   
+                          by Samuel Devulder
+                      (devulder@info.unicaen.fr)
+
+                              Oct. 1997
+                                   
+
+INTRODUCTION
+============
+
+This the Amiga port of UAE v0.6.9. UAE is the Un*x Amiga Emulator
+written by Bernd Schmidt. 
+
+You should read the README file before this one to know more about uae.
+(how to use it, command-line options, what is emulated, and so on...).
+
+This port features many things. It is build with the help of Geekgadget:
+GCC, ixemul, ... Thus allowing an easy port of the original unix version
+to pOS without a lot of modification. It is also based in part on
+examples of the pOS developer package. I am very gratefull to proDAD for
+providing me (and other developers) that package.
+
+
+REQUIREMENTS
+============
+
+This version will work on any machine running at least pOS r26. That
+version needs ixemul v47.1. UAE needs roughly 6-8Mb of free ram and a
+fast processor. It has been tested successfully on a A500 OCS with 
+8Mb of fast ram with a 68030 processor (gvp A530 board) running pOS r27.
+
+
+QUICKSTART
+==========
+
+To try quickly UAE, insert a bootable disk in df0 that runs on a standard
+A500 (a demo for example), and type in a pOS shell:
+
+    > Stack 32000
+    > UAE -L -H2 -S2 -c2 -s2 -f2 -O320:256:XYl -0/dev/df0
+
+Then you should see a window open on you pOS workbench with the demo
+running inside.
+
+The emulated amiga with that setup is a standard A500: 512kb chip,
+512kb slow fast, sound and full color display.
+
+
+FEATURES
+========
+
+UAE can display in 8 bits or in truecolor (24 bits). In 8bits, UAE
+can use a grayscale palette (-H0) or a color palette (-H1). Thoses
+two modes does not use the dither and thus gives the maximum rendering
+speed but you loose some colors. You can also activate the truecolor
+mode (-H2) that will make UAE use all of the 4096 colors ECS can give.
+In that case, UAE will automatically dither the output if necessary
+thanks to pOS RTG drivers.
+
+If you use the -L option, UAE will try to only update the needed part
+of the window. That will propably speed up things a little bit
+especially in truecolor mode.
+
+The sound can be emulated in this version. But Amigas Hardware is too
+slow for it to be really usefull. On my amiga, UAE produces one second
+of sound every twenty seconds in Sanity's Interference demo. Thus, An
+amiga which is around 20 times faster as an A4000 would be nice. I
+wonder what will this version of UAE give when recompiled for a PPC
+running pOS (please tell me if you succed to produce such an executable).
+
+The CPU emulation is speed up by using ASM code to compute flags
+directly from the native CPU on m68K and x86 targets. For risc machines
+as the PPC, it seems that asm hacks are not usefull, so the generic
+C code is used.
+
+You can insert disks by pressing CTRL-LALT-F1, CTRL-LALT-F2,
+CTRL-LALT-F3, or CTRL-LALT-F4. F1 corresponds to drive DF0, F2 to DF1,
+and so on. Alternatively you can simply eject a disk by pressing
+LSHIFT in addition of the above keys.
+
+You can mount native partitions using the -m option. Be sure to use unix
+convention when giving a path to UAE. For exemple do not do 
+
+        CLI> uae -m boot:dh0:path -0 /disks/df0.adf 
+
+but rather
+
+        CLI> uae -m boot:/dh0/path -0 ../disks/df0.adf
+
+This is not a bug, but an ixemul.library feature. You can access native
+disks by specifying /dev/<device-name>[.device]/unit or /dev/df<num>
+after -0. For example you can do "uae -0 /dev/df0" or "uae -0 
+/dev/pTrackdisk.device/0" to use the internal floppy drive as drive 0
+under UAE. Under the file requester, select the DEV: assign to access
+disk-devices.
+
+You can reset the emulator by pressing CTRL-ALT-DEL in UAE's window. I
+guess it reminds you about something :^) You can enter debug mode by
+pressing ^C or ^D in the cli/shell window or by pressing the close-gadget
+of UAE's window.
+
+The F12 key of the X11 version of uae is simulated by pressing
+CTRL-SHIFT-ALT-F10 simultanemously. This toggles the mouse emulation
+mode and is needed for some games or demos when you find that the
+mouse emulation does not work well.
+
+You can toggle on/off the screen rendering to speed up the sound
+processing by pressing CTRL-SHIFT-ALT-F9. You can also "iconify" UAE
+by pressing on the gagdet next to the depth-gadget. When uae is
+iconified, the display is automatically switch off, speeding the
+emulation a little bit (be you won't be able to see it as the window
+is shrinked :-)
+
+If UAE does not find a rom-file, it'll use the ROM located at address
+$F80000 - $FFFFFF. Thus, you need not grab it and that will spare you
+some disk space. You can disable this feature by creating the
+environment variable "USE_UAE_ERSATZ", in which case UAE will try to
+emulate rom calls using a built'in pseudo kickstart. That feature will
+probably disappear when pOS will be able to run on other hardwares than
+amiga machines.
+
+If you setenv AUDIONAME <filename>, then uae will put the sound-samples
+into <filename>. Using that you can grab soundtracks very easily :-).
+Notice that <filename> can have two "%d". The first one will be replaced
+by the frequency (see the -R flag for UAE) and the second one will be
+replaced by the buffer size (-B option).
+
+*NEW*: If under uae you run "amiga/uae_rcli", then you'll be able to 
+run AmigaOS commands in UAE just by dropping the icon of the executable 
+on UAE's window. 
+
+
+MISSING FEATURES
+================
+
+The joystick can't be used: use the -J flag instead.
+
+No AREXX port available to use an external GUI: use the built-in
+pseudo GUI (did you see the leds in the dragbar ? :-)
+
+No mouse-pointer masking.
+
+
+HOW TO (RE-)BUILD UAE
+=====================
+
+You should be familiar with unix programming to build UAE. For the
+moment it can only be cross-compiled under AmigaOS as apparently
+there is no "ln -s" or "Makelink" support in pOS r27 (That will
+probably change in future releases).
+
+If you wish to (re-)build uae, you need to have GeekGadget correctly
+installed (see ftp://ftp.ninemoons.com/pub/gg/). Not all part of
+Geek Gadget are needed, but be sure to have gcc2.7.2.1, binutils,
+autoconf, awk, ...
+
+To compile for pOS you should setenv CFLAGS "-D__POS__" as it is
+that define that is used to find the target system. Alternatively, 
+you can simply add "--target=p.os" when launching ./configure.
+
+The default Makefile provided is for a MC68030 microprocessor. If you
+wish to have a Makefile tuned for your CPU (and fpu), just type "sh -c
+configure". If the configure script is correcly written (or with some
+extra tuning in Makefiles), UAE should also compile for a x86 or PPC
+architecture if you are using a special version of GCC tuned to
+cross-compilation (the cpu specific parts of uae are dissociated from
+OS specific things). I can't wait trying UAE for pOS on x86 or PPC
+plateforms :-)
+
+Once your Makefile is generated (if needed), you can modify the file
+"config.h" to suit your needs. I suggest you to define DONT_WANT_SOUND
+in "config.h". That will speed up the emulation (sound emulation slows
+down the speed by roughly 10%).
+
+When you'll have configured uae correctly, type "make" in a shell. Then
+one hour and a half later you'll get the uae executable (it might be less
+if you have a *real fast* m68k machine, but don't expect less that 15
+minutes). I know it's slow, but Amigas are slow (even those with 68060
+are not that fast, by today's standards ;-).
+
+NOTE: I had reports that gcc complains and fail to compile cpu_f?.s.
+This is caused by a problem with perl5 and src/md-amiga/cpuopti.
+To avoid this you can try to use perl4 instead of perl5, or uncomment
+the lines in the beginning of src/md-68k/cpuopti. Unfortunately, UAE
+will run slower as the asm files won't have an extra optimization pass.
+
+NOTE 2: With some fiddling, you can succeed in compiling UAE with the
+nixpos link-library. That library will give you an executable that can
+run without ixemul. But then you'll loose the ability of uae to produce
+statistics when you enter 'c' in its debugger. You'll also have to enter
+a mandatory space between flags and arguments in the makefile.
+
+
+REMARKS OR BUG-REPORTS
+======================
+
+You can send me your remarks and bug-report to:
+
+                       devulder@info.unicaen.fr

@@ -1,0 +1,127 @@
+NAME   = uae4all.gpe
+O      = o
+RM     = rm -f
+CC     = arm-linux-gcc
+CXX    = arm-linux-g++
+STRIP  = arm-linux-strip
+SDL_BASE = /opt/local/devkitpro/devkitGP2X/bin/arm-linux-
+
+PROG   = $(NAME)
+
+all: $(PROG)
+
+FAME_CORE=1
+
+DEFAULT_CFLAGS = `$(SDL_BASE)sdl-config --cflags`
+LDFLAGS        = `$(SDL_BASE)sdl-config --libs` -lSDL_mixer -lSDL -lmikmod -lz -static
+
+
+MORE_CFLAGS = -O3  -Isrc/ -Isrc/include/ -Isrc/menu -Isrc/vkbd -fomit-frame-pointer  -Wno-unused -Wno-format -DUSE_SDL -DGCCCONSTFUNC="__attribute__((const))" -DUSE_UNDERSCORE -fno-exceptions -DUNALIGNED_PROFITABLE -DREGPARAM="__attribute__((regparm(3)))" -DOPTIMIZED_FLAGS -D__inline__=__inline__ -DSHM_SUPPORT_LINKS=0 -DOS_WITHOUT_MEMORY_MANAGEMENT -DVKBD_ALWAYS -DMENU_MUSIC
+
+
+MORE_CFLAGS+= -DROM_PATH_PREFIX=\"./\" -DDATA_PREFIX=\"./data/\" -DSAVE_PREFIX=\"./\"
+
+#MORE_CFLAGS+= -DUSE_AUTOCONFIG
+#MORE_CFLAGS+= -DUAE_CONSOLE
+MORE_CFLAGS+= -DGP2X
+MORE_CFLAGS+= -DUSE_ZFILE
+#MORE_CFLAGS+= -DUAE4ALL_NO_USE_RESTRICT
+#MORE_CFLAGS+= -DNO_SOUND
+MORE_CFLAGS+= -DNO_THREADS
+#MORE_CFLAGS+= -DDEBUG_TIMESLICE
+MORE_CFLAGS+= -DFAME_INTERRUPTS_PATCH
+#MORE_CFLAGS+= -DFAME_INTERRUPTS_SECURE_PATCH
+
+#MORE_CFLAGS+= -DUAE_MEMORY_ACCESS
+#MORE_CFLAGS+= -DSAFE_MEMORY_ACCESS
+#MORE_CFLAGS+= -DERROR_WHEN_MEMORY_OVERRUN
+
+#MORE_CFLAGS+= -DDEBUG_UAE4ALL
+#MORE_CFLAGS+= -DDEBUG_FILE=\"stdout.txt\"
+##MORE_CFLAGS+= -DDEBUG_UAE4ALL_FFLUSH
+#MORE_CFLAGS+= -DDEBUG_M68K
+#MORE_CFLAGS+= -DDEBUG_INTERRUPTS
+#MORE_CFLAGS+= -DDEBUG_CIA
+###MORE_CFLAGS+= -DDEBUG_SOUND
+#MORE_CFLAGS+= -DDEBUG_MEMORY
+###MORE_CFLAGS+= -DDEBUG_MAPPINGS
+#MORE_CFLAGS+= -DDEBUG_DISK
+#MORE_CFLAGS+= -DDEBUG_CUSTOM
+###MORE_CFLAGS+= -DDEBUG_EVENTS
+###MORE_CFLAGS+= -DDEBUG_GFX -DDEBUG_BLITTER
+###MORE_CFLAGS+= -DDEBUG_FRAMERATE
+###MORE_CFLAGS+= -DAUTO_FRAMERATE=1400
+###MORE_CFLAGS+= -DMAX_AUTO_FRAMERATE=4400
+###MORE_CFLAGS+= -DAUTO_FRAMERATE_SOUND
+#MORE_CFLAGS+= -DSTART_DEBUG=999999
+#MORE_CFLAGS+= -DMAX_AUTOEVENTS=999990
+MORE_CFLAGS+= -DAUTO_RUN
+
+
+#MORE_CFLAGS+= -DPROFILER_UAE4ALL
+
+CFLAGS  = $(DEFAULT_CFLAGS) $(MORE_CFLAGS)
+
+OBJS =	\
+	src/savestate.o \
+	src/audio.o \
+	src/autoconf.o \
+	src/blitfunc.o \
+	src/blittable.o \
+	src/blitter.o \
+	src/cia.o \
+	src/savedisk.o \
+	src/compiler.o \
+	src/custom.o \
+	src/disk.o \
+	src/drawing.o \
+	src/ersatz.o \
+	src/gfxutil.o \
+	src/keybuf.o \
+	src/main.o \
+	src/md-support.o \
+	src/memory.o \
+	src/missing.o \
+	src/gui.o \
+	src/od-joy.o \
+	src/sound.o \
+	src/sdlgfx.o \
+	src/writelog.o \
+	src/zfile.o \
+	src/menu/fade.o \
+	src/menu/menu.o \
+	src/menu/menu_load.o \
+	src/menu/menu_main.o \
+	src/vkbd/vkbd.o \
+
+ifdef FAME_CORE
+CFLAGS+=-DUSE_FAME_CORE -DUSE_FAME_CORE_C
+src/m68k/fame/famec.o: src/m68k/fame/famec.cpp
+OBJS += \
+	src/m68k/fame/famec.o \
+	src/m68k/fame/m68k_intrf.o
+else
+OBJS += \
+	src/m68k/uae/newcpu.o \
+	src/m68k/uae/readcpu.o \
+	src/m68k/uae/cpudefs.o \
+	src/m68k/uae/fpp.o \
+	src/m68k/uae/cpustbl.o \
+	src/m68k/uae/cpuemu.o
+
+endif
+
+CPPFLAGS  = $(CFLAGS)
+
+$(PROG): $(OBJS) 
+	$(CC) $(CFLAGS) -o $(PROG) $(OBJS) $(LDFLAGS)
+	$(STRIP) $(PROG)
+
+
+run: $(PROG)
+	./$(PROG)
+
+clean:
+	$(RM) $(PROG) $(OBJS)
+
+

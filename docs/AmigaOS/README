@@ -1,0 +1,825 @@
+                              UAE-0.7.0
+                            AMIGA version
+                                   
+                          by Samuel Devulder
+                      (devulder@info.unicaen.fr)
+
+                              Feb. 1997
+                                   
+
+                               CONTENT
+                               =======
+                         1. INTRODUCTION
+                         2. REQUIREMENTS
+                         3. QUICKSTART
+                         4. COMMAND LINE ARGUMENTS
+                           a. Window size
+                           b. Screen type
+                           c. Render style
+                           d. Memory settings
+                           e. Floppy emulation
+                           f. Volume mounting
+                         5. RUNTIME HOTKEYS
+                           a. Reset UAE
+                           b. Enter in debug-mode
+                           c. Quitting UAE
+                           d. Enable/Disable display
+                           e. Ejecting and inserting virtual floppies
+                         6. FAQ
+                         7. HOW TO SPEED UP UAE?
+                         8. AREXX PORT
+                         9. HOW TO (RE-)BUILD UAE
+                        10. COMPILING UAE WITH SAS/C
+                        11. COMPILING FOR POWERUP
+                        12. REMARKS OR BUG-REPORTS
+                        13. LAST NOTE
+
+
+
+
+1. INTRODUCTION
+===============
+
+This the Amiga port of UAE v0.7.0. UAE is the Un*x Amiga Emulator
+written by Bernd Schmidt. 
+
+This port is build with the help of ADE (Amiga Development Enviroment):
+GCC, ixemul, ... Thus allowing an easy port of the original unix version to
+the Amiga without a lot of modifications. 
+
+For extra information (specially, the unix-like command line options), you
+should read the README file.
+
+
+2. REQUIREMENTS
+===============
+
+This version will work on any Amiga running at least AmigaOS v2.04 and is
+programmed to use AmigaOS v3.0 facilities when available. You'll need
+ixemul installed because it was compiled with gcc. To allow the GUI to
+work, MUIRexx (and MUI) must be installed too. Without MUIRexx, UAE will
+stick to CLI and unix-style operations.. this is quite boring :)   
+
+UAE needs roughly 8Mb of ram to run on the Amiga (of course, this depends
+on UAE memory settings). A fast processor is also strongly recommended. 
+
+Note: if you are short in ram, that you can use UAE under VMM (virtual
+memory program by Martin Apel). If you dare, you can also run UAE under
+UAE! 
+
+
+3. QUICKSTART
+=============
+UAE is originaly a unix world program. That means it has cryptic option and
+command line arguments. Hopefully, I've managed to make this a bit more
+amiga-user friendly. Roughtly, UAE can be seen as organised in layers: On
+top you find the GUI (graphical user interface): UAEWB; below, there is the
+CLI-to-unix command-line translator: "UAEWB CLI"; and the last layer is the
+"UAE" executable which can only understand unix-like parameters. 
+
+                         [UAEWB]    <==>  MUIRexx GUI
+                            |                 |
+                            V                 V
+                       [UAEWB CLI]  <==>     CLI
+                            |                 |
+                            V                 V
+                          [UAE]     <==>     Unix
+
+Each layer transforms and directs its arguments to the layer immediately
+below until the last unix level. You can run UAE from every layer; so that
+means there is at least three ways to start UAE: You can either use the
+workbench, or a CLI/Shell with the standard amiga template or in a
+cli/shell with a unix-like (read cryptic) command-line. 
+
+To quickly try UAE, you should use the workbench. That requires MUIRexx to
+be installed (v3.0 is prefered). Provided MUIRexx is properly installed,
+you can simply click on the UAEWB icon. The GUI-launcher will pop-up, then
+you can modify the settings and press on the "USE" button. If you stop the
+mouse pointer on a gadget, an help-bubble will tell you about the meaning
+of the gagdet. 
+
+To start UAE from the cli, you can simply enter "UAEWB CLI". You can also
+add various arguments (see below) to modify the default setup.
+
+Last way: the unix-fashion. This one is reserved for advanced users or
+users that already know uae on a unix-like plateform. In that mode, UAE
+accepts argument of the original linux-uae with some minor differences. If
+you have a bootable disk, put it in DF0: and type this in a shell/cli:  
+        UAE -H2 -S2 -c2 -s2 -f2 -O320:256:XYl -0/dev/df0
+Then you should see a screen-mode requester. Select the HAM6 (pal:320x256)
+mode to see the demo run in a HAM screen.
+
+Once UAE is running, you should see the runtime GUI appear on the
+workbench. Help-Bubbles will tell you how the GUI works.. The QUIT button
+closes everything.
+
+
+4. COMMAND LINE ARGUMENTS
+=========================
+
+a. Window size 
+--------------
+This is the size of the display UAE will use. This is the first parameter
+you need to enter. Normally, a window size of 320x256 or 320x240 (ie. 
+pal-lores output is emulated) or 640x512/640x480 (ie. pal/hires output is
+emulated) should be enough (recall UAE only emulates an A500 where only PAL
+screens are available).
+
+This option is selected with the folling command lines:
+
+    unix-style: -O<width>:<height>:XY<ld>
+        <width>  can be 320 or 640. If it is 320, then <ld> must be 'l'.
+        <height> can be 256 (or 240) or 512 (or 480). If it is 512, <ld>
+                 must be set to 'd'.  
+
+    amiga-style: LORES/S,HIRES/S
+        LORES makes uae use a 320x256-like window
+        HIRES makes uae use a 640x512-like window
+
+    GUI-style: select LORES or HIRES.
+
+Other resolution are of course possible, but you should know what you are
+doing to use them. 
+
+b. Screen type
+--------------
+This is the second parameter you should enter. This option tells UAE what
+kind of output it must use. It can be a public screen or a customscreen. If
+the customscreen is used, it is declared as public with "UAE" as a
+name. You can then, using MUI, redirect the GUI on UAE screen (but I think
+it not a good idea :) 
+
+    unix-style: -H n  
+        n=0 => Makes UAE automagically select the best PASL screen to
+               display the desired size. 
+        n=1 => Tells UAE to use the workbench screen.
+        n=2 => UAE will pop-up and asl-screen selector in which you can
+               select the mode you prefer. Please note that you will
+               probably have to correct the screen-size because ASL tends
+               to modify the initial setting of the -O option (I know, this
+               is strange :) 
+        n=3 => this mode is supposed to give a Graffiti screen, but I think
+               it is somehow broken (graffiti users can use picasso96 I was
+               told anyway :-) 
+
+     amiga-style: DEFSCR/S,PUBSCR/S,REQSCR/S,SM/K,DEPTH/K
+        DEFSCR => same as -H0 above.
+        PUBSCR => same as -H1 above.
+        REQSCR => same as -H2 above.
+        
+        SM/K and DEPTH/K are working together. You use them to tell UAE to
+        use a special screen-mode (SM=<ModeID>) at a specific depth
+        (DEPTH=<depth>) without using the mouse. For example, to use an
+        HAM6 output, you can do:   
+                         UAEWB CLI LORES SM=0x21800 DEPTH=6
+
+Note that, HAM6 is the only ham-mode supported. HAM8 is not usefull for UAE
+because the ECS can't display more than 4096 colors simultaneously.
+                 
+c. Render style
+---------------
+UAE can render a dithered output and/or a gray output. 
+
+The dithered ouput is usefull when not enough colors are available
+(typically less than 256), but it takes some cpu power and reduces the
+output readibily. By default, uae always dithers, but you can disable this
+with the following options: 
+
+    unix-style:  -x
+
+    amiga-style: NODITHER/S
+
+    GUI-style:   click on the DITHER check box.
+
+The gray output is usefull when not enough colors are available, it also
+reduces the chipram requirement and thus increase the speed of the display
+(16colors + ditherings is pretty good and fast): 
+
+    unix-style:  -T
+
+    amiga-style: GRAY/S
+
+    GUI-style:   select the GRAY checkmark.
+
+d. Memory settings
+------------------
+UAE can emulate different kinds of memory settings. You can have from 512kb
+up to 8Mb of chipram, you can also have fastmemory at $200000 or
+pseudo-fast memory at $C00000. If UAE is emulating a 68020+ cpu, then you
+can even have Zorro-III ram (up to 64Mb of Z-III ram):
+
+    unix-style: -c<n>, -s<n>, -F<n>, -U<n>
+        see original README or use "UAE -h".
+
+    amiga-style: CHIP/K,SLOWFAST/K,Z2RAM/K,Z3RAM/K
+        memory is mesured in Kb but a few inputs are aceptables:
+        - CHIP can be 256 or 512 or 1024 or 2048.
+        - SLOWFAST is the memory at $C00000 and 512 or 1024 are the two
+          availables choice.  
+        - Z2RAM is the memory at $200000 and it can grow from 1024 (1Mb)
+          to 8192 (8Mb) by steps of 1024 (1Mb).
+        - Z3RAM is the zorro 3 memory and it starts from 1024 to 65536 by
+          steps of 1024 (1Mb).
+
+    GUI-style: Should be self-explicit. Use the help-bubbles in case of
+        trouble.        
+
+e. Floppy emulation
+-------------------
+You can emulate up to 4 floppy disks with UAE using adf files (amiga disk
+file). Here is the command line way to define them:
+
+    unix-style: -0<name1>, -1<name2>, -2<name3>, -3<name4>
+
+    amiga-style: DF0/K, DF1/K, DF2/K, DF3/K. 
+        simply use DFn=<name>.
+
+    GUI-style: 
+        enter <name> in the DFx: asl file-requester.
+
+There is a special magic in UAE in that you can use your native floppy
+system for UAE. To do do, you must use a <name> with a special format. That
+format is DEV:<device-name>[.device]/unit or DEV:DF<num> (uppercase or
+lowercase doesn't matter) with the amiga or GUI style. With the unix-style,
+you can use the unix-style path: /dev/<device-name>[.device]/unit or
+/dev/df<num>. You can even see those magic DEV: file in UAE file-requester
+under the DEV: assign. For example, to make UAE use the current disk you
+have in df1, just use the dev:df1 name.. 
+
+Note: the DEV: assign that UAE creates can interfere if you have a real
+DEV: handler installed. UAE will output a warning if he sees that DEV: is
+already used. In that case you wont be able to see the DEV: assign in the
+file requester but you can still use the DEV:name magic in UAE (the DEV:
+handler and UAE magic are compatible :)
+
+f. Volume mounting
+------------------
+You can mount Amiga partition under UAE. This is usefull if you want to see
+your own workbench running under UAE in a workbench window. Please not that
+this is an advanced option and you should refer to the original README to
+see how to properly use that feature, but here is how it can be used on the
+amiga: 
+
+    unix-style: -m<uaename>:<amiga path>
+        You can use that paramater up to 20 times. <Amiga path> can be a
+        natural amiga-path like sys:t/ or a unix-style path like /sys/t/. 
+
+    amiga-style: MOUNT/K
+        You can only mount one single volume. The syntax is
+            MOUNT=<uaename>:<amiga path>
+
+    GUI-style: 
+        You can enter up to 2 volumes with the GUI using the "Volume 1:"
+        and "Volume 2:" string gadget in the "Disk setup" panel. Other
+        volumes must be entered using the "extra:" string gadget on the
+        misc panel. The "extra" parameters in the GUI are transmitted
+        directy to the unix executable, so you must use the "-m" or "-M"
+        scheme (see README). 
+                  
+        
+5. RUNTIME HOTKEYS
+==================
+When UAE is running, you can make the emulator some specific actions
+(reset, change a virtual floppy, ...) by pressing certain keys. Here is
+a listing:
+
+a. Reset UAE
+------------
+You can reset the emulator by pressing CTRL-ALT-DEL in UAE's window. I
+guess it reminds you about something :^) [*] You can altenatively press on 
+the "RESET" button in the GUI.
+
+b. Enter in debug-mode
+----------------------
+You can enter debug mode by pressing ^C or ^D in the cli/shell window or by
+pressing the close-gadget of UAE's window when used on a public screen. You
+can also send a break signal to UAE task using c:break or other tools like
+that. Last solution: press on the "debug" button on the GUI.
+
+c. Quitting UAE
+---------------
+To quit UAE, you have to enter in debug-mode (see above) and press 'q'. You
+can also send the QUIT command to the AREXX port name UAE (see below). 
+
+d. Enable/Disable display
+-------------------------
+You can toggle on/off the screen rendering to speed up the sound processing
+by pressing CTRL-SHIFT-ALT-F9 or using the "display: off" cycle gagdet in
+the GUI. 
+
+e. Ejecting and inserting virtual floppies
+------------------------------------------
+You can insert disks by pressing CTRL-LALT-F1, CTRL-LALT-F2, CTRL-LALT-F3, or
+CTRL-LALT-F4 in UAE window. F1 corresponds to drive DF0, F2 to DF1, and so on.
+Alternatively you can simply eject a disk by pressing LSHIFT in addition of
+the above keys. On the GUI, there is an "Eject" button to eject disks, and
+you can enter the name of the file uae can use as a disk in the string
+gadget to the right of the "Eject" button.
+
+_____
+[*] That's the way to Reset an IBM-PC clone :)
+
+
+6. FAQ
+======
+
+Q. Can I use my joystick?
+
+A. Yes, just try it :)
+
+
+Q. Can I use .dms files instead of .adf?
+
+A. Yes, grab undms.c.Z by David Tritscher from aminet (misc/unix). Compile 
+it using any C compiler (DICE by Matt Dillon for example). Put the 
+executable someware in your path (c: for example), and UAE will be able to 
+use dms files.
+
+
+Q. The README file tells about a necessary kick.rom file, but I've noticed it
+is not needed by the amiga port, why ?
+
+A. If UAE does not find a rom-file, it'll use the ROM located at address
+$F80000 - $FFFFFF. Thus, you need not grab it and that will spare you
+some disk space. You can disable this feature by creating the
+environment variable "USE_UAE_ERSATZ", in which case UAE will try to
+emulate rom calls using a built'in pseudo kickstart.
+
+
+Q. Can I use cybergraphics or picasso96?
+
+A. Yes, using the -H2 option, you can select a cybergfx/picasso96 mode. Be
+sure to select a proper window size for UAE. If you are using a
+cybergfx/picasso96 workbench, UAE will use all the available bitdepth. That is
+to say that if your workbench is 16bbp, UAE will run trucolor without
+dithering.
+
+
+Q. Can I make a movie with UAE?
+
+A. Yes you can. First you must use a native amiga screenmode (because my
+iff-grab routine pokes in the chipram :(). Second, you need to define
+ENV:UAEIFF to a proper filename. Then, UAE will save an IFF file at every
+frame. For example if you: "setenv UAEIFF t:uae.%04d", UAE will create
+t:uae.0000, t:uae.0001, t:uae.0002, ... If you forget the %d format specifier,
+uae will add ".%05d" by default to the format. You can then collect all those
+iff files into a single anim file using an appropriate program (Rend24 by
+Thomas Krehbiel for example). 
+
+
+Q. There is no sound, even with the -S2 setting!
+
+A. The sound may not work, depending on the internal setup used during the
+compilation for the current executable.
+
+
+Q. Can I use the stereo output?
+
+A. Yes, but you'll need AHI to be installed on you system.
+
+
+Q. Why is the sound so ugly?
+
+A. The sound can be emulated in this version. But Amigas are too slow for it
+to be really usefull. On my amiga, UAE produces one second of sound every
+twenty seconds in Sanity's Interference demo. Thus, An amiga which is around
+20 times faster as an A4000 would be nice. PowerPC Amiga will probably achieve
+this one day. 
+
+
+Q. Can I grab the sound with UAE?
+
+A. Yes you can. If you setenv AUDIONAME <format>, then uae will put the
+sound-samples into a file using the <format> specifier. The <format> 
+specifier looks like a filename with optionally two "%d". If present, the
+first "%d" will be replaced by the frequency (see the -R flag for UAE) and the
+second one will be replaced by the buffer size (-B option for UAE). This
+is usefull if you want to use the AUD: driver Martin Brenner. Alternatively,
+you can enter the <format> in the GUILauncher.
+
+
+Q. What is the "Appwindow started" message that UAE tells me while booting? 
+
+A. With UAE on the amiga, you can run one of you executable within the
+emulator. To do so, you must mount your system partition (-m sys:sys:) as
+well as other partition you'd like to use (in other word, make UAE boot on
+a clone of your workbench). Then, run the "amiga/uae_cli" executable inside
+UAE. Once this is done, click on a Workbench icon on your real workbench
+and drop it onto UAE's window.. Then *MAGIC*, you'll see the executable
+start in UAE! Alternatively, you can send "uaeexe <command-line>" to the
+ARexx port of UAE and it will execute <command-line> in an emulated cli
+environment. 
+
+
+Q. Can UAE be a bit faster using some ASM magic?
+
+A. There is already some ASM magic: the CPU emulation is speed up by using
+ASM code to compute flags directly from the 680x0 SR/CCR register.  
+
+
+Q. Is there any special setting to make it run a bit faster?
+
+A. Seen next section :)
+
+
+7. HOW TO SPEED UP UAE?
+=======================
+Here are a few tips to make UAE run faster. Those are for the unix-style of
+command line, but you should be able to interpret them with the GUI or the 
+amiga-style. 
+
+First you need to know that chunky2planar conversion takes time. In order 
+to decrease that time, I encourage you to install NewWPA8 on your system. 
+NewWPA8 can be found in Aminet. You can also gain speed by reducing the 
+screen depth. Of course uae running on a 3bitplanes screen is ugly, but 
+you can increase the output quality by using a grayscale output (-T
+option). 
+
+You can gain speed by reducing UAE screen/window size. By default, you can 
+use a 320x256 customscreen mode, but a better solution is to make uae run 
+on a 640x256 workbench screen and use a 320x128 window. That way, uae will
+skip one line out of two speeding things up a bit. To achieve this you can 
+launch UAE with the following commandline:
+
+                        CLI> UAE -H1 -O320:128:XYlc
+
+You can also skip one frame out of two with the -f2 option, but this
+reduces the smoothness of the display. An other option to gain speed is 
+to make UAE emulate a 32bit blitter that terminates his operations
+immediately. This is done with the -n3i option. 
+
+An other option is to attribute more CPU power to the customchip
+emulation. The parameter -w<num> permits this. The more <num> is, the more
+time UAE spend in the customchip emulation. Some demos ore games are very
+customchip intensive, but although uae default setup is good for most
+situation, it may be interresting to increase the <num> parameter. The
+default value is 4, but some demos require 8 or 10 to permit all the
+customchip operation to perform better (Enigma demo for example). The
+problem is that with a big <num> value, UAE will have very few time to
+emulate the CPU. The problem is that the CPU has to respond quickly to
+interrupts, and a high value of <num> will prevent it to respond fast
+enough leading to a crash or a dead lock. (Remind that even a real amiga
+with hires and disk-dma and sound-DMA on can have trouble to multitasks
+(cf. Octamed documentation)). So the thing is with the -w<num> parameter to
+find the proper value of <num> to have a fast customchip but still enough
+time for the cpu emulation. The option -w8 can increase the speed of some
+demos while it slows down some other demos. This is dependant of the
+program so that no general rule is available.  
+
+The ultimate option to make UAE run faster is to ... (surprise, surprise!)
+buy a faster CPU... If only the 68060 running a 350Mhz was available :-)
+I know is not really an option, so to sum the things up, to run UAE fast, 
+you had rather have a fast CPU (68060 at 50Mhz), a 640x256 (16 colors) 
+workbench with NewWPA8 installed, and run UAE with
+
+                       CLI> UAE -H1 -O320:128:XYlc -f2 -n3i -w8
+
+I hope all those tips will help you.
+
+
+8. AREXX PORT
+=============
+This section is rather for experienced user or programmers that want to
+enhance UAE or to replace MUIRexx GUI.
+
+UAE provides an AREXX port through which you can set or retrieve
+internal parameters or variables such as the state of the joystick
+emulation or the framerate and so on. Is also implements a "feedback"
+mecanism so that a GUI piloting UAE through the AREXX port can hear
+about dynamical modification of UAE variables such as led states and
+the like. The port name is "UAE". If that port already exists, UAE
+will disable it's AREXX feature (that is to say if you have 2 copies
+of UAE running on your system, only one will have an AREXX port. I
+doubt anyone will try to run 2 UAE in the same time :-).
+
+The commands that need a string argument accepts quoted strings. If
+the string is not quoted then it is the following word that will be
+used. The quotes can be single (') or double ("). They must match (eg.
+if you begin with ('),then you must end your string with (') too).
+Within a string, you can use a backslash (\) to express escape
+sequences. For example, "This 'is' a \"string\"." represents the
+string (This 'is' a "string"). I hope you get it :-)
+
+Here is a list of the available commands:
+
+        * BYE
+        * QUIT
+                This make the emulator exit.
+
+        * RESET
+                This makes a hard-reset of the emulator.
+
+        * DEBUG
+                This forces the emulator to enter in debugging mode.
+
+        * EJECT <num>
+                This will eject the disk in drive <num> (from 0 to 3).
+
+        * INSERT <num> <filename>
+                This will insert the filedisk <filename> in drive unit
+                <num>. 
+
+        * FRAMERATE <num>
+                This sets the framerate to <num> (1 <= <num> <= 20).
+                It is a way to overwrite the -f flag of UAE.
+
+        * VERSION <arg>         (<arg> = NUM | AUTHOR | PORT | STRING)
+                This places in the AREXX 'RESULT' variable some
+                information about UAE's version. 
+
+                NUM returns a numerical value that is to be interpreted
+                as UAEMAJOR*10000 + UAEMINOR*100 + UAESUBREV (ie. uae
+                v0.6.4 will return "604").
+
+                AUTHOR returns the original author of UAE (ie. Bernd
+                Schmidt). 
+
+                PORT returns the name of the port author (that's me!:-)
+                
+                STRINGS returns a summary string made with the above
+                strings. 
+
+        * DISPLAY <arg>         (<arg> = ON | OFF | TOGGLE)
+                This will enable or disable the display rendering.
+
+        * FAKEJOYSTICK <arg>    (<arg> = ON | OFF | TOGGLE)
+                This will enable or disable the joystick emulation. It
+                is a way to overwrite the -J flag from the command
+                line. 
+
+        * SOUND <arg>           (<arg> = ON | OFF | BEST)
+                This sets the state of the sound emulation (see option
+                '-S' on the command line). BEST is the same as using
+                the -S3 switch on the commandline.
+
+        * QUERY <var>
+                This asks UAE's for its internal variables. That
+                state is written in the arexx 'RESULT' variable. So
+                don't forget to put 'OPTIONS RESULTS' in your arexx
+                scripts. 
+
+                <var> can be one of the following:
+
+                * FAKEJOYSTICK => returns "1" if the joystick
+                  emulation is ON and "0" if it is OFF.
+
+                * DISPLAY => returns "1" if the display is not
+                  inhibited and "0" otherwise.
+
+                * FRAMERATE => returns the current framerate (see
+                  option -f).
+
+                * SOUND => returns "0" if the sound is not emulated
+                  (ie. uae -S0 was used). "1" is returned when the
+                  sound is OFF (think about uae -S1). "2" means the
+                  sound emulation is ON and "3" means it is the best
+                  sound-emulation that is used (uae -S3).
+
+                * NAME_DF0
+                * NAME_DF1
+                * NAME_DF2
+                * NAME_DF3 => returns the name of the diskfile used in
+                  the indicated unit.
+                  
+                * LED_DF0
+                * LED_DF1
+                * LED_DF2
+                * LED_DF3 => returns "1" if the drive led is hilighted
+                  and "0" if the led is OFF.
+
+                * LED_POW => returns "1" if the powerled is ON and "0"
+                  otherwise. 
+
+        * UAEEXE [run] <executable> <args>
+                This will make UAE lauch the <executable> provided 
+                you've previouly starded uae_rcli. If <executable> is 
+                "QUIT", then the "uae_rcli" process will exit(). Note 
+                that you must use "run" in order to launch the 
+                executable as an asynchronous command.
+
+        * FEEDBACK <eventname> PORT|ADDRESS <portname>
+                               CMD_ON|CMD|CMD_OFF <cmd> 
+                That command needs a special explanation:
+
+                <eventname> is the name of an internal UAE event. It
+                can be any of:
+                   ON_EXIT (UAE is about to quit),
+                   LED_POW (the power led has changed),
+                   LED_DF0 (led of drive DF0 has changed),
+                   LED_DF1 (the same, but for DF1),
+                   LED_DF2 (well...),
+                   LED_DF3 (guess!),
+                   NAME_DF0 (name of filedisk df0 has changed),
+                   NAME_DF1 (obvious),
+                   NAME_DF2 (ditto),
+                   NAME_DF3 (...).
+
+                <portname> is the name of an AREXX port. It can be
+                "COMMAND" in which case <cmd> is interpreted as DOS
+                command. 
+
+                <cmd> is a string containing a command that UAE will
+                send to <portname> when the event matching <eventname>
+                occur.  
+
+                Each event has 2 available <cmd>s. One is set by the
+                CMD_ON keyword, the other by CMD_OFF. CMD_ON can be
+                abreviated to CMD.
+
+                When the event is the name of a led (LED_POW, LED_DF0,
+                ...), it is the <cmd> associated to CMD_ON that will be
+                sent to <portname> if the led is hilighted. It is the
+                <cmd> of the CMD_OFF argument that will be used if the
+                led is dimmed. I think you need an example to make it
+                clear (no pun intended :)
+
+                If you issue the command:
+
+                        address UAE feedback LED_POW PORT COMMAND
+                        CMD_ON "list t:" CMD_OFF "list s:" 
+
+                Then UAE will issue "list t:" when the led is set to ON
+                and "list s:" when it set to OFF. Note: this feature
+                was not initially meant to transform UAE as a dir-like
+                programm :-) A more serious example can be found in
+                UAEGUI.rexx where you'll find something like:
+
+                        address UAE feedback LED_DF0 PORT UAEGUI,
+                         CMD_ON  "switch ID DF0 ATTRS 0x8042654b 1",
+                         CMD_OFF "switch ID DF0 ATTRS 0x8042654b 0"
+
+                That makes the gui led follow any state changements.
+
+                If <eventname> is not a name of a led (ON_EXIT,
+                NAME_DF0, ...) then UAE will only use the CMD_ON
+                command. For events like NAME_DF0, <cmd> can bear a
+                '%s'. It'll be replaced by the name of the
+                correponding filedisk. For example, the following code:
+
+                        address UAE feedback NAME_DF0 PORT UAEGUI,
+                         CMD "popasl ID NDF0 CONTENT %s"
+
+                Will change the content of the popasl gadged whose ID
+                is NDF0 automatically when the drivename is modified.
+
+                The event ON_EXIT is used when uae is about to exit.
+                You can use it to automatically close an external GUI
+                when UAE ends:
+                
+                        address UAE feedback ON_EXIT PORT UAEGUI,
+                         CMD "quit"
+                        /* sends "quit" to UAEGUI when UAE exits */
+
+Note: I hope my explanation about the ARexx port is not too fuzzy.
+You can always have a look to UAEGUI.rexx to figure out how to use
+it. The script UAEGUI.rexx requires MUIRexx v3.0 by Russ Leighton
+<russ@sneezy.lancaster.ca.us>. MUIRexx can be found on Aminet and
+allows quick programming of GUIs with MUI and ARexx.
+
+
+9. HOW TO (RE-)BUILD UAE
+========================
+This section is rather for programmers that want to build their own
+versions of UAE. You should be familiar with unix word if you intend to do
+so. If you want to compile UAE with SAS/C, you must read the next section.
+
+If you wish to (re-)build uae, you need to have GeekGadget (short: GG) and
+gcc correctly installed (see ftp://ftp.ninemoons.com/pub/gg/). Not all part
+of GG are needed, but be sure to have gcc2.7.2.1, binutils, autoconf, awk,
+etc.
+
+The default Makefile provided is for a MC68030 microprocessor. If you
+wish to have a Makefile tuned for your CPU (and fpu), just type "sh -c
+configure". 
+
+If you have deleted the file "configure", you can rebuild it from
+"configure.in". To do this, use autoconf 2.10.
+
+Once your Makefile is generated (if needed), you can modify the file
+"config.h" to suit your needs. You can also modify "src/od-amiga/ami-win.c"
+to allow the support of cybergfx modes (you'll need to obtain
+CGraphX-DevKit.lha from Aminet then). I suggest you to define
+DONT_WANT_SOUND in "config.h". That will speed up the emulation (sound
+emulation slows down the speed by roughly 10%). 
+
+When you'll have configured uae correctly, type "make" in a shell. Then
+one hour and a half later you'll get the uae executable (it might be less
+if you have a *real fast* Amiga, but don't expect less that 15 minutes).
+I know it's slow, but Amigas are slow (even those with 68060 are not that
+fast, by today's standards ;-).  
+
+To compile, 10Mb of free memory should be enough (I succeded with 4Mb, but
+virtual memory helps in that case). The resulting directory size is
+roughtly 5.7Mb on my harddrive. Be sure to have a stack of at least
+300Kb when compiling UAE and at least 32kb when UAE is running.
+
+NOTE: I had reports that gcc complains and fail to compile cpu_f?.s.
+This is caused by a problem with perl and src/md-68k/cpuopti. I don't
+know where it comes from precisely as I never experienced that problem.
+Anyway, to avoid this, you should uncomment the lines in the beginning of
+src/md-68k/cpuopti. Unfortunately, UAE will run slower as the asm files
+won't have an extra optimisation pass.
+
+
+10. COMPILING UAE WITH SAS/C
+============================
+This section is rather for programmers that want to build their own
+versions of UAE using SAS/C. You should be familiar with unix word and
+SAS/C if you intend to do so. 
+
+To compile UAE with SAS/C you'll need SAS/C V6.58 and a subset of GG (see
+the previous section). That subset must include ixemul, sh, make and perl
+to do the compilation and at least sh-utils, cpp, perl, sed, autoconf to
+run the configure script. Probably a few other package are needed, so if
+you want to be on the safe side, you had rather had GG completely
+installed. On my machine, the subpart of GG I use (gcc, g++, man, curses,
+termcap, ...) takes only 14Mb on an XFH partition.. that's not much, but
+I've spent time to replace duplicates with symbolic links.
+
+Once you have GG properly installed, you must copy the file
+"src/od-amiga/scc" to somewhere in your path (sc:c for example). You can
+also do something like:
+                      CLI> assign c: src/od-amiga add
+or any other solution. The purpouse is to enable GG's tools to find scc.
+The file scc is a perl script that tries to emulate gcc behaviour using
+SAS/C. [note to amiga-developpers: that script is tuned for UAE, but I
+think it can be modified for other projects, let me know about it if you
+intend enhance it]. Then, do:
+                      CLI> setenv CC scc
+to tell the configure script to use scc as the C compiler. Next, run the
+configure script:
+                      CLI> sh -c configure --enable-sound
+The configure script will probably produce warnings, but they are not
+important. Then, check src/Makefile to see if it fills your needs (you'll
+probably have to replace -g with -O3 to have an optimised version of UAE,
+and modify -m<cputype> with -m68060 if you have a 68060 cpu). Now, as the
+last operation, type in
+                      CLI> make
+to build UAE and be patient! (it takes a while with optimisations enabled).
+
+Last note about SAS/C: Compiling UAE with SAS/C instead of gcc will
+disable some nice features of UAE (native filesystems mounting,
+average time per frame computation, ...) because SAS/C is not enough
+POSIX compliant.
+
+
+11. COMPILING FOR POWERUP
+=========================
+
+This is tricky! For the moment that section is not yet complete.
+If you intend to compile UAE for powerup you should be sure to know
+what you are doing because it is difficult.
+
+To compile UAE for powerup, you must have a few things installed.
+This is a difficult part! First gcc for mc68k must be installed,
+then find ppc-amigaos-gcc somewhere and install it. It can be found
+on Phase5 CD-ROM or (possibly) on GeekGadget mirrors. Finally, you
+must also install the ixemul-bridge from Holger Jakob in order to
+have a ppc version of libamiga.a, libc.a and libgcc.a and such other
+goodies.
+
+Once everything is installed, you must run "configure" as if you where
+compiling for mc68k. Then "make pup" will give you a (hopfully) working
+uae.elf executable.
+
+If you encounter trouble with missing "#include" files (pccinlines
+or ppcprotos) during the compilation, I'd recommend you to re-generate
+your ppcinlines and ppcprotos using fd2inlines because I've noticed
+that the ppcinlines package comming from the Vendor is not complete
+( I've told you compiling for powerup was tricky :-( ).
+
+
+12. REMARKS OR BUG-REPORTS
+==========================
+
+You can send me your remarks and bug-report to:
+
+                       devulder@info.unicaen.fr
+
+
+13. LAST NOTE
+=============
+
+Why emulate an Amiga on an Amiga ? That can seem to be a foolish
+behaviour.. Actually it is not !
+
+Many old games/demos refuse to work well if you are using a 68030+;
+even with degrader running (ever tried to make ST4Amiga work on
+anything greater than a 68000?). In that case, uae might be usefull.
+
+UAE might also help graphic-board owners. With UAE, they can view all
+the demos with copper and blitter effects that fails to run on their
+graphics board. Or run programs like Deluxe-Paint or Brilliance that
+poke the hardware directly. That is specialy usefull for DRACO owners.
+
+Using uae on a 68040+ Amiga will let you play games or demos on your
+workbench, in a perfect multitasking. And that is, believe me, quite
+amazing (even on my poor 68030 :-). Alternatively, UAE makes a 
+wonderfull screen-saver (a bit memory-hungry though).
+
+The main advantage of uae, will be when PowerPC Amigas will come out.
+On these machines, I bet no old programs will run. Those machines will
+certainly include a 680x0 emulation powerfull enough to run DOS 
+programs, but certainly not sufficient to run old games. Thanks to UAE,
+backward compatibility will not be a problem anymore. UAE is definitely 
+a great program ! 

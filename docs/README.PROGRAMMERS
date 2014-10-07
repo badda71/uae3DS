@@ -1,0 +1,316 @@
+You can help to make this program better. If you fix bugs or implement new
+features, I'd be grateful if you send me patches. For a list of interesting
+projects, and for a brief summary on how UAE works, see below.
+
+A few guidelines for anyone who wants to help:
+- Please contact me first before you implement major new features. Someone 
+  else might be doing the same thing already. This has already happened :-(
+  Even if no one else is working on this feature, there might be alternative
+  and better/easier/more elegant ways to do it.
+- If you have more than one Kickstart, try your code with each one.
+- Patches are welcome in any form, but diff -u or diff -c output is preferred.
+  If I get whole source files, the first thing I do is to run diff on it. You 
+  can save me some work here (and make my mailbox smaller).
+
+Some possible projects, in order of estimated difficulty:
+- Add gamma correction
+- If the serial port still isn't working (I've got no idea, I don't use it),
+  fix it.
+- Someone with a 68020 data sheet might check whether all opcodes are
+  decoded correctly and whether all instructions really do what they are 
+  supposed to do (I'm pretty sure it's OK by now, but you never know...).
+- Add more 2.0 packets to filesys.c
+- Multi-thread support is there now, it just needs someone to test it on a SMP
+  machine and to fix it so it improves speed instead of slowing the thing 
+  down.
+- Improve the Kickstart replacement to boot more demos.
+- Snapshots as in CPE. Will need to collect all the variables containing
+  important information. Fairly easy, but boring. (Use core dumps instead :-)
+  _If_ someone attempts this, please be more clever than the various CPC
+  emulators and dump state only at one fixed point in the frame, preferrably
+  the vsync point. Also talk with Petter about this.
+- Find out why uae.device has to be mounted manually with Kick 1.3.
+  The problem seems to be that we don't have a handler for it. I _think_ what
+  we need is the seglist of the standard filesystem handler. Problem is,
+  DOS hasn't been started when the devices are initialized and so we can't get
+  to the DosBase->RootNode->FileHandlerSeg pointer, and then there is the
+  confusing matter of BCPL GlobVecs and other weird stuff...
+- Some incompatibilities might be fixed with user-modifiable fudge variables
+  the same way it's done in various C64 emulators.
+- With the new display code, it would probably be easier than before to
+  implement ECS resolutions - however, a lot of places rely on the OCS timing
+  parameters and display sizes.
+- Figure out a diskfile format that supports every possible non-standard
+  format [I'll work on this soon (I hope)].
+- Port bsdsocket library code to other operating systems than Win32.
+- Implement 68551 MMU. I have docs now. Not among the most necessary things.
+  Should be done like exception 3 handling: add code to genamode in gencpu.c.
+- Implement AGA support. Some bits and pieces exist.
+- Reimplement Amiga OS. (Well-behaved) Amiga programs could then be made
+  to use the X Window System as a "public screen". Of course, not all the
+  OS would have to be re-done, only Intuition/GFX/Layers (which is enough).
+  [Started, look at gfxlib.c - not usable yet.]
+- Find some extremely clever ways to optimize the smart update methods. Some
+  ideas:
+  a) Always use memcmpy() to check for bitplane differences. If no differences
+     are found, see if BPLxDELAY got modified, if so, scroll.
+     Problems:
+      * You'd still have to draw a few pixels around the DIW borders. Not very
+        hard.
+      * Scrolling with memcpy in video memory can be terribly slow (no, I
+        shouldn't have bought the cheaper video card with DRAMs)
+      * At least every 15 pixels a full update has to be done since the
+        bitplane pointers get updated after that. And that's with the slowest
+	scrolling - if the playfield scrolls faster, the benefit converges
+	against zero.
+     You could also do vertical scrolling tests, but similar problems arise - 
+     where should one check? One line above/below? What about faster
+     scrolling? You could use the bitplane pointers as hints, but with
+     double/triple buffering this gets problematic, too.
+     On the whole, I don't think it would be worth the effort, even if it
+     works very well for a few games.
+  b) Well, there is no b). If I thought of something I forgot it while
+     writing a).
+- Port it to Java and Emacs Lisp
+- A formal proof of correctness would be nice.
+
+
+Source file layout
+
+src/      contains (mostly) machine-independent C code.
+include/  contains header files included by C code.
+md-*/     CPU and compiler dependent files, linked to machdep by configure
+od-*/     operating system dependent files, linked to osdep by configure
+td-*/     thread library dependent files, linked to threaddep by configure
+sd-*/     Sound code. sd-* is only for sound systems which are not OS specific
+          or for which no "od-*" directory exists. Linked to sounddep
+scg-*/    SCSI code.
+          This is the same code as in the cdrecord libscg, so this will become
+          obsolete as soon as the libscg is released seperately. In the meantime,
+          UAE will be distributed together with the code itself, because it
+          also requires patching: not every libscg implementation is thread-safe
+          in the current cdrecord version.
+targets/  Contains header files which contain some information about which
+          options a specific port of UAE understands.
+
+
+Coding style
+
+As long as your code is hidden in a file buried in md-*/ or od-*/ where I
+never have a look at it, you can probably get away with not following these
+guidelines. 
+
+* Do not include CR characters.
+* Do not use GNU C extensions if you can't hide them in a macro or in a
+  system-specific file so that an alternative implementation is available
+  when GNU C is not used.
+  This applies to _all_ OS/CPU/compiler specific details. Basically, nothing
+  of that sort should appear in src/*.c (we're a bit away from that goal at
+  the moment, but it's getting better).
+* Repeat after me: #ifdefs are evil (most of the time).
+* Make sure your code does not make assumption about type sizes other than
+  the minimum widths allowed by C. If you need specific type sizes, use the
+  uae_u32 type and its friends.
+* Set up your editor so that tab characters round up to the next position
+  where ((cursorx-1) % 8) == 0, i.e. 8 space tabs. Do not use 4 space tabs,
+  that makes the code awful to read on other machines and worse to edit.
+  (I'm talking about the tab character here, not indentation!)
+* Lines can be up to 132 characters wide. Use SVGATextMode for the Linux
+  console, or use a windowing system in a high resolution.
+* C++ comments are a no-no in C code.
+* Indentation - look at some code in custom.c and try to follow it. Don't
+  use GNU 2-space-in-weird-places indentation, I find it awful. But _do_
+  follow the GNU rules for adding whitespace in expressions, and those for
+  breaking up multiple-line if statements.
+  Fixed indentation rules almost never make sense - break the rules if that
+  makes your code more readable.
+  Hint: Get jed from space.mit.edu, /pub/davis. It can indent your code
+  automatically. Put the following into your .jedrc, and it will come out
+  right:
+  C_INDENT		= 4;
+  C_BRACE		= 0;
+  C_BRA_NEWLINE		= 0;
+  C_Colon_Offset	= 1;
+  C_CONTINUED_OFFSET	= 4;
+
+
+How it works
+
+Let's start with the memory emulation. All addressable memory is split into
+banks of 64K each. Each bank can define custom routines accessing bytes, 
+words, and longwords. All banks that really represent physical memory just 
+define these routines to write/read the specified amount of data to a chunk 
+of memory. This memory area is organized as an array of uae_u8, which means 
+that those parts of the emulator that want to access memory in a linear 
+fashion can get a (uae_u8 *) pointer and use it to circumvent the overhead of
+the put_*() and get_*() calls. That is done, for example, in the
+pfield_doline() function which handles screen refreshes.
+Memory banks that represent hardware registers (such as the custom chip bank
+at 0xDF0000) can trap reads/writes and take any necessary actions.
+
+To provide a good emulation of graphical effects, only one thing is vital:
+Copper and playfield emulation have to be kept absolutely synchronous. If the
+copper writes to (say) a color register in a specific cycle, the playfield 
+hardware needs to use the new information in the next word of data it
+processes.
+UAE 0.1 used to call routines like do_pfield() and do_copper() each time the
+CPU emulator had finished an instruction. That was one of the reasons why it
+was so slow. Recent versions try to draw complete scanlines in one piece. This
+is possible if the copper does not write to any registers affecting the
+display during that scanline. Therefore, drawing the line is deferred until
+the last cycle of the line. However, sometimes a register which affects how
+the screen will look is modified before the end of the line (think of copper
+plasmas). That's what "struct decision thisline_decision" is for. It is
+initialized at the start of each line. During the line, whenever a vital
+register is changed, one of the decide_*() functions is called and may modify
+thisline_decision. There are several independent decisions:
+ - which DIW should be used
+ - where does data fetch start/stop (or is the line in the border altogether)
+ - where should sprites be drawn (note: the same sprite can appear more than
+   once on one scanline, see Turrican I world 3 levels 1 and 3 for the best
+   example)
+ - what are the playfield pointers at the start of DDF. Related, what data do
+   they point to.
+ - what are the playfield modulos at the end of DDF
+ - coppermagic with the colors is remembered for later use
+ - so is copper magic with the bitplane delay values. I used to think there
+   was no useful application for modifying BPLCON1 while data is being
+   displayed, but Sanity demos can make Amiga emulator programmers look real
+   old.
+
+All of this is remembered while the raster line is processed by the hardware.
+After the line (at hsync), all the decisions are made if they weren't made
+before. At that point the line can be drawn by playfield_draw_line.
+Additionally, all the decisions from the previous displayed frame are saved
+and compared with the new ones, since often lines are not modified between
+frames. This saves a lot of redrawing work.
+
+The CPU emulator no longer has to call all sorts of functions after each
+instruction. Instead, it keeps a list of events that are scheduled (timer
+interrupts, hsync and vsync events) and their "arrival time". Only the time
+for the next event is checked after each CPU instruction. If it's higher than
+the current cycle counter, the CPU can continue to execute.
+
+Things that can't be supported with the current "decision" model:
+  - Changes in lores/hires mode during one line. Dunno whether that was ever
+    used in reality.
+  - Changes to the bitplane DMA bit during one line. Hardly useful and not
+    likely to be used. [but there are at least two programs which do ugly
+    things like that, and there are some hacks in UAE that make those programs
+    work (Magic 12 Ray of Hope 2 is one of these demos)]
+  - Changes in bitplane data during one line. If programs do this kind of
+    thing, it's most likely accidental and the program is broken. Can happen
+    with programs that use the blitter incorrectly, like all the Andromeda
+    demos.
+  - others? (fill in if you can think of anything)
+
+All in all, it's unlikely that this causes compatibility problems. If it does,
+fudge values could be introduced (although that sort of thing gets messy
+quickly).
+
+
+* Native code vs. 68k code
+
+It is possible to call native code from 68k code; autoconf.c has some routines
+which make setting up a call trap very easy. However, it is not as easy to
+call 68k code from native C code, at least not while Amiga Exec multitasking
+is running. You ask why?
+
+Amiga process1 calls native function foo
+Native function foo calls some 68k function and goes into 68k mode
+Amiga context switch happens, process1 is put to sleep and process2 gets run.
+Amiga process2 calls native function foo
+Native function foo calls some 68k function and goes into 68k mode
+Amiga context switch happens, process2 is put to sleep and process1 gets run.
+Process 1 completes the 68k function called by foo and returns from 68k mode.
+
+There. Now we are in function foo again. When it called the 68k code, process2
+was active. Now process1 is active, and the function we called in process2
+hasn't completed yet. What a mess.
+
+To get around this, you need to do some stack magic. Code to do this exists,
+but it must be adapted for each port, since setting up a different stack is
+completely non-portable.
+
+
+* How multithreading in filesys.c works
+
+AmigaOS is nice enough to start one processes for each mounted filesystem. All
+of these run in the 68k emulation code, i.e. in the main UAE thread. This is
+the reason why multithreading is desirable: if the main UAE thread blocks
+waiting for I/O, the CPU emulation can't continue to run. Since the Amiga OS
+is capable of multi-tasking, it is possible that other code could run until
+the I/O operation is complete. The most important bit of code that can run is
+the code that moves the mouse pointer - it's unpleasant if the pointer does
+not follow mouse movement during disk/CD accesses.
+
+When a packet is received by the filesys.asm code, filesys_handler is called.
+This function always runs in the main UAE thread.
+ - In the single-threaded case, this function performs the action that was
+   requested, then returns 0 to indicate "action completed, reply packet".
+   Nothing else is performed.
+ - In the multi-threaded case, filesys_handler figures out which unit the
+   packet was for and sends the packet to the UAE thread responsible for
+   handling this unit. filesys_handler returns 0 to indicate: queue the
+   packet. Also, one (at that point unused) field in the packet is set to
+   0 to indicate that the action was not completed.
+
+The latter case is the interesting one. The thread that got the packet does
+the following:
+ - perform the action as usual
+ - set the "command complete" field in the packet to -1.
+ - send a message to the AmigaOS (!) filesystem process. However, it can't do
+   that without some effort. We can't call 68k code from the emulator easily.
+   So we have to use an Amiga interrupt. The filesystem init code sets up an
+   Exec IntServer for the EXTER interrupt, and hsync_handler() checks
+   periodically whether the filesystem needs an interrupt and raises one if
+   necessary.
+   Only one dummy message is used per filesystem unit, which is allocated at
+   startup. This means that there must be some locking to prevent the unit
+   thread from sending the same message twice to the same port. To determine
+   whether the message is free, three counts are kept. "cmds_sent" is
+   incremented by the UAE thread whenever it has completed a command.
+   "cmds_acked" is set to the same value of cmds_sent at the point that the
+   interrupt handler got invoked and decided it must send a message. Finally,
+   cmds_complete is set to this value at the time the AmigaOS process receives
+   the dummy message. Whenever cmds_acked == cmds_complete, the dummy message
+   is free to be sent again.
+   
+The EXTER interrupt basically walks through the units, looks at the cmds_*
+fields and sends the dummy message to the Amiga filesystem process when
+possible and necessary.
+
+When the Amiga filesystem process receives such a dummy message, it does the
+following:
+ - increment cmds_complete as described above.
+ - walk through the queue of unprocessed commands and see which ones now have
+   a status of -1, indicating that they are finished. These are removed from
+   the queue and replied to.
+
+
+* Calltraps at fixed locations
+
+F0FF00: return from 68k mode.
+F0FF10: must have gotten lost somewhere ;)
+F0FF20: used by filesys.c to store away some information from the startup
+        packet.
+F0FF30: filesys_handler().
+F0FF40: startup_handler(), handles only the startup packet for each
+        filesystem.
+F0FF50: used by the EXTER interrupt which we set up for the filesystem.
+F0FF60: used by the uaectrl/uae-control programs (see uaelib.c)
+F0FF70: used by the task that gets set up for the mouse emulation.
+F0FF80: getchipmemsize()
+F0FF90: uaeexe
+F0FFA0: timehack
+F0FFB0: AHI
+
+* How the compiler works
+
+.. yet to be written. To be decided, in fact.
+
+
+Portability
+
+This section was out of date. I'll rewrite it.
+Some day.

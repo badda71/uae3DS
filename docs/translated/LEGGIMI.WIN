@@ -1,0 +1,660 @@
+File LEGGIMI per la versione Win32/DirectX di UAE (0.8.x)
+
+(c) 1995-1998 Bernd Schmidt   <crux@pool.informatik.rwth-aachen.de>
+(c) 1997-1998 Mathias Ortmann <ortmann@informatik.tu-muenchen.de>
+(c) 1997-1998 Brian King      <brian_king@codepoet.com>
+
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+Traduzione ed aggiunte a cura di Fulvio Leonardi, Copyright (c) 1998.
+
+Home Page italiana di UAE : http://www.panservice.it/uae/
+
+E-mail                    : uae@mbox.panservice.it
+
+Tutti i diritti sono riservati. E' concessa la distribuzione di questo
+documento in qualsiasi forma, a patto che avvenga gratuitamente. NON sono
+autorizzate modifiche di alcun tipo senza l'espresso consenso dell'autore,
+ne' tantomeno diverse attribuzioni di provenienza. Se parti di questo
+documento o l'intero documento stesso vengono inclusi in mezzi di
+informazione (come siti web o articoli di riviste), e' richiesta una
+citazione dell'autore, della sua e-mail ed eventualmente del suo sito. Per
+qualsiasi tipo di diffusione che vada al di la' della normale distribuzione
+del software di Pubblico Dominio, contattare l'autore.
+
+All trademarks used in this document are property of respective owners.
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄATTENZIONEÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Questa versione di UAE e' stata ottimizzata per le prestazioni, non per la
+facilita' d'utilizzo. Se non sei certo di poterla usare e non sei disposto
+ad investire un'oretta del tuo tempo nella lettura della documentazione e
+nella comprensione dei meccanismi di funzionamento di UAE, o se non sei un
+"veterano" di Amiga con una solida base d'informatica, questo programma non
+fa per te. NON USARLO. Potesti riprovare tra un paio di mesi, quando
+ulteriori progressi ed una nuova interfaccia utente potrebbero aver reso UAE
+Win32/DirectX una applicazione perfettamente integrata con lo stile Windows.
+Grazie per la collaborazione.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄATTENZIONEÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Per informazioni generali su UAE, fai riferimento al seguente indirizzo:
+
+ http://www.freiburg.linux.de/~uae/
+
+Questo LEGGIMI _non_ copre le funzionalita' di UAE che sono comuni a tutte
+le versioni. Se non hai ancora dimestichezza con UAE, consultare la
+documentazione generica prima di provare ad utilizzare questa versione
+non sarebbe una cattiva idea.
+
+La documentazione generica di UAE puo' essere trovata nella cartella "docs"
+presente in questo archivio. Abbi tuttavia un po' di "sale in zucca": non
+tutti i dettagli della documentazione Linux riguardano WinUAE e viceversa.
+
+L'ultima versione di UAE Win32/DirectX puoi trovarla su:
+
+ http://www.codepoet.com/UAE/
+
+Questa versione e' ben lontana dall'essere completa ed implementa niente
+piu' che le funzionalita' ridotte "all'osso" di UAE. Attualmente appartiene
+ancora agli ambienti Un*x (deve partire da linea di comando).
+
+NOTA:
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+L'interfaccia utente integrata nelle precedenti versioni e' "morta sul
+campo". Verra' presto reimplementata, insieme ad un file di configurazione
+comune a TUTTE le versioni di UAE.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Se utilizzi Windows 95 e non hai ancora installato le DirectX, devi
+procurartele ed installarle. UAE funziona anche con le vecchie versioni
+delle DirectX, cosi' e' possibile che tu non abbia alcun problema se hai
+installato un gioco DirectX sul tuo computer almeno una volta.
+
+Windows 95 OSR 2.x, 98 ed NT 4 hanno gia' incluse le DirectX. Con NT 4 hai
+bisogno di un driver grafico adeguato. Sfortunatamente, molti driver
+standard che sono acclusi ad NT non supportano completamente le DirectX,
+cosi' potresti dover contattare il costruttore della tua scheda video per un
+aggiornamento.
+
++--------------------------------------------------------------------------+
+|                    RAPPORTO DI BACHI VIA E-MAIL                          |
+|                                                                          |
+| Per favore assicurati che le seguenti condizioni siano state rispettate  |
+| prima di riportare qualsiasi tipo di problemi:			   |
+|                                                                          |
+|  1. Stai usando l'ultima versione di UAE.                                |
+|  2. Hai letto _bene_ la documentazione (il 90% delle potenziali domande  |
+|     trova risposta nei file LEGGIMI, inclusa la piu' popolare di tutte:  |
+|     "Perche' non ottimizzate l'emulazione del sonoro?").                 |
+|  3. Ti sei "spremuto" bene il cervello in cerca di una soluzione.        |
+|  4. I driver grafici del tuo sistema sono aggiornati (spiacente, ma non  |
+|     posso dirti dove puoi reperire i driver per NT 4 della tua scheda    |
+|     video Trident o Cirrus Logic).                                       | 
+|                                                                          |
+| Se mi scrivi, riporta _sempre_ quale versione di UAE stai usando.        |
+| Includi tutte le informazioni necessarie, per esempio le opzioni che     |
+| stai utilizzando sulla linea di comando (vedi oltre, alla sezione "Bachi |
+| e problemi conosciuti").                                                 |
+|                                                                          |
+| NON mandarmi software pirata di alcun tipo, non importa perche' non sta  |
+| funzionando. E NON CHIEDERMI ROM O SISTEMA OPERATIVO AMIGA!              |
++--------------------------------------------------------------------------+
+
+
+1. Parametri della linea di comando
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Le opzioni della linea di comando di UAE possono essere ottenute battendo:
+
+ uae -h
+
+che ritornera':
+
+ -h                 : Fornisce aiuto sulle opzioni.
+ -m VOLUME:percorso : Monta la directory definita a <percorso> come
+		      dispositivo AmigaDOS definito a <VOLUME:>.
+ -M VOLUME:percorso : Come -m, ma monta il dispositivo in sola lettura
+		      (utile per montare CD-ROM -vedi oltre).
+ -W defin           : Monta un file hard disk. Il parametro <defin> e'
+		      composto da:
+		      "settori per traccia:numero di superfici:blocchi
+                      riservati:nome del file" (per i valori tipici, vedi
+                      oltre).
+ -s n               : Emula n*256 Kilobyte di Slow RAM all'indirizzo
+		      0xC00000.
+ -c n               : Emula n*512 Kilobyte di Chip RAM all'indirizzo
+		      0x000000.
+ -F n               : Emula n Megabyte di Fast RAM all'indirizzo 0x200000.
+ -Z n               : Emula n (max 64) Megabyte di Fast RAM Zorro III.
+		      Richiede un parametro CPU almeno uguale a '2', senza
+		      indirizzamento a 24 bit.
+ -U n               : Emula una scheda video compatibile Picasso96 con n
+		      Megabyte di memoria.
+		      Richiede un parametro CPU almeno uguale a '2', senza
+		      indirizzamento a 24 bit.
+ -w n               : Setta la velocita' della CPU ad n (predefinito: 4).
+		      Valori comuni: -1 = velocita' "turbo"; 0 = quanto un
+		      Amiga 500 (vedi oltre).
+ -a                 : Non aggiunge dispositivi d'espansione (disabilita la
+		      Fast RAM e l'emulazione dell'hard disk).
+ -J xy              : Specifica come emulare la porta joystick 0 (x) ed 1
+		      (y). Usa 0 per il joystick 0; 1 per il joystick 1; M
+		      per il mouse; a/b/c per diversi rimpiazzi da tastiera
+		      (vedi oltre).
+ -f n               : Setta il tasso d'aggiornamento dello schermo ad 1/n.
+		      Solo l'n-simo schermo verra' disegnato.
+ -i                 : Mostra gli accessi illegali alla memoria.
+ -t                 : Testa la velocita' di tracciamento dello schermo
+		      (rende l'emulatore molto lento).
+ -G                 : Disabilita l'interfaccia utente.
+ -A n               : Setta l'accuratezza dell'emulazione ad n (0, 1 o 2).
+		      Il valore predefinito e' '2', il che significa che
+		      l'emulatore cerchera' di essere il piu' accurato
+		      possibile.
+ -g                 : Attiva la graphics.library sostitutiva (SPERIMENTALE).
+ -C defin           : Setta i parametri della CPU. '0' attiva l'emulazione
+		      68000, '1' quella 68010, '2' la 68020, '3' quella
+                      68020 + la FPU 68881. In aggiunta, per la CPU 68000,
+                      puoi specificare 'c' per una emulazione piu' lenta
+                      (circa il 20%) ma piu' compatibile ed 'a', per le
+                      emulazioni 68020, per uno spazio d'indirizzamento 
+                      della memoria a 24 bit. Di solito, UAE utilizza uno
+		      spazio d'indirizzamento a 24 bit quando emula un
+		      68000/10 ed uno a 32 bit quando emula un 68020. Se
+		      viene specificato 'a' con un parametro CPU uguale a
+		      '2' o '3', viene abilitato uno spazio d'indirizzamento
+		      a 24 bit con l'emulazione 68020. Sembra essere
+		      necessario ad alcune immagini del Kickstart.
+		      Attenzione: quest'opzione ha effetti controproducenti
+		      e dovrebbe essere disabilitata per valore predefinito.
+ -n defin           : Setta i parametri del blitter. 'i' fa terminare
+		      immediatamente le operazioni del blitter, '3' fa
+		      adottare operazioni a 32 bit (potrebbe far piantare le
+		      macchine RISC).
+ -[0123] file       : Usa <file> anziche' df[0123].adf (predefinito) come
+		      disk file.
+ -r file	    : Usa <file> come immagine delle ROM anziche' kick.rom
+		      (predefinito).
+ -K file	    : Usa <file> come chiave software per le ROM criptate.
+ -S defin           : Setta i parametri per l'emulazione del sonoro (vedi
+		      oltre).
+ -p porta           : Usa <porta> per l'output stampante (predefinito:
+		      LPT1).
+ -I dispositivo     : Usa <dispositivo> per l'output seriale (per esempio,
+		      COM1).
+ -d [s] [p]         : Apre la porta [s]eriale o [p]arallela solo se
+		      necessario.
+ -P n               : Setta la priorita' di base di UAE (vedi oltre).
+ -O defin           : Definisce la modalita' di visualizzazione (vedi
+		      oltre).
+ -H modo	    : Definisce la profondita' di colore da utilizzare (vedi
+		      oltre).
+
+
+Opzioni audio
+±±±±±±±±±±±±±
+
+Il formato del parametro di definizione del sonoro "-S" e' il seguente:
+
+ -S abilita:modo:bit:frequenza:directsound
+
+Non devi necessariamente specificare tutti i parametri, puoi fermarti ad
+ogni campo.
+
+ abilita     : Accetta '0' (audio escluso), '1' (audio emulato, ma senza
+	       output), '2' (audio emulato, con output) o '3' (emulazione
+	       audio completa ed accurata). Il valore suggerito e' '2'.
+ modo        : Accetta 's' (stereo) o 'm' (mono).
+ bit         : Numero di bit da utilizzare per l'output sonoro, generalmente
+	       8 o 16.
+ frequenza   : Frequenza di campionamento dell'output sonoro, generalmente
+	       22050 o 44100 (Kilohertz).
+ directsound : Specifica se indirizzare l'output sonoro al dispositivo Wave
+	       della scheda audio dall'emulazione, oppure tramite
+	       DirectSound (DirectX), bufferizzandolo o meno.
+	       Valori consentiti:
+	       0 = WaveOut circolare;
+	       1 = WaveOut doppio-buffer;
+	       2 = DirectSound circolare;
+	       3 = DirectSound doppio-buffer.
+
+L'implementazione DirectSound potrebbe essere compatibile con piu' schede
+audio e potrebbe risolvere i problemi dei possessori delle Gravis Ultra
+Sound.
+
+Per disabilitare completamente il sonoro, usare "-S 0" (predefinito). Se un
+programma dipende dagli interrupt audio, "-S 1" li abilitera', lasciando
+comunque il sonoro disattivato. Per un sonoro completo, usare "-S 2". C'e'
+inoltre un'opzione particolare, "-S -1", che disabilita l'audio ed il
+FrameSync (sincronizzazione col video), rendendo le temporizzazioni di UAE
+Win32/DirectX comparabili a quelle delle altre versioni.
+
+Raccomando le seguenti opzioni per i settaggi del sonoro e della velocita'
+della CPU : "-w -1 -S 2:s:16:22050:1". Per ulteriori informazioni vedi
+oltre, alla sezione "Velocita' d'esecuzione".
+
+Gli utenti della Sound Blaster AWE64 dovrebbero abilitare l'opzione "Full
+Duplex" del driver, dal Pannello di Controllo di Windows.
+
+
+Opzioni di visualizzazione
+±±±±±±±±±±±±±±±±±±±±±±±±±±
+
+Dimensioni dello schermo
+------------------------
+
+Il formato dello specificatore 'defin' del parametro della modalita' di
+visualizzazione "-O" e' il seguente:
+
+ -O larghezza:altezza:modificatori
+
+ 'larghezza' ed 'altezza' specificano le dimensioni dello schermo.
+ 'modificatori' e' una stringa che contiene nessuno o alcuni dei seguenti
+ caratteri:
+ l    : Considera lo schermo come Lores (bassa risoluzione), tracciando solo
+	il secondo pixel.
+ x, y : Centra lo schermo orizzontalmente e/o verticalmente.
+ d    : Raddoppia l'altezza dello schermo per una migliore emulazione delle
+	modalita' interallacciate.
+ c    : Corregge le proporzioni visive.
+ D    : Modalita' a doppia scansione, per emulare il display della serie
+	1084 dei Monitor Commodore.
+ a    : Modalita' a pieno schermo per l'emulazione dei chipset grafici
+	Amiga.
+ p    : Modalita' a pieno schermo per le videate Picasso96.
+
+Per allargare le immagini in una finestra, utilizza l'opzione di doppia
+scansione, senza quella di bassa risoluzione.
+
+Colori
+------
+
+Il formato dello specificatore 'modo' del parametro di profondita' del
+colore "-H" e' il seguente:
+
+ 0 (256 colori); 1 (32768 colori); 2 (65536 colori);
+ 3 (256 colori, con dithering per una migliore visualizzazione);
+ 4 (16 colori, con dithering); 5 (16 milioni di colori).
+
+NOTA:
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Il valore predefinito di <modo> per WinUAE e' ora 0 (8 bit per pixel, 256
+colori). Se vuoi adoperare una profondita' di colore a 16 bit per pixel
+(32768 colori) per mappare meglio sul PC la modalita' grafica a 12 bit per
+pixel (4096 colori) dell'Amiga, specifica "-H 1".
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+UAE potrebbe decidere di ignorare la profondita' di colore utilizzata e/o di
+riportare le dimensioni dello schermo a valori piu' accettabili.
+
+Alcuni drivers DirectDraw (DirectX) per schede video sono difettosi, e non
+permettono agli schermi Picasso96 di aprirsi a 256 colori (per esempio), se
+la profondita' di colore del desktop di Windows e' maggiore di 256 colori.
+Questo causa una gran confusione sullo schermo di Windows. Cio' non accade
+con Windows NT, ed e' un problema derivante puramente da driver programmati
+male: procurati la versione piu' aggiornata e contattami se il problema
+persiste.
+
+
+Dispositivi fisici/logici
+±±±±±±±±±±±±±±±±±±±±±±±±±
+
+Hard disk, CD-ROM
+-----------------
+
+Per condividere dispositivi e/o directory tra AmigaDOS e Windows, e'
+necessario utilizzare i parametri "-m" e "-M" (sola lettura).
+
+Ad esempio, "-m WORK:C:\WB" rende la directory "C:\WB" disponibile ad
+AmigaDOS come dispositivo "WORK:", mentre "-M CD0:D:\" rende possibile
+l'utilizzo del CD-ROM (supposto che l'unita' sia D:\), attribuendogli il
+nome "CD0:".
+
+UAE tentera' di fare del suo meglio per colmare i divari esistenti tra le
+semantiche dei filesystem Microsoft e Commodore, ma ci sono delle
+limitazioni intrinseche:
+
+1. l'attributo "Sola lettura" di Windows controlla i bit 'w' e 'd' dal lato
+   Amiga;
+2. gli attributi 'r' ed 'e' sono sempre attivati;
+3. gli attributi 'h', 's' e 'p' non possono essere attivati;
+4. l'attributo 'a' e' riservato;
+5. non sono supportati i commenti ai file;
+6. non tutti i nomi dei file che sono vietati dall'imperfetto filesystem
+   Windows vengono ancora correttamente interpretati; lo sono, comunque, i
+   piu' comuni.
+
+ATTENZIONE: L'ambiente operativo di UAE _non_ e' per niente sicuro! Non c'e'
+alcun controllo sugli accessi alle directory poste oltre il percorso di
+attivazione definito. Non credere che i tuoi dati siano perfettamente certi
+di ingannare i programmi Amiga!
+
+--
+
+Puoi scegliere di definire come hard disk un file hard disk precedentemente
+creato col comando "makedisk". I file hard disk sono grandi file che
+contengono l'immagine di un filesystem Amiga. Funzionano per una buona
+percentuale come i disk file. Puoi semplicemente creare un grande file vuoto
+e dire ad UAE di usarlo come hard disk file, ma hai bisogno di formattarlo
+dall'interno dell'emulazione prima di cominciare ad usarlo.
+
+L'opzione "-W defin" e' quella necessaria a questo scopo . Il parametro
+<defin> e' composto da:
+"settori per traccia:numero di superfici:blocchi riservati:nome del file",
+i valori geometrici consueti sono:
+
+ settori per traccia : 32
+ numero di superfici :  2
+ blocchi riservati   :  2
+
+ "nome del file" e' il nome e la eventuale locazione del file hard disk.
+
+Il file hard disk deve avere una capacita' in Megabyte multipla di due (1,
+2, 4, 8, 16, 32, 64 ecc.).
+
+ATTENZIONE: se utilizzi l'hard disk file di una precedente versione di UAE e
+questa non viene correttamente riconosciuta, potresti provare ad attribuire
+al parametro "blocchi riservati" il valore '0', MA POTREBBE NON FUNZIONARE E
+PERDERESTI TUTTI I DATI. Fai una prova su una copia, prima.
+
+
+Floppy disk
+-----------
+
+Il parametro "-[0123] file" permette di usare un qualsiasi <file> anziche' i
+valori predefiniti per i disk file df[0123].adf.
+
+Esempio: "-0 C:\DISKS\RSI1.ADF"
+
+WinUAE supporta le immagini dei dischetti compresse con Gzip. Se hai un
+compressore Gzip a 32 bit gia' installato, puoi tranquillamente salvare le
+tue immagini dei dischi in formato compresso (.adz), cosi' come pure le
+immagini delle ROM (.roz).
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+Se non hai un decompressore Gzip integrato, devi copiare il file "gzip.exe"
+in una directory definita nel PATH, per esempio "C:\WINDOWS\COMMAND". Puoi
+ottenere Gzip da <ftp://oak.oakland.edu/>.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Le immagini dei dischi compresse verranno protette in scrittura. Ricorda che
+puoi dinamicamente inserire (Fine+F1...F4) ed estrarre (Shift+Fine+F1...F4)
+le immagini dei dischi nel corso dell'emulazione.
+
+Utenti Windows NT: utilizzare la funzione di compressione dell'NTFS invece
+del Gzip e' un'ottima idea se volete salvare spazio e scrivere sulle
+immagini dei dischi allo stesso tempo.
+
+Porta seriale/parallela
+-----------------------
+
+Per abilitare l'output parallelo, usare "-p <porta>", dove <porta> e' una
+specificazione di dispositivo (predefinito: LPT1). Al momento, un nuovo
+lavoro di stampa verra' generato dopo 2 secondi di inattivita' sulla porta
+stampante. Questo intervallo e' sperimentale e potrebbe essere reso
+configurabile in futuro. Contattami se hai dei commenti.
+
+Il supporto seriale e' ancora in fase beta, ma le cose migliorano
+rapidamente. Per attivarlo, usare "-I dispositivo", dove <dispositivo> e',
+per esempio, COM1. RTS e CTS saranno ben presto funzionali.
+
+Joystick
+--------
+
+Il formato del parametro di specificazione dell'emulazione joystick e' il
+seguente:
+
+ -J xy
+
+Questa opzione di permette di configurare liberamente le porte joystick e
+mouse dell'Amiga. Il valore predefinito e' '-J M0', che configura il mouse
+alla porta 1 (come di solito) e il joystick, se presente, alla porta 2.
+
+Le rilocazioni da tastiera sono le seguenti:
+
+	       a	       b	     c
+
+Sopra     Tast. Num. 8  Cursore Su           T
+Sotto     Tast. Num. 2  Cursore Giu'         B
+Sinistra  Tast. Num. 4  Cursore Sin.         F
+Destra    Tast. Num. 6  Cursore Destra       H
+Fuoco     Tast. Num. 0  Ctrl Destro    Alt Sinistro
+
+
+Velocita' e priorita' d'esecuzione
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+
+Velocita'
+--------
+
+Il parametro "-w n" e' piuttosto importante per l'ottimizzazione delle
+prestazioni di UAE. Con software programmato male che aspetta una specifica
+posizione del pennello elettronico sullo schermo (per esempio "Great Giana
+Sisters"), "-w" puo' persino controllare se un gioco scorre o se e' bloccato
+(dai uno sguardo alla sezione "Compatibilita'", piu' avanti).
+
+Se la CPU corre troppo veloce (<n> e' troppo basso, per esempio inferiore a
+4), alcuni programmi possono piantarsi perche' gli eventi pilotati dai cicli
+della CPU avvengono troppo tardi. Per i giochi e le demo che si
+sincronizzano con l'interrupt del vertical blank (quando viene terminato il
+tracciamento dello schermo), un valore ottimale per <n> e' dato quando la
+CPU finisca di elaborare i dati per uno schermo, immediatamente prima che il
+pennello elettronico virtuale termini di disegnare lo schermo stesso, cosi'
+il minor tempo possibile e' sprecato nella richiesta di tracciamento del
+prossimo schermo. Di solito si puo' ottenere con valori intorno ad 8, ma
+trovare quello giusto richiede qualche esperimento e questa procedura non
+puo' essere automatizzata.
+
+Valori elevati di <n> (come ad esempio 20) rendono la CPU estremamente
+lenta, ma possono essere l'unica alternativa per generare un sonoro continuo
+su macchine al di sotto dei 200 Megahertz.
+
+Il valore predefinito di <n> e' uguale a 4. Puoi provare ad ottenere una
+piccola perdita di prestazioni, che e' compensata in altri campi, settandolo
+a 7.
+
+Valori particolari di <n> sono -1 e 0. "-w -1" permette alla tua CPU x86 o
+compatibile di esprimere tutta la sua potenza, "-w 0" fa si' che venga
+utilizzata solo la potenza necessaria ad emulare un Amiga 500. Queste
+opzioni funzionano correttamente solo se il sonoro e' abilitato (utilizzare
+almeno "-S -1"). Su un Pentium II 266 Megahertz, settando
+"-w 0 -S 2:s:16:22050:1" l'utilizzo della tua CPU sara' all'incirca del 50%,
+lasciandoti cosi' la possibilita' di utilizzare il PC per altre applicazioni
+mentre l'Amiga viene emulato.
+
+Priorita'
+--------
+
+Per valore predefinito, UAE viene eseguito ora nella NORMAL_PRIORITY_CLASS.
+Cio' dovrebbe aumentare un po' le prestazioni quando UAE e' l'applicazione
+attiva.
+
+In precedenza veniva eseguito nella IDLE_PRIORITY_CLASS: per alcune
+misteriose ragioni, in tale modalita' vengono parzialmente risolti problemi
+di movimento a scatti del cursore del mouse nella modalita' a finestra.
+
+Se necessiti di una classe di priorita' differente, puoi selezionarla con
+l'opzione "-P n", dove <n> puo' assumere i seguenti valori:
+
+NORMAL_PRIORITY_CLASS     32     IDLE_PRIORITY_CLASS           64
+HIGH_PRIORITY_CLASS	 128     REALTIME_PRIORITY_CLASS      256
+
+
+Opzioni e consigli generali
+±±±±±±±±±±±±±±±±±±±±±±±±±±±
+
+Se vuoi velocizzare l'emulazione e non hai necessita' di una grafica fluida,
+puoi usare l'opzione "-f" per far aggiornare lo schermo ogni 'n' fotogrammi.
+
+L'opzione "-g" sostituisce alcune funzioni della graphics.library e della
+layers.library con routine native _sperimentali_.
+
+Parametrizzare il blitter con "-n 3i" potrebbe in teoria causare problemi di
+compatibilita', ma potrebbe anche risolvere problemi di incompatibilita'...
+trova tu quale opzione fa per te!
+
+Utilizza _sempre_ l'ultima versione dei driver per Picasso96! Puoi trovarli
+sui vari siti di UAE, oppure dirigerti sui link da essi riportati.
+
+Per utenti Amiga ESPERTI: raccomando altamente di utilizzare FastIPrefs
+anziche' IPrefs. Fa un sacco di cose in piu', in maniera piu' veloce e piu'
+stabile. Potete reperirlo sulle raccolte di shareware oppure su AmiNet.
+
+
+2. Emulazione della tastiera
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Molti tasti replicano le loro identiche funzionalita' in UAE, ma ci sono
+poche eccezioni di rilievo:
+
+ - il tasto Amiga "\" e' stato rimappato dall'F11;
+ - se non hai una tastiera Win 9x, dovrai usare Ins e Home (Freccia
+   altosin.) come rimappature dei tasti Amiga sinistro/Amiga destro (questa
+   rimappatura e' diversa dalle altre versioni di UAE);
+ - il tasto HELP e' stato rimappato da PagGiu';
+ - F12 fa comparire l'interfaccia grafica (quando sara' completata); sulle
+   tastiere Win 9x puo' essere richiamata anche dal tasto "Menu" accanto al
+   tasto "Windows" di destra;
+ - Bloc Scorr blocca il tracciamento dello schermo, velocizzando il sonoro;
+ - Pausa blocca il sonoro, velocizzando il resto dell'emulazione (nota che
+   non puoi disabilitare il sonoro in questa maniera se non hai configurato
+   le opzioni audio di UAE dall'inizio);
+ - Fine+F1, F2, F3 o F4 ti permette di cambiare le immagini dei dischetti
+   nei disk drive Amiga "virtuali"; Shift+Fine+F1, F2, F3 o F4 li espelle.
+
+
+3. Il problema delle prestazioni
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Su un PC sufficientemente potente, UAE ti riportera' con la mente ad un
+passato forse migliore.
+
+Grazie ai driver DirectX, le prestazioni grafiche pure di questa versione
+saranno tra le piu' alte tra tutte le piattaforme Intel. La modalita'
+800x600 e' lenta solo il 20% in piu' della 320x200 su un Pentium Classic 100
+Megahertz, sebbene sia necessario che vengano veicolati sul bus PCI
+ogni secondo quantita' di byte maggiori di sette volte. Questa tabella
+mostra come la velocita' di tracciamento netta dipenda dalla profondita' di
+colore selezionata, normalizzando ad 1 (100%) quella a 16 bit per pixel, a
+schermo intero:
+
+16 bit per pixel (32768 colori) a schermo intero    - 100%
+16 bit per pixel (32768 colori) in finestra         -  98%
+24 bit per pixel (65536 colori) in finestra         -  72%
+32 bit per pixel (16777216 colori) in finestra      -  60%
+
+Sfortunatamente, le modalita' in finestra causano pesanti rallentamenti su
+attivita' di sistema come input da mouse o da tastiera (al momento non c'e'
+modo di evitarlo). Tutto cio' non accade su macchine multiprocessore, con
+sistemi operativi che li supportino (come Windows NT).
+
+L'audio e' un lusso. Poiche' l'output sonoro e' strettamente sincronizzato
+con l'accesso diretto alla memoria del video, _non_ otterrai un suono pulito
+_finche'_ la tua macchina non e' capace di andare a 50 schermi al secondo
+almeno internamente.
+
+Morale della favola: comprati un Pentium Pro o un Pentium II se vuoi una
+grafica fluida ed un sonoro continuo allo stesso tempo (mi hanno detto che
+anche un Pentium MMX 200 Megahertz, overcloccato a 250 [con bus della
+piastra madre a 83.3 Megahertz moltiplicato per 3] e' una piattaforma
+abbastanza potente per eseguire UAE... rimarrebbe il problema delle
+temporizzazioni sul bus PCI e delle varie periferiche IDE, SCSI, etc. se il
+clock e' sincrono; per non parlare poi della possibilita' di esporre a gravi
+rischi di elettromigrazione il processore stesso... non so se "il gioco vale
+la candela"). Non ho ancora pareri definitivi sull'AMD K6 (1 e 2) e sul
+Cyrix 6x86MX, ma dovrebbero svolgere onestamente il loro lavoro.
+
+Su un Pentium Classic 100 Megahertz con una Matrox Millenium PCI, UAE
+Win32/DirectX e' leggermente piu' veloce della versione Linux su
+AcceleratedX con programmi che effettuano un _sacco_ di aggiornamenti dello
+schermo, ad esempio i giochi di azione e le demo. Tutte le altre
+applicazioni dovrebbero andare approssimativamente alla stessa velocita'.
+Considera che dovresti utilizzare i parametri "-w <n> -S -1 -P 128" per
+raffrontare plausibilmente la versione Win32 a quella Linux o DOS, con <n>
+(che nella versione Linux e' dato dall'opzione "M68K_SPEED" nel file di
+compilazione config.h) di solito uguale a 4.
+
+
+4. Compatibilita'
+°°°°°°°°°°°°°°°°
+
+Il numero di programmi che non funzionano perfettamente con UAE decresce con
+ogni nuova versione. Se scopri una parte di software che necessita di un
+particolare trattamento, fammelo sapere. Ho ricevuto copie di software
+pirata sulla mia casella postale in passato. NON FATELO PIU'.
+
+Consulta il file "COMPATIBILITY.TXT" per alcuni suggerimenti su come far
+girare certi software, magari contribuendo ad accrescere la collezione di
+parametri suggeriti dagli utenti.
+
+Attualmente, la gestione degli sprite e' ancora un problema.
+
+Una ristretta manciata di programmi richiede che vengano emulati
+l'instruction prefetch e/o l'eccezione 3 dei microprocessori (per esempio
+Shadow of the Beast I, Katakis e Denaris). Possono essere forzati
+nell'esecuzione agendo sul parametro "-C defin", specificando a <defin>
+l'opzione '0c'.
+
+
+5. Ringraziamenti
+°°°°°°°°°°°°°°°°°
+
+A Bernd Schimdt per aver creato questa completa emulazione del computer piu'
+complesso che sia mai esistito.
+
+A Mathias Ortmann, per aver iniziato questa laboriosa versione di UAE e per
+aver fornito la base di questo documento.
+
+Alla Microsoft, per aver costruito un eccellente ambiente di sviluppo
+integrato e per aver progettato un sistema operativo (Windows NT) che non si
+e' piantato una sola volta durante lo sviluppo di questo progetto,
+nonostante gli abbia fatto fare a ripetizione operazioni fuori standard.
+
+Alla Free Software Foundation per una inestimabile serie di utilita'.
+
+Alla Cygnus Software per averle portate in ambiente Win32.
+
+A Thomas Kessler per aver spietatamente rintracciato e riportato anche il
+piu' subdolo baco.
+
+Ad Andreas Schildbach per aver fornito diverse centinaia di migliaia di
+istruzioni per secondo, sotto forma di microprocessore ultra-potente,
+dimostrando che questo programma comincera' ad avere senso sulla generazione
+di computer di fascia medio-bassa del 1999.
+
+Alla Cloanto, per il loro impegno con Amiga Forever.
+
+A tutti i siti mirror ed ai loro webmaster.
+
+A tutti coloro che hanno versato somme alla mia fondazione su Internet.
+
+
+6. Bachi e problemi conosciuti
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+L'interfaccia grafica e' assente.
+
+Le modalita' Picasso96 in finestra Windows causano corruzione dello schermo.
+
+ShapeShifter si rifiuta di funzionare con piu' di 8 Megabyte di RAM se viene
+selezionata l'opzione "Use Largest Free Block", o se viene attivata la porta
+seriale.
+
+Per favore usa il seguente schema per ogni rapporto di bachi:
+1. versione del sistema operativo (Kickstart e Workbench) Amiga usato;
+2. estensioni attivate (MagicWB, NewIcons, DirOPUS, ToolManager, eccetera);
+3. settaggi sul lato Amiga che hanno causato il problema;
+4. sistema operativo ospite (Windows 95, 95 OSR 2.x, 98, NT 4, NT 4 SP x,
+   eccetera);
+5. versione DirectX;
+6. scheda video PC e versione del suo driver;
+7. scheda audio PC e versione del suo driver.
+
+
+7. File compresi nell'archivio
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+winuae/uae.exe                 - l'eseguibile principale di WinUAE
+winuae/amiga/*.*	       - diverse utilita' Amiga
+winuae/docs/windows/readme.txt - questo file LEGGIMI in lingua inglese
+winuae/docs/translated/*.*     - documentazioni tradotte in varie lingue
+winuae/docs/*.*                - manualistica principale di UAE

@@ -1,0 +1,361 @@
+
+   Quelques Questions Fréquemment Posées. Veuillez lire ceci
+   attentivement si vous avez des problèmes.
+   
+  Problèmes usuels
+  
+   Q: De temps en temps, après la fermeture de UAE, la répétition
+   automatique pour les touches ne fonctionne plus !
+   R: Utilisez la commande "xset r on" (problème inhérent à X-Windows,
+   surtout sur les stations Solaris, on ne sait pas pourquoi.). [Devrait
+   être aujourd'hui résolu. A noter que ceci arrive tout le temps quand
+   UAE se termine anormalement]
+   
+   Q: Quand UAE s'initialise, le message "Illegal instruction: 4e7b"
+   apparaît. Pourquoi ?
+   R: C'est normal, il s'agit du test de type de CPU effectué par le
+   Kickstart.
+   
+   Q: Quand UAE s'initialise, le message "Illegal instruction: 00f8"
+   apparaît (plusieurs fois). Pourquoi ?
+   R: Parce que votre ROM Kickstart a été compilée pour le 68020. (peut
+   aussi arriver quand il y a un bug dans UAE)
+   
+   Q: Quand UAE charge <insérez votre jeu favori ici>, le message
+   "Non-standard sync" apparaît.
+   R: Votre jeu favori est protégé contre la copie. Il existe des moyens
+   de transférer de tels disques, mais ceux-ci sont compliqués et ne vous
+   aideront pas, parce que découvrir toutes les méthodes de protection
+   serait une trop grande perte de temps. J'espère qu'il y aura une
+   solution générique un jour, mais en attendant vous n'avez pas de
+   chance.
+   
+   Q: Pendant la compilation, le message "_xxx_ illegals generated", ou
+   "16 mismatches", apparaît. Est-ce un problème ?
+   R: Non. Je peux utiliser cette information pour dire si il y a un
+   problème ou non, mais ce ne devrait pas être le cas.
+   
+   Q: Comment puis-je produire le symbole "@" (ou n'importe quel autre
+   signe) ? Sur le clavier de mon PC c'est possile par AltGr+0, mais ça
+   n'a pas l'air de marcher.
+   R: Regardez le clavier de votre Amiga. Utilisez la même combinaison
+   que pour un vrai Amiga. Ces combinaisons changent en fonction du pays.
+   Vérifiez que vous avez chargé la table de traduction de touches
+   adaptée pour votre AmigaOS (p. exemple, en france, vérifiez qu'il y a
+   une commande "setmap fr", ou équivalent, dans cotre
+   S:startup-sequence). Vous pouvez probablement produire le symbole "@"
+   avec la combinaison de touches Alt+Shift+2.
+   
+  Incompatibilités
+  
+   Q: UAE ne fonctionne pas avec mon image de Kickstart 1.2.
+   R: Vous avez sans-doute besoin de désactiver l'émulation de disque dur
+   et de mémoire Fast, par le paramètre "-a". le Kickstart 1.2 ne gère
+   pas les fonctionnalités d'initialisation automatique dont a besoin
+   l'émulation du disque dur.
+   
+   Q: Que puis-je faire si un jeu/démo/application ne fonctionne pas ?
+   R: Si vous essayez d'éxécuter un jeu ou une démo, activez un peu de
+   Slow RAM, et essayez à nouveau. Quelques vieux logiciels ont des
+   problèmes de compatibilité que la Slow RAM peut quelquefois résoudre.
+   Si il s'agit d'une application, vérifiez les détails évidents, comme
+   les prérequis en mémoire vive, la version du Kickstart, etc. De même,
+   vérifiez que le logiciel que vous essayez d'exécuter n'est pas conçu
+   pour les machines équipées de l'AGA.
+   Vous pouvez aussi essayer de changer d'autres options, comme le type
+   de CPU. Pour les jeux, "-C0c" peut quelquefois avoir de l'effet.
+   
+  Disques Amiga, images de disque, disques durs, CD-ROMs
+  
+   Q: Est-il possible de lire des disquettes Amiga avec un PC ?
+   R: Non, et oui. Non, c'est impossible avec un PC standard. Cependant,
+   avec un peu de matériel supplémentaire (un nouveau contrôleur de
+   disquettes), c'est possible. Je connais actuellement deux solutions,
+   le pack AFR qui consiste en une interface sur port parallèle que vous
+   avez à construire vous-même et ses gestionnaires, ou bien le
+   contrôleur Catweasel, disponible sous forme de carte ISA accompagnée
+   de logiciels DOS qui permettent la création de fichiers-images de
+   disques. Je possède moi-même un contrôleur Catweasel, et
+   effectivement, il fonctionne.
+   
+   Q: Ne pourrais-je pas connecter le lecteur de disquettes de l'Amiga au
+   PC d'une certainemanière, et l'utiliser pour lire des disquettes
+   Amiga ?
+   R: Vous pouvez connecter des lecteurs Amiga (basse densité) au PC, car
+   ils sont parfaitement identiques aux lecteurs PC. Cela ne vous aidera
+   pas, parce que le problème vient du contrôleur et non pas du lecteur
+   lui-même. Vous devez vous faire une raison.
+   
+   Q: Mais le PC peut lire les formats à 11 secteurs par piste !
+   R: Oui, mais ces secteurs sont différents au niveau matériel.
+   
+   Q: Mais l'Amiga peut lire des disquettes PC !
+   R: Et alors ?
+   
+   Q: Mais le PC peut lire les disquettes d'Atari ST !
+   R: Et alors ?
+   
+   Q: Mais...
+   R: Hors de question. Si vous êtes toujours convaincu que c'est
+   obligatoirement possible, prouvez-le. Ecrivez un programme qui peut
+   lire des disquettes Amiga avec un contrôleur standard pour PC, et je
+   présenterai mes excuses en public.
+   
+   Q: Comment puis-je utiliser des images DMS ?
+   R: Utilisez DMS sous UAE comme vous l'auriez fait sur un vrai Amiga.
+   La décompression d'un fichier DMS sur DF0: écrasera le fichier .adf
+   utilisé pour émuler df0:.
+   
+   Q: Comment puis-je transférer des disquettes non-DOS utilisées par de
+   nombreuses démos ?
+   R: Avec transdisk. Le fait qu'elles soient illisibles par AmigaDOS ne
+   veut pas dire qu'elles ne le soient pas par transdisk.
+   Explication détaillée : Il y a deux choses à observer quand on parle
+   du "format" d'un disque. Premièrement, le formatage de bas niveau qui
+   divise chaque piste en secteurs, et cela d'une certaine façon. La
+   plupart des disquettes Amiga sont formatées de façon standard, où
+   chaque piste contient 11 secteurs de 512 octets chacun, soit un total
+   de 880Ko (80 pistes) par disquette. Il y a de plus quelques
+   informations supplémentaires en dehors des secteurs, afin que le
+   contrôleur puisse trouver ces secteurs. Les disquettes PC sont
+   formatées de façon différente, et c'est pourquoi un contrôleur PC ne
+   peut pas lire les disquettes Amiga.
+   Si un disque est formaté de cette façon, il peut être recopié par
+   l'utilitaire standard AmigaDOS "diskcopy", ou l'équivalent Workbench,
+   et transdisk sait le gérer.
+   Maintenant, la seconed partie du "format" d'un disque est le système
+   de fichiers. Si vous voulez créer des fichiers et des répertoires sur
+   un disque, vous devez écrire des informations spéciales sur certain
+   secteurs du disque. Ces informations contiennent (par exemple) le nom
+   du disque ("workbench1.3" ou autre), et la liste de fichiers qu'il
+   contient. Ces informations sont appelées "système de fichiers".
+   L'Amiga reconnaît plusieurs systèmes de fichiers, dont le système de
+   fichiers originel (OFS, pour Original FileSystem) et le récent Fast
+   FileSystem (FFS), introduit avec le Kickstart 1.3.
+   Si vous n'inscrivez pas de système de fichiers sur un disque, les
+   données des secteurs peuvent toujours être lues par des programmes
+   comme transdisk ou "diskcopy", mais ces données n'ont pas de sens pour
+   eux. Le fait est qu'elles n'ont pas à en avoir. Ces données ne peuvent
+   avoir de sens que pour le Workbench qui doit déterminer quels fichiers
+   sont présents sur un disque. Si le Workbench ne peut pas trouver de
+   système de fichiers connu sur un disque, le disque sera marqué
+   "non-DOS" (en opposition à "unreadable", qui signifie que le disque
+   n'est pas formaté normalement en bas niveau).
+   
+   Q: Comment puis-je changer de fichier-image de disque ? R: Votre
+   version de UAE devrait avoir une interface utilisateur (la version X11
+   en a une) qui vous permet de le faire. Lisez le fichier README
+   spécifique à votre système pour plus de détails. Vous pouvez aussi
+   utiliser le programme "uaectrl" présent dans votre sous-répertoire
+   "amiga".
+   
+   Q: Pourquoi l'émulation de lecteur de disquettes est-elle aussi lente,
+   après tout le fichier-image est placé sur un disque dur ?
+   R: Parce que la rotation du disque est émulée. C'est nécessaire.
+   Utilisez l'émulation de disque dur quand c'est possible.
+   
+   Q: <insérez ici votre problème favori en rapport avec l'émulation par
+   fichier-image de disque dur (hardfile)>
+   R: N'utilisez pas de fichier-image de disque dur. Utilisez l'émulation
+   de système de fichier (option "-m") à la place.
+   
+   Q: Comment puis-je lire des CD-ROMs Amiga ?
+   R: Avec l'émulation de système de fichiers. Fournissez le paramètre
+   "-M CD:/cdrom" à UAE si vous utilisez un système Unix avec le CD monté
+   sous /cdrom, ou bien "-M CD:D:\" si vous utilisez DOS et que D est
+   vottre lettre d'unité de lecteur de CD-ROM. Si vous utilisez un
+   système différent, vous devriez pouvoir trouver la méthode à suivre.
+   
+   Q: Est-il possible de lire des disques durs Amiga avec un PC ?
+   R: Oui. Linux 2.0 contient un gestionnaire de système de fichiers
+   Amiga capable de lire les disques OFS/FFS. Lisez le README Unix pour
+   plus de détails.
+   
+  L'Avenir d'UAE
+  
+   Q: Quand sortira la prochaine version, et que contiendra-t-elle ?
+   R: Elle sortira quand elle sera finie.
+   
+   Q: Y aura-t-il une version shareware ou payante d'UAE dans le futur ?
+   R: Non.
+   
+   Q: Ne pourriez-vous pas utilisez l'émulation de CPU de ARDI pour
+   accélerer UAE ?
+   R: UAE est un logiciel gratuit. Il est fourni avec son code source.
+   l'Executor d'ARDI est protégé et commercialisé. ARDI n'a pas du tout
+   de raisons de donner son code source gratuitement, parce que Executor
+   ne serait plus rentable autrement. (si, on m'a réellement posé ce
+   genre de questions ! Je me demande d'où les gens tiennent ce genre
+   d'idée).
+   
+  Vitesse
+  
+   Q: Je n'ai pas de sortie sonore continue ! J'ai seulement un 486DX/40,
+   y a-t-il un rapport ?
+   R: Essayez un Pentium-II-300, ce genre de choses sont réputées pour de
+   meilleurs résultats.
+   
+   Q: Serait-il possible d'accélérer les choses en émulant le CPU de
+   manière native sur, disons, un Mac 68k ?
+   R: J'en doute. UAE doit pouvoir interrompre l'émulation de CPU à
+   n'importe quel moment pour effectuer des tâches nécessaires à
+   l'émulation du matériel. Vous ne pouvez donc pas le laisser
+   fonctionner tout seul.
+   
+   Q: Serait-il possible d'accélérer les choses en utilisant des cartes
+   vidéo accélératrices, par exemple en utilisant le 'blitter' des puces
+   S3 ?
+   R: J'en doute. Je ne suis pas un expert des cartes grapiques pour PC,
+   mais il es probable que les seules choses qu'ont en commun les
+   blitters S3 et de l'Amiga sont 7 lettres minuscules. Même si ils
+   étaient similaires, vous devriez garder toute la mémoire Chip en
+   mémoire graphique, et cela n'aurait guère d'autre effet que de
+   douloureusement ralentir l'émulation.
+   
+   Q: Pourquoi ne pas ajouter une gestion spéciale pour la GUS ou les
+   cartes à tale sonore, qui utiliserait des fonctionnalités matérielles
+   pour accélérer l'émulation du son ?
+   R: De nouveau, à cause des différences entre le matériel de l'Amiga et
+   celui du PC (dans notre cas, de la GUS), ce n'est pas réellement
+   possible. Vous pourriez *éventuellement* exploiter ce système dans
+   certains cas spécifiques (les modules ProTracker pourraient être un
+   tel cas), mais je ne pense pas que vous pouvez arriver à quelque chose
+   qui émule tout le matériel sonore.
+   Le problème est qu'en examinsant juste les valeurs qu'un programme
+   inscrit dans les registres du matériel sonore, vous pouvez
+   difficilement en déduire ce qu'il essaie de faire, ni ce qu'il
+   essaiera de faire par la suite. A l'opposé, il est facile d'écrire un
+   lecteur de modules SoundTracker pour la GUS, parce que vous savez
+   exactement ce que vous lisez, et comment le lire. (Cela ne veut pas
+   dire que vous ne pouvez pas utilisez la GUS pour la sortie sonore,
+   mais juste que vous ne pouvez pas l'utiliser pour *accélérer* la
+   sortie sonore.)
+   
+   Q: Emuler tout le matériel est une mauvaise idée. Pourquoi
+   n'émulez-vous pas simplement le système d'exploitation ? Après tout,
+   c'est ce qui fait que l'Amiga est tel qu'il est.
+   R: Réponse courte: Je ne suis pas d'accord.
+   Réponse longue: le système d'exploitation (OS) n'est que la moitié de
+   ce qui fait que l'Amiga est tel qu'il est. C'est un très bon système
+   d'exploitation, et il contient certaines fonctionnalités qui me
+   manquent dans n'importe quel autre système d'exploitation, mais il est
+   très défaillant en termes de (par exemple) protection mémoire et de
+   performance du système de fichiers.
+   L'autre chose qui a rendu particulier l'Amiga dans les années 80 est
+   sont architecture personnalisée (custom chip). Si vous regardez dans
+   de vieux (1985) magazines informatiques, vous pourrez constater que
+   les capacités du système d'exploitation de l'Amiga ne sont mentionnées
+   qu'en marge, parce que les gens ne se rendaient pas compte qu'il était
+   révolutionnaire pour un ordinateur familial. Ils se rendaient compte,
+   en revanche, que l'Amiga pouvait afficher 4096 couleurs à la fois et
+   qu'il avait un blitter et un copper qui pouvaient faire plein de
+   choses diverses, comme des balles qui rebondissent. Et je pense que
+   c'est la supériorité du matériel qui a fait un succès de l'Amiga.
+   Je vois UAE comme un programme similaire aux émulateurs C64 : il vous
+   permet d'éxécuter quelques vieux jeux et d'autres programmes que vous
+   ne pouvez pas remplacer par de meilleurs équivalents pour PC. En tant
+   que tel, il peut déjà être utilisé pour utiliser des jeux comme Monkey
+   Island ou Bard's Tale à une vitesse satisfaisante. Des CPUs plus
+   rapides permettront probablement de jouer à des jeux d'action, comme
+   les CPUs rapides ont rendu possible l'émulation du C64 à vitesse
+   originale sur le PC. UAE n'est pas (à l'origine) destiné à
+   l'utilisateur en puissance d'Amiga qui utilise des applications de
+   haute qualité sur son A4000 avec une carte 68060, mais pour les gens
+   comme moi qui sont passés d'un A500 au PC il y a quelques années,
+   parce qu'ils voulaient gagner de l'argent en développant des
+   logiciels.
+   D'un autre côté, émuler un système d'exploitation est beaucoup plus
+   difficile (DMHO). Surtout si la plateforme d'émulation est
+   complètement différente de la plateforme émulée. Vous avez besoin de
+   vous préocupper des conversions entre systèmes petit et grand boutien
+   et d'autres cauchemars du même type. l'AmigaOS n'a pas été non plus
+   conçu avec des soucis de portabilité.
+   
+   Q: Quelle est la vitesse de l'émulation ? R: Ça dépend.
+   Pour compresser des fichiers avec PowerPacker, UAE est 17 fois plus
+   rapide que mon A500 sur mon K6-233.
+   Pour jouer à Turrican I, il n'y a pas de ralentissements (avec son).
+   Pour jouer à Turrican III, UAE est un peu plus lent que l'A500.
+   Pour certaines démos (pas beaucoup), UAE est assez lent par rapport à
+   l'A500.
+   Règle simple: l'émulation du son prend beaucoup de temps, ainsi que
+   celle des effets du copper et les défilements. Si vous n'avez pas
+   besoin de tout cela, c'est parfait.
+   
+   Q: Comment puis-je l'accélérer ?
+   R: Exécutez l'émulateur à la résolution d'écran la plus basse
+   (320x200), réglez-là à 256 couleurs, vérifiez que la correction
+   d'aspect est désactivée, et réglez la fréquence d'affichage à 1/3.
+   Finalement, désactivez le son (si vous avez une version qui vous
+   permet de compiler votre propre éxécutable, activez "DONT_WANT_SOUND"
+   dans config.h). Ce ne sera pas très beau, mais l'émulation sera aussi
+   rapide que possible sur votre machine.
+   Si vous utilisez la version X, vérifiez que vous utilisez l'option
+   "-T". Ne pas utiliser cette option est moins dangereux, mais aussi
+   ralentit l'émulation. Mieux, quand vous éxécutez "configure",
+   fournissez le paramètre "--enable-dga" si votre serveur X (XFree86 3.2
+   ou supérieur) vous le permet.
+   Il est très important que vous n'utilisiez pas de modes graphiques à
+   24 ou 32 bits par pixel.
+   
+  Divers
+  
+   Q: Ai-je besoin d'un vrai Amiga pour utiliser ce programme ?
+   R: Oui, à moins que vous n'ayez d'autre façon légale d'obtenir des
+   fichiers-images de ROM ou les logiciels système, comme le CD Amiga
+   Forever de Cloanto.
+   
+   Q: D'où puis-je télécharger une ROM Kickstart et/ou des jeux Amiga ?
+   R: Lisez les docs à nouveau. Vous ne le pouvez pas. Ce serait illégal
+   d'offrir sur le net des logiciels protégés par copyright. (Oui, si
+   vous aviez un jour acheté un jeu spécifique et que vous l'aviez
+   revendu avec l'Amiga, le télécharger aujourd'hui serait quand même
+   illégal. Désolé.)
+   
+   Q: Est-ce que UAE fonctionne sur les DEC Alpha/Stations Sparc,
+   SGIs/autre ?
+   R: UAE devrait fonctionner sur tout système Unix disposant d'au moins
+   X11R5 et un compilateur C décent. Donc la réponse est probablement
+   oui. Utilisez juste les sources Unix génériques et suivez les
+   instructions dans le README.UNIX pour les compiler. Toutefois,
+   l'utilisation de GCC et des binutils GNU peut augmenter vos chances.
+   
+   Q: Pourquoi y a-t-il une zone vide sur la partie gauche de l'écran ?
+   R: L'Amiga peut afficher des graphiques à cet endroit, mais ne le fait
+   généralement pas parce que cela pourrait désactiver certains sprites.
+   Cette zone n'est utilisée que par certaines démos. Les écrans normaux
+   sont excentrés. Je ne ferai rien pour ça. Si vous ne pouvez pas le
+   supporter, vous pouvez essayer d'utiliser les résolutions de 320x200
+   ou 640x480, qui tentent de recentrer l'image. C'est à peu près
+   impossible d'obtenir un résultat correct pour tous les programmes. Si
+   votre écran ne rentre pas dans les résolutions inférieures, utilisez
+   une résolution de 800x600.
+   
+   Q: Où puis-je trouver un résumé complet de toutes les paramètres de
+   ligne de commande ?
+   R: Dans les fichiers README. Vous pouvez aussi la créer de vous-même,
+   en tapant: "uae -h > uae-help.txt".
+   
+   Q: Mon programme de test de performances, <insérez votre programme
+   ici>, donne des résultats bizarres.
+   R: Les programmes Amiga éxécutés par l'émulateur pensent que les
+   horloges internes de l'Amiga peuvent être utilisées pour mesurer le
+   temps réel. Mais dans UAE, ces horloges de mesurent que le "temps
+   d'émulation". Sysinfo, par exemple, donne le même résultat sur toutes
+   les machines. Donc n'utilisez pas des programmes de test de
+   performance pour tester la vitesse de l'émulateur.
+   Certains de ces programmes utilisent aussi des boucles serrées
+   d'instructions DIV ou MUL pour mesurer la vitesse du CPU ; en "temps
+   d'émulation", ces instructions prennent autant de temps que n'importe
+   quelle autre instruction, et vous obtenez des valeurs beaucoup trop
+   hautes.
+   Si votre CPU reconnaît l'instruction RDTSC (et si UAE l'utilise),
+   l'utilisation de programmes de test de performance devient plus
+   sensée. Pas trop, malgré tout, à cause de la vitesse minimale que le
+   programme obtiendra, quelque soit la machine. Plus la machine est
+   rapide, plus le résultat sera précis.
+   
+   Q: N'était-ce pas appelé the Unusable Amiga Emulator (L'Emulateur
+   Amiga Inutilisable) ? R: Si. Mais plus personne ne pense que ce nom
+   convienne aujourd'hui. C'était seulement valable pour la version 0.1,
+   qui ne s'initialisait même pas.

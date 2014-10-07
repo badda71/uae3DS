@@ -1,0 +1,628 @@
+[This is the swedish version of the UAE-README.]
+
+Detta är version 0.7.5 av UAE, Uni*x Amiga Emulator.
+
+
+Licens
+======
+
+UAE är tillgängligt under de regler som gäller för GNU General Public Lisence.
+Se filen COPYING som finns med i toppkatalogen i detta arkiv för detaljer.
+
+
+Inledning
+==========
+
+En emulator är ett program som tillåter dig att köra mjukvara ursprungligen avsedd för 
+en maskin med helt annan hårdava och/eller operativ-systemän din dator. 
+UAE tillåter dig att köra de flesta de Amiga-program. Det är en mjukvaru-
+emulator, vilket innebär att ingen extra eller speciell hårdvara krävs för att göra
+detta. Amigans hårdvara emuleras exakt som på en riktig Amiga, vilket lurar Amiga-
+programmen att tro att de verkligen körs på en riktig Amiga.
+
+UAE utvecklades ursprungligen för Unixoida system. Under tiden har det portats till
+Mac, DOS, BeBox, NextStep, XFree86/OS2 och Win32-miljö, samt till Amiga (emulatorn
+kan nu faktiskt köra sig själv). Du bör ha fått flera filer med till denna fil som
+innehåller instruktioner för hur du installerar och använder versionen för
+ditt operativsystem.
+
+Denna sektion är precis vad den heter: en inledning.
+Vänligen läs _hela_ denna fil, speciellt om du har problem. UAE har väldigt många
+funktioner, och lika många konfigurationsinställningar. Om du inte känner till dem,
+så kommer UAE troligtvis inte heller att fungera för dig, eller åtminstone inte så
+bra som det borde.
+
+Läs också "FAQ"-filen som innehåller de vanligaste frågorna och svaren på dessa.
+Systemspecifika dokument som "README.UNIX" och "README.WIN" finns också, och du bör
+läsa den som berör dig.
+
+Folk har klagat på att UAE-dokumentationen använder för svårt språk. Det är tråkigt
+att höra, men vad än MessySoft och Tomato säger, så är datorprogram inte alltid
+lätta att använda. UAE kräver viss assistans från dig, och därför bör du veta
+åtminstone lite grann om datorer. Och när allt kommer omkring så är du ju ett
+Amiga-fan, så du borde ju veta vad Workbench är, eller hur?
+
+
+
+Egenskaper
+==========
+
+Denna version av UAE emulerar:
+
+- En Amiga 500, med 68000 eller 68020 CPU
+  (68020 inkluderar en 68881 FPU).
+- OCS Grafik chipset, plus stora blits från ECS
+  chipsettet.
+- Upp till 2Mb chip RAM och upp till 8Mb
+  fast RAM, eller 8Mb chip RAM utan fast RAM.
+- Upp till 64Mb Zorro III fast RAM, oberoende
+  av chip RAM inställning.
+- Upp till 1Mb slow RAM, för ökad
+  kompabilitet med problemmjukvara.
+- Upp till 8Mb grafikkortsminne, användbart
+  av program som stöder det.
+- Picasso 96 kompatibla grafikkort.
+- 4 x 3.5" diskdrivar (DF0:, DF1:, DF2:,
+  och DF3:).
+- Hårddiskemulering.
+- Joystick stöds (med möjlighet att mappa
+  joysticken till det numeriska tangentbordet).
+- Musstöd.
+- Möjlighet att köra i flera olika
+  upplösningar (för ökad grafikkvalitet eller
+  högre hastighet).
+- Fullt ljudstöd, bestående av 4 8-bitars
+  kanaler (ihopmixade till en, så utmatningen
+  är för tillfället i mono).
+- Beta-stöd av parallel och seriell port.
+- Och en del annat som inte fungerar 
+  tillräckligt bra för att nämna här.
+
+
+
+Krav/Begränsningar (VIKTIGT! LÄS DETTA)
+========================================
+
+Inte emulerat:
+- Sprite till "playfield" kollisioner (Sprite
+  till sprite kollisioner fungerar).
+- En MMu (del av 68030/040 CPU:er utom
+  de som Commodore använde). Detta innebär
+  att du inte kan använda virtuellt minne
+  eller köra riktiga operativsystem
+  som Linux eller BSD.
+- AGA-chipset (A400/A1200). Detta chipset
+  har utökat möjligheterna så att 256
+  färger går att använda i alla upplösningar.
+- Serieports-emulering finns men fungerar 
+  inget vidare.
+
+Eftersom PC:ns floppy-kontroller inte klarar Amiga-diskar (japp, det är ett faktum),
+måste floppy-åtkomsten emuleras på annat sätt. Floppyn emuleras med hjälp av en
+spegelfil av den diskett du vill emulera. En diskfil (image file) är en fil
+innehållande rå data från en Amiga-diskett, och innehåller 901120 byte (880K) vilket
+är standardstorleken på en Amiga-diskett.
+
+För att köra programmet, krävs att en kopia av det ROM du har i din Amiga kopieras
+över till din PC. Du kan inte köra UAE utan denna kopia av ROM. Den är inte
+inkluderad eftersom det är copyrightskyddat material. Be mig inte att skicka en till
+dig, för det kommer jag inte att göra. Har du ingen Amiga men ändå vill köra programmet
+så får du först köpa en Amiga eller åtminstone system-mjukvaran (ROM + Workbench).
+ROM-kopian skall vara antingen 256K eller 512K. Förinställt är att UAE letar efter
+en ROM-kopia med namnet "kick.rom".
+
+Läs sektionen "Verktyg" nedan för information om hur ROM- och disk-filer.
+
+Om du inte har någon Kickstart-fil så kan det hända att du ändå kan köra vissa
+spel och demos. Emulatorn innehåller en del primitiv kod som kommer att försöka läsa
+och exekvera bootsektorn på disk-filen du använder, och om ditt program bara
+använder de en eller två  kickstart-funktioner som stöds av
+"replacement kickstart", så kommer ditt program att starta. Vänta dig inte
+för mycket bara.
+
+Du behöver förstås en del annan mjukvara också - ja varför skulle du annars vilja
+emulera en Amiga? Det finns några olika sätt att ge UAE tillgång till mjukvaran,
+till exempel med en diskfil, eller genom hårddiskemulering. Du bör göra en disk-
+fil av din Workbench-diskett och lägga in den som "df0.adf" (ADF= Amiga Disk File")
+första gången du kör UAE. Mer om hur du går diskfiler finns att läsa i kapitlet
+"Överföra mjukvara".
+
+
+
+Starta UAE
+==========
+
+Först bör du läsa den systemspecifika dokumentationen om hur du installerar
+UAE. Du bör ha en exekverbar fil kallad "uae". Du kan helt enkelt exekvera den,
+eller ge den en eller flera av följande växlar:
+
+[Please refer to the English documentation for this section.  The option
+handling has changed and the translated docs were incorrect]
+
+UAE kan också ignorera och/eller vägra vissa kombinationer av dessa två
+parametrar. Det kan också hända att vissa inte kommer att fungera på
+ditt system.
+
+Du kan också lägga dessa alternativ i en konfigurationsfil i din 
+hemkatalog. Skapa bara ~/.uaerc och lägg in några av dessa alternativ
+i den. På icke-Unix-system är filen kallad uae.rc och skall ligga i
+aktiv katalog.
+
+
+Att välja färgdjup och grafikläge
+=================================
+
+Som beskrivits i den föregående stycket, så kan UAE köras i många olika
+upplösningar och färgdjup. Hur som helst så kommer bara några av 
+alternativen att vara tillgängliga om du använder X11 versionen, eftersom
+X servern avgör hur många färger som är tillgängliga. Om du kör i 256
+färger i X server kan du använda "-H3" för att använda "dithering"
+och på så vis få ett bättre resultat.
+
+Du får själv experimentera vilken upplösning som är bäst för dig, och som
+ger en tillfredställande hastighet. Observera att "dithering" kräver tid,
+så även om UAE ser bättre ut i 256 färger med "dithering" än utan, så
+kommer allt att gå långsammare i det läget.
+
+Den rekommenderade upplösninge är 800x600. I lägre upplösingar kommer en del
+"overscan" bilder som Amiga försöker att visa inte att få plats på skärmen.
+Andra bilder kommer kanske inte att vara centrerade, och vissa grafikeffekter
+kan se mysko ut. För bästa resultat, använd 800x600 med minst 32768 färger.
+
+Använd _inte_ 24-bitars eller 32-bitars färgdjup om du absolut inte måste.
+De är alldeles för långsamma för att vara användbara.
+
+
+Hårddiskemulering
+=================
+
+Eftersom användandet av diskfiler kan vara rätt jobbigt, så är det nödvändigt
+att emulera hårddiskar. Det finns två sätt att som gör att du kan använda
+stora mängder data med UAE: hårddiskfiler och monterade kataloger.
+
+1. Hårddiskfiler
+
+Hårddiskfiler är stora filer som innehåller Amigans filsystem.
+De fungerar ungefär på samma sätt som diskfiler. Du kan skapa en
+stor tom fil och tala om för UAE att använda den som hårddisk, men du måste
+formatera den innifrån emulatorn innan du kan använda den.
+
+Under Unix kan du skapa en (oformatterad) hårddiskfil med
+  dd if=/dev/zero of=hardfile bs=512 count=16384
+Detta kommer att skapa en tom fil på 8 Mb. För andra operativsystem
+följer ett program kallat "makefile" med UAE, eller något annat
+sätt på vilket du kan skapa en sådan fil.
+
+För att tala om för emulatorn att du vill använda en specifik fil som
+hårddiskfil använder du växeln "-W".
+Exempel:   uae -W 32:1:2:hardfile
+De första tre talen är geometrisk information som talar om för
+AmigaOS hur disken är organiserad. Det första talet (32) är antalet
+sektorer per spår, det andra (1) talar om hur många huvuden eller
+ytor som används och det tredje (2) är antalet reserverade block.
+Om du använder "normala" storlekar (i steg om två, t. ex. 32 Mb),
+så bör du inte få några problem om du använder siffrorna i exemplet 
+ovan. Att använda andra siffror kan vara klokt om du till exempel
+använder en hårddiskfil som är en direkt kopia av en riktig
+Amigahårddisk som använder en annan geometri. Det sista argumentet
+till växeln "-W" är namnet på hårddiskfilen.
+
+Om du använder Kickstart 1.3 eller tidigare kan inte hårddiskfiler
+monteras vid start, vilket givetvis gör att det heller inte går
+att boota från dem. Du får istället boota från en diskettfil
+eller från ett filsystem (se nedan), och montera hardfile.device
+senare. För att göra det, lägg till följande exempel i din 
+"DEVS:mountlist":
+
+UAE0:	   Device = uaehf.device
+	   Unit   = 0
+	   Flags  = 0
+	   Surfaces  = 1
+	   BlocksPerTrack = 32
+	   Reserved = 1
+	   Interleave = 0
+	   LowCyl = 0  ;  HighCyl = 511
+	   Buffers = 5
+	   DosType = 0x444F5300
+	   BufMemType = 1
+#
+
+(Du måste justera värdena om du angett en annan geometri, och/eller
+din hårddiskfil har en annan storlek är 8 Mb, och/eller hårddiskfilen
+inte skall monteras som UAE0: eftersom du monterat andra hårddiskar
+tidigare).
+
+Sedan skriver du "mount uae0:" (eller lägger kommandot i din
+startup-sequence), och du bör nu kunna komma åt hårddiskfilen.
+Glöm inte att först köra AmigaOS format:
+
+	format drive uae0: name Herr_Bananapa
+
+2. Åtkomst av ursprungligt filsystem från emulatorn
+
+Detta har flera fördelar:
+ - Inga problem med Kickstart 1.3
+ - Det är mera smidigt.
+ - Det är mycket snabbare.
+
+Om du specifierar -M eller -m växeln använder du ditt ursprungliga
+filsystem från emulatorn. Om du startar UAE med:
+
+	uae -m sound:/usr/amiga/modules
+
+så kommer du att ha tillgång till alla filer i /usr/amiga/modules genom
+att läsa från AmigaDOS-volymen "SOUND:".
+(DOS-användare: Testa "uae -m dh0:c:\" för att montera C:\ som DH0:)
+
+Du kan montera upp till 20 enheter, antingen hårddiskfiler eller filsystem,
+genom att ange ovan stående kommandon upprepade gånger.  Enheterna kommer att
+kallas UAE0:, UAE1: osv. UAE kommer att boota från UAE0: om ingen diskettfil
+hittats i DF0:.
+Du kan också använda altrnativet att montera ditt ursprungliga filsystem för
+att montera CD-ROMar, och du kan misshandla hårddiskfilsemuleringen för att
+montera diskettfiler: "uae -W 11:2:2:wb13.adf" kommer att montera
+diskettfilen wb13.adf.
+
+
+Verktyg / Överföra filer
+========================
+
+Som du säkert redan vet, så behöver du överföra en del filer från din Amiga
+till datorn du tänkt köra UAE på. Det finns ett par olika sätt att göra detta på:
+
+- Använd en nollmodemkabel, och ett terminalprogram på var dator, så kan 
+  överföra filerna via Zmodem upload/download. Amigor med 68000 CPU kommer
+  vanligtvis upp i ungefär 3000 cps (24000 bps) genom nollmodemkabel genom
+  använda Commodores standarddrivrutin för serieporten, serial.device, men
+  med en ersättare för denna kallad BaudBandit.device, kan man komma upp i
+  så mycket som 5500 cps (44000 bps ungefär). BaudBandit finns att hämta från
+  AmiNet (t ex ftp://wuarchive.wustl.edu/ãminet).
+  Ett andra alternativ för överföring via nollmodemkabel är att använda
+  Basicprogrammet adfi.bas som följer med UAE. Windowsanvändare bör observera
+  att Windows inte bör vara igång när man kör detta program, annars så 
+  kommer mycket information att försvinna någonstans på vägen ut i 
+  CyberSpace.
+
+- Om du har OS 2.04 eller högre på din Amiga så kan du använda CrossDOS för
+  att få över dina amigafiler till din andra dator. Bara komprimera din
+  diskettfil med LHA eller något annat PC-kompatibelt arkiverings-program,
+  och kopiera över filerna på en 720 Kb diskett. Nu är det bara att ta
+  disketten till din PC, kopiera in filen(erna) på hårddisken och packa upp
+  dem. Om du inte har CrossDOS på din dator så finns ett liknande freeware
+  program kallat MSH, vilket kan hämtas hem från Aminet. Det finns också
+  på Fish-disk 382 och 327. (Även om detta program påstår sig fungera på
+  AmigaOS 1.2+ så har jag inte fått det att fungera på någon av de två A500
+  som jag testat på, den ena med OS 1.2, den andra med OS 1.3.  Övers. anm.)
+
+I vilket fall som helst så rekommenderas att du läser dokumentationen som
+medföljer respektive program. Dessa program kan inte förklaras här.
+
+I amiga-katalogen som kommer med UAE, ligger två små program som kommer att
+hjälpa dig med att generera de bildfiler du behöver. Dessa program heter
+"transdisk" och "transrom". Kopiera dem till din Amiga och gör dem körbara
+genom att skriva "protect transrom rwed" och "protect transdisk rwed" i
+ett AmigaShell-fönster.
+Transrom dumpar innehållet i din Kickstart ROM, och Transdisk kommer att
+dumpa en kopia av innehållet på en diskett i någon av diskdrivarna.
+Båda programmen skriver till standardutmatningsenheten (läs skärmen),
+så det måste omdirigeras för att göra nytta.
+
+	transrom >ram:kick.rom
+
+Ovanstående kommer kopiera innehållet i ditt ROM till en fil i din RAM-disk
+med namnet kick.rom,
+
+	transdisk >ram:df0.adf
+
+kommer däremot att skapa en bildfil av disketten i DF0: och lägga den i
+RAM-disken. Dessa filer är rätt så stora, 262144 eller 524288 byte för
+för ROM-filerna och 901120 byte för diskettfilerna.
+
+Kör ALDRIG något av dessa program genom Workbench. Öppna alltid ett
+Shell- eller CLI-fönster för att köra programmen.
+
+Transdisk har följande växlar:
+	
+	-d enhet:	Använd denna istället för df0:
+	-s n		Börja kopiering vid spår n (förvalt: 0).
+	-e n		Sluta kopiering vid spår n (förvalt: 79).
+	-w fil.adf	Läs inte från disketten, utan skriv istället
+			innehållet i fil till disketten.
+	-h		Disketten är en HD-diskett. HD-diskettfiler
+			stöds ännu inte av UAE. Lägg märke till att
+			filen kommer att bli dubbelt så stor.
+
+Så för att kopiera disketten i DF1: till en bildfil i RAM:, skriv:
+
+	transdisk >ram:bildfilsnamn.adf -d trackdisk 1
+
+Om du inte har tllräckligt med RAM för en hel diskettbildfil så kan du
+dela upp disketten i flera delar med "-s" och "-e". För att dela upp en
+disk i fyra delar, skriv:
+  
+  transdisk >ram:df0_1.adf -s 0 -e 19
+  transdisk >ram:df0_2.adf -s 20 -e 39
+  transdisk >ram:df0_3.adf -s 40 -e 59
+  transdisk >ram:df0_4.adf -s 60 -e 79
+
+Givetvis måste du spara undan den första filen någon annanstans innan du kan
+ta nästa del, annars kommer ju RAM-disken att vara full.
+När du sedan har fått över alla filerna till din PC, så vill du förstås
+pussla ihop delarna till en enda stor diskettfil. För att åstakomma detta
+under UNIX så skriver du:
+  cat df0_1.adf df0_2.adf df0_3.adf df0_4.adf >df0.adf
+och under DOS:
+  COPY /B df0_1.adf+df0_2.adf+df0_3.adf+df0_4.adf df0.adf
+Jag har hört att följande program finns till Macen för att sätta ihop
+binära filer:
+"ChunkJoiner 2.1.2" finns under Info-Mac's <disk> katalogen eller 
+"JoinFiles 1.0.1" under Info-Mac's <text>.
+
+Transdisk kan för närvarande endast läsa disketter som är skrivna i
+standard AmigaOS format. Detta betyder att de flesta spel som har
+någon sorts kopieringsskydd inte kan läsas av transdisk (mer om disk-
+format i FAQ-filen).
+
+
+********************************************************************
+*Om du överför komersiell programvara från din Amiga så får du inte*
+*distribuera den resulterande bildfilen, eftersom detta skulle vara*
+*ett brott mot gällande internationella copyright-lagar.           *
+*Kickstart ROM är en komersiell programvara. Du får endast använda *
+*Kickstart taget från din egen Amiga, och du får inte distribuera  *
+*Kickstart ROM-filer. Vänligen läs licensen som kom med din        *
+*mjukvara  för ytterligare detaljer.                               *
+********************************************************************
+
+
+
+Hämta filer från en diskettfil
+==============================
+
+Om du har en diskettbildfil, och du vill ha ut filerna som ligger i den,
+så kan du använda verktyget "readdisk". Det byggs automatiskt utav "make".
+Om du har en diskbildfil kallad "Workbench1.3D" sparad som df0.adf, skriv:
+	readdisk df0.adf
+och hela katalogstrukturen från bildfilen kommer att kopieras till en ny
+underkatalog med namnet "Workbench1.3D". Du kan också om du vill specifiera
+en annan katalog än den aktuella att lägga filerna i. 
+Readdisk läser för tillfället endast diskar med OFS. FFS-diskar kommer
+glatt att rapporteras vara oläsbara. Använd unixfs.device innifrån emulatorn
+för att föra över filer från FFS-diskar.
+
+
+Picasso 96 grafikkortsemulering
+===============================
+
+För att använda denna funktion måste du använda en version av UAE som emulerar
+68020, och du måste använda 32-bitars adressytrymme, samt verson 3.x av
+Kickstart ROM, annars kommer inte Picasso att fungera.
+Du måste sedan ange växeln "-U" för att specifiera hur mycket grafikminne
+du vill emulera, t. ex. "-U 4". Sedan behöver du Picasso 96 mjukvara vilket
+inte distribueras med UAE (det kommer snart en länk till Picasso 96s hemsida
+på UAEs hemsida). Version 1.31+ rekommenderas. Installera mjukvaran, och
+var noga med att se till att "uaegfx"-drivaren är aktiverad. Efter att
+detta är klart, starta om emulatorn, och du borde sedan kunna välja
+nya lägen från programmet ScreenModes.
+
+
+Programmet UAE_CONTROL
+======================
+
+I Amiga-underkatalogen kommer du att finna två program, uaae_control och
+uaectrl, vilka ger samma funktionalitet som X11s GUI. Uaectrl är shell-
+baserat och bör fungera med vilken version av Kickstart som helst, medan
+uae_control behöver gadtools.library och en någorlunda ny verson av 
+reqtools.library vilket gör att det bara fungerar med Kiskstart 2.0+.
+Kopiera dessa två program till den katalog som du använder för hårddisk-
+emulering. De bör vara självförklarande.
+
+
+Snabb överblick av Debug kommandon
+==================================
+
+Några (fönstersystembaserade) portningar av UAE har en inbyggd debug
+funktion. Du kan trycka ^C när som helst för att komma in i debug
+funktionen.
+Varje debug-kommando består av en bokstav, och ibland även någon
+parameter.
+
+g			Starta körning vid aktuell adress.
+c			Dumpa statusen hos CIA och "custom chips".
+r			Dumpa statusen hos CPUn.
+m <adress>  <rader>	Minnesdumpning med start vid <adress>.
+d <adress>  <rader>	Disassemblering med start vid <adress>.
+t			Stega en instruktiom.
+z			Stega genom en instruktion - användbart för JSR, DBRA etc.
+f <adress>		Stega till PC == <adress>.
+q			Avsluta emulatorn.
+M			Leta efter ljudmoduler.
+S <filnamn> <adress> <längd>
+			Spara en ljudmodul.
+
+
+Ljud
+====
+
+Om din version av UAE stöder ljud så kan du ange parametrar på kommandoraden
+vad gäller frekvens och antal bitar som skall användas; om du inte specifierar
+nåt så kommer vettiga förvalda värden att användas. Om grafikutmatning är påslaget
+när ljud spelas, så kommer emulatorn att gå alldeles för slött på de allra flesta
+system. Ljudet kommer inte oavbrutet utan kommer att hacka. Därför finns ett
+litet "hack" med i UAE för att stänga av grafiken: Tryck Scrolllock för att stoppa
+grafiken, tryck igen för att sätta på den igen.
+
+Kvaliten på ljudemuleringen avgörs av växeln "-S". Med "-S 3" emuleras all ljud-
+hårdvara; en del program som till exempel AIBB kräver detta och måste köras med
+denna inställning. "-S 2" fungerar dock oftast minst lika bra, men är i vissa fall
+avsevärt snabbare än "-S3". "-S 1" försöker att emulera det mesta av ljudhårdvaran
+men ger inget ljud. "-S 0" stänger helt av all ljudemulering.
+
+
+Pekare
+======
+
+Det finns ett par siter på internet som innehåller användbar hjälp om UAE.
+
+Den nya "Officiella" UAE sidan finns på:
+
+http://www.freiburg.linux.de/~uae
+
+Tack till Stefan Reinauer som nu underhåller sidan.
+
+Där finns även länkar till andra sidor om UAE. En som är speciellt
+användbar är "UAE discussion board" underhållen av Gustavo Goedert,
+adressen direkt dit är:
+
+http://www.netrunner.com.br/dosuae/uaeboard/index.html
+
+Inte riktigt så bra som diskussionsgrupp p g a hjärnskadad mjukvara
+(Ratscope), men ändå en välsingelse.
+
+Det finns tydligen en diskussionsgrupp kallad "alt.emulators.amiga", men den
+får jag inte hit.
+Diskussionsgruppen "comp.sys.amiga.emulations" kan tyckas vara det rätta stället
+att diskutera Amiga-emulering på, men ärligt talat är det inte det. Lämpligare
+ställen är "comp.emulators.misc", och givetvis Gustavos diskussionsgrupp.
+
+
+Tack och bidragsgivare
+======================
+
+Tack till alla er som hitentills skrivit till mig om buggar och 
+lyckanden/misslyckanden när de försökt göra emulatorn med olika hårdvara
+och olika kickstartversioner. En lista på alla som hjälp till med källkoden
+finns i CREDITS-filen (som har blivit för stor för att ha med här).
+
+Speciellt tack till:
+  - Jay Miner, Dale Luck, R.J. Mical och alla andra som byggde Amigan.
+  - Felix Bardos, vilkens HRM jag "lånade".
+  - Hetz Ben Hamo mailade Peter Kittel på Commodore om lov att få ge bort
+    Kick 1.3. Tyvärr var svaret negativt :-(
+  - Bruno Coste, Ed Hanway, Alessandro Soldo och Marko Nippula som bidragit
+    med dokumentation.
+  - Fabio Ciucci får utmärkelsen "Bästa bug-rapporterna" för hans hjälp
+    blitter emuleringen och andra problemområden.
+  - Michael C. Battilana och Cloanto Software, för deras stöd.
+  - Julian Eggebrecht på Factor 5, för att ha bidragit med flera F5 spel.
+
+
+Författare/Underhållare (av program och hemsidor)
+=================================================
+
+Min adress är (vänligen läs "innan du skickar e-mail" nedan):
+
+crux@pool.informatik.rwth-aachen.de
+
+Eller via vanlig post:
+
+Bernd Schmidt
+21 St Stephen's Place
+Cambridge CB3 0JE
+UK
+
+Det är mer troligt att jag svarar på E-mail, och definitivt mycket snabbare.
+Undvik helst telefonsamtal om du kan.
+Jag distribuerar ingen mjukvara, vare sig PD eller komersiell. Skicka inga disketter
+utan att åtminstone fråga först, du kommer inte att få dem tillbaka.
+
+Följande människor har portat UAE till olika plattformar; du bör ställa
+plattformsspecifika frågor direkt till dessa:
+
+DOS port:
+  Gustavo Goedert <ggoedert@netrunner.com.br>
+  Available: http://www.netrunner.com.br/dosuae
+  Sourecode: tillgänglig på ovanstående hemsida. Större delen inkluderad
+	     i huvud-källkoden (med viss fördröjning).
+
+Mac port:
+  Originally: Ernesto Corvi <someone@imagina.com>
+  Currently: Arnaud Blanchard <jblancha@pratique.fr>
+  Available: http://www.pratique.fr/~jblancha/
+  Sourcecode: extra fil tillgänglig. Bits och delar i huvud-källkoden,
+	      men ingen du kan få och kompilera sig.
+
+
+BeBox port:
+  Christian Bauer <bauec002@goofy.zdv.uni-mainz.de>
+  Available: The main UAE web page (use the Unix sources)
+  Sourcecode: Inkluderad i huvudkällkoden (denna version går ej att kompilera).
+
+
+NextStep port:
+  Ian Stephenson <ians@cam-ani.co.uk>
+  Available: The main UAE web page (use the Unix sources)
+  Sourcecode: Inkluderad i huvudkällkoden. Bör gå och kompilera utan problem.
+
+
+Amiga port:
+  Originally: Olaf 'Olsen' Barthel <olsen@sourcery.han.de>
+  Currently: Samuel Devulder <devulder@info.unicaen.fr>
+  Available: Not quite sure yet. Paul Liss' Web page has binaries.
+  Sourcecode: Inkluderad i huvudkällkoden. Bör gå och kompilera utan problem.
+
+
+pOS port:
+  Samuel Devulder <devulder@info.unicaen.fr>
+  Available: Not quite sure yet.
+  Sourcecode: Inkluderad i huvudkällkoden. Bör gå och kompilera utan problem.
+  
+XFree86/OS2 port:
+  Krister Bergman <bellman@kuai.se>
+  Available: http://www.kuai.se/~bellman/html/xfreeapps.html
+  Sourcecode: Ingenting speciellt. Tydligen går Unix-grejerna att kompilera
+	      utan problem (?).
+
+
+Win32 port:
+  Mathias Ortmann <ortmann@informatik.tu-muenchen.de>
+  Available: http://www.informatik.tu-muenchen.de/~ortmann
+  Sourcecode: Vi arbetar på det.
+
+
+Acorn RISC PC port:
+  Peter Teichmann <sol@Space.WH1.TU-Dresden.De>
+  Available: http://www.wh1.tu-dresden.de/~sol/acorn.shtml
+             http://www.wh1.tu-dresden.de/~sol/acorne.shtml
+  Sourcecode: En del av den är inkluderad i huvud-källkoden, men eftersom Acorns
+	      OS tydligen inte har någon ordentlig filhantering så kan du inte ens
+              använda en del av källkodens layout. Kräver också en hel del extra filer.
+
+Eftersom jag i regel inte har möjlighet att testa och förbättra de olika portningarna,
+är det en god idé att kontakta respektive författare först om du har problem.
+
+
+Innan du e-mailar
+=================
+
+Innan du kontaktar mig med problem som du har, så läs _allt_ som står ovan.
+Läs också FAQ-filen vilken innehåller massa information som kan vara dig till
+hjälp. Läs också den README-fil som gäller för just din plattform.
+
+Jag kan inte svara på _alla_ frågor. Om du har problem med att förstå denna
+LÄS_MIG-fil, antingen för att du inte är någon hejare på svenska eller för att
+du inte har en aning om hur datorer fungerar, så försök först att få tag på någon
+kompis som bättre kan förstå vad som står här och som kan förklara för dig. Jag
+kan till exempel inte förklara för dig hur terminalprogram eller CrossDOS fungerar
+eftersom jag inte använder något av det, och det skulle ändå vara alldeles för
+tidsslukande. Denna fil och FAQ-filen innehåller ungefär all information jag kan
+ge dig. Jag försöker ändå att hjälpa folk som har frågor, men ibland tar det för
+mycket tid helt enkelt.
+
+Så skulle jag bli glad om ni inte ber om Kickstart ROMmar eller någon annan
+copyrightad mjukvara. Skicka inte heller några stora saker till mig (>=50K)
+utan att åtminstone fråga mig först, eller lägg upp det någonstans i webrymden.
+Om jag får en 3 Mb stor skärmdump eller något liknande ("det fungerar inte, och
+genererar denna fil"), så kommer jag troligtvis att bli väldigt arg, och om du
+har otur så klagar jag hos din sysadmin och du kan förlora ditt konto.
+Tänk först, handla sedan.
+
+Just det, en sak till: Om jag lovar att göra något (som att lägga till nya
+funktioner), och jag glömmer det, påminn mig. Detta händer lite då och då,
+och är en känd bug i min hjärna. Jag skall byta den.
+
+
+Översatt till svenska av:  Jonas Holm Pileborg (pileborg@algonet.se)
+Ladda gärna ner mina (och mina kompisars) kassa berättelser från min 
+extremdåliga hemsida (jag har gjort bakgrunderna själv):
+http://www.algonet.se/~pileborg/

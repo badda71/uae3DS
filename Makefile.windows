@@ -1,0 +1,171 @@
+NAME   = uae4all
+O      = o
+RM     = rm -f
+#CC     = i686-w64-mingw32-gcc
+CC     = gcc-3
+#CXX    = i686-w64-mingw32-g++
+CXX    = g++-3
+STRIP  = strip
+
+PROG   = $(NAME).exe
+
+all: $(PROG)
+
+FAME_CORE=1
+#FAME_CORE_C=1
+LIB7Z=1
+
+DEFAULT_CFLAGS = `sdl-config --cflags`
+LDFLAGS        = `sdl-config --libs` -lz -lmingw32 -lmingwex -mwindows
+
+MORE_CFLAGS = -O3  -Isrc/ -Isrc/include/ -Isrc/menu -Isrc/vkbd -fomit-frame-pointer  -Wno-unused -Wno-format -DUSE_SDL -DGCCCONSTFUNC="__attribute__((const))" -DUSE_UNDERSCORE -fno-exceptions -DUNALIGNED_PROFITABLE -DREGPARAM="__attribute__((regparm(3)))" -DOPTIMIZED_FLAGS -D__inline__=__inline__ -DSHM_SUPPORT_LINKS=0 -DOS_WITHOUT_MEMORY_MANAGEMENT -DVKBD_ALWAYS -DMENU_MUSIC -DDOUBLEBUFFER 
+
+#MORE_CFLAGS+= -DUSE_MAYBE_BLIT
+#MORE_CFLAGS+= -DUSE_BLITTER_DELAYED
+#MORE_CFLAGS+= -DUSE_BLIT_FUNC
+#MORE_CFLAGS+= -DUSE_LARGE_BLITFUNC
+#MORE_CFLAGS+= -DUSE_VAR_BLITSIZE
+#MORE_CFLAGS+= -DUSE_SHORT_BLITTABLE
+#MORE_CFLAGS+= -DUSE_BLIT_MASKTABLE
+#MORE_CFLAGS+= -DUSE_RASTER_DRAW
+#MORE_CFLAGS+= -DUSE_ALL_LINES
+#MORE_CFLAGS+= -DUSE_LINESTATE
+#MORE_CFLAGS+= -DUSE_DISK_UPDATE_PER_LINE
+MORE_CFLAGS+= -DWIN32 -DUSE_ZFILE
+
+MORE_CFLAGS+= -DROM_PATH_PREFIX=\"./\" -DDATA_PREFIX=\"./data/\" -DSAVE_PREFIX=\"./\"
+
+
+#MORE_CFLAGS+=-DNO_VKBD
+MORE_CFLAGS+= -DNO_SOUND
+MORE_CFLAGS+= -DNO_THREADS
+MORE_CFLAGS+= -DEMULATED_JOYSTICK
+MORE_CFLAGS+= -DFAME_INTERRUPTS_PATCH
+
+#MORE_CFLAGS+= -DDEBUG_UAE4ALL
+##MORE_CFLAGS+= -DDEBUG_UAE4ALL_FFLUSH
+#MORE_CFLAGS+= -DDEBUG_M68K
+#MORE_CFLAGS+= -DDEBUG_INTERRUPTS
+#MORE_CFLAGS+= -DDEBUG_CIA
+##MORE_CFLAGS+= -DDEBUG_SOUND
+#MORE_CFLAGS+= -DDEBUG_MEMORY
+#MORE_CFLAGS+= -DDEBUG_DISK
+#MORE_CFLAGS+= -DDEBUG_CUSTOM
+#MORE_CFLAGS+= -DDEBUG_SAVESTATE
+##MORE_CFLAGS+= -DDEBUG_GFX -DDEBUG_BLITTER
+##MORE_CFLAGS+= -DDEBUG_FRAMERATE
+#MORE_CFLAGS+= -DSTART_DEBUG=1855
+#MORE_CFLAGS+= -DMAX_AUTOEVENTS=1856
+#MORE_CFLAGS+= -DSTART_DEBUG_SAVESTATE
+##MORE_CFLAGS+= -DAUTO_SAVESTATE=400
+##MORE_CFLAGS+= -DMAX_AUTOEVENTS=401
+#MORE_CFLAGS+= -DAUTO_RUN
+#MORE_CFLAGS+= -DAUTOEVENTS
+##MORE_CFLAGS+= -DPROFILER_UAE4ALL
+##MORE_CFLAGS+= -DAUTO_PROFILER=4000
+##MORE_CFLAGS+= -DMAX_AUTO_PROFILER=5000
+
+
+CFLAGS  = -Isrc/include -I/usr/include/w32api -I/usr/include/mingw -I/usr/local/include $(DEFAULT_CFLAGS) $(MORE_CFLAGS)
+
+OBJS =	\
+	src/savestate.o \
+	src/audio.o \
+	src/autoconf.o \
+	src/blitfunc.o \
+	src/blittable.o \
+	src/blitter.o \
+	src/cia.o \
+	src/savedisk.o \
+	src/compiler.o \
+	src/custom.o \
+	src/disk.o \
+	src/drawing.o \
+	src/ersatz.o \
+	src/gfxutil.o \
+	src/keybuf.o \
+	src/main.o \
+	src/md-support.o \
+	src/memory.o \
+	src/missing.o \
+	src/gui.o \
+	src/od-joy.o \
+	src/sound.o \
+	src/sdlgfx.o \
+	src/writelog.o \
+	src/zfile.o \
+	src/menu/fade.o \
+	src/menu/menu.o \
+	src/menu/menu_load.o \
+	src/menu/menu_save.o \
+	src/menu/menu_main.o \
+	src/vkbd/vkbd.o 
+
+ifdef LIB7Z
+CFLAGS+=-DUSE_LIB7Z
+OBJS+= \
+	src/lib7z/7zAlloc.o \
+	src/lib7z/7zBuf2.o \
+	src/lib7z/7zItem.o \
+	src/lib7z/7zIn.o \
+	src/lib7z/7zHeader.o \
+	src/lib7z/7zBuf.o \
+	src/lib7z/7zCrc.o \
+	src/lib7z/7zDecode.o \
+	src/lib7z/7zExtract.o \
+	src/lib7z/7zFile.o \
+	src/lib7z/7zStream.o \
+	src/lib7z/Alloc.o \
+	src/lib7z/Bcj2.o \
+	src/lib7z/Bra86.o \
+	src/lib7z/BraIA64.o \
+	src/lib7z/Bra.o \
+	src/lib7z/LzFind.o \
+	src/lib7z/LzmaDec.o \
+	src/lib7z/LzmaEnc.o \
+	src/lib7z/lzma.o
+endif
+
+ifdef FAME_CORE
+ifdef FAME_CORE_C
+CFLAGS+=-DUSE_FAME_CORE -DUSE_FAME_CORE_C
+src/m68k/fame/famec.o: src/m68k/fame/famec.cpp
+OBJS += src/m68k/fame/famec.o
+else
+CFLAGS+=-DUSE_FAME_CORE
+src/m68k/fame/fame.o: src/m68k/fame/fame_win.asm
+	nasm -f win32 -o src/m68k/fame/fame.o src/m68k/fame/fame_win.asm
+OBJS += src/m68k/fame/fame.o
+endif
+OBJS += src/m68k/fame/m68k_intrf.o
+else
+OBJS += \
+	src/m68k/uae/newcpu.o \
+	src/m68k/uae/readcpu.o \
+	src/m68k/uae/cpudefs.o \
+	src/m68k/uae/cpuemu.o \
+	src/m68k/uae/cpustbl.o \
+	src/m68k/uae/fpp.o
+endif
+
+CPPFLAGS  = $(CFLAGS) -fno-exceptions -I./src
+
+$(PROG): $(OBJS) 
+	$(CC) -L/usr/lib/mingw -L/usr/local/lib -L. -o $(PROG) -lmingw32 $(OBJS) -lSDL_static_129 -lstdc++ -lpthread -mwindows -mno-cygwin -luser32 -lgdi32 -lwinmm -ldxguid
+	strip $(PROG)
+
+#	$(CC) $(CFLAGS) -o $(PROG) $(OBJS) $(LDFLAGS)
+
+src/$(NAME)_res.o: src/$(NAME).rc
+	windres -i src/$(NAME).rc -o src/$(NAME)_res.o
+
+
+
+
+run: $(PROG)
+	./$(PROG)
+
+clean:
+	$(RM) $(PROG) $(OBJS) std*.txt
+
+

@@ -1,0 +1,235 @@
+[in Polish]
+
+        Jest to *streszczenie* informacji zawartych 
+                 w innych dolaczonych plikach. 
+
+
+Spis tresci:	1. Prawa autorskie i zastrzezenia
+                2. Ogolne informacje
+                3. Parametry podawane w linii polecen
+                4. Emulacja twardego dysku
+                5. Przenoszenie danych z Amigi
+                6. O Autorze
+
+[1. PRAWA AUTORSKIE]
+Copyright 1995, 1996, 1997 Bernd Schmidt i wspolautorzy 
+
+UAE nalezy do grupy programow FREEWARE, co oznacza, ze nie wymaga sie oplaty za
+uzytkowanie go do celow osobistych. Zezwala sie na jego bezplatna dystrybucje, 
+pod warunkiem, ze bedzie rozpowszechniany jako pelne archiwum o niezmienionej
+zawartosci. Za program nie wolno pobierac zadnych oplat, za wyjatkiem ceny 
+nosnika na ktorym jest rozprowadzany. Wyjatkiem od tej zasady jest zamiesz-
+czenie programu w kolekcjach freeware/shareware na plytach CD i na CD-ROMach 
+dolaczanych do magazynow. Nie udziela sie zadnych gwarancji. Jesli uzywasz tego 
+programu, robisz to na swoje wlasne ryzyko. Autorzy nie sa odpowiedzialni za 
+zadne zniszczenia, ktore moga byc wynikiem dzialania programu. "Amiga" jest 
+zastrzezonym znakiem handlowym Amiga International. 
+
+[2. OGOLNE INFORMACJE]
+
+UAE stworzony zostal dla systemow Unixowych. Od tego czasu powstaly wersje dla 
+Maca, DOSa, BeBoxa, NextStep, srodowiska XFree86/OS2 i samej Amigi. Z tym 
+dokumentem powinienies otrzymac kilka innych plikow zawierajacych informacje
+na temat instalacji i uzytkowania wersji programu dla Twojego systemu 
+operacyjnego.
+
+UAE jest emulatorem programowym, ktory pozwala na uruchomienie wiekszej czesci
+Amigowskiego  oprogramowania. W tej chwili emulowane sa: Amiga 500 z procesorem
+68000 lub 68020, OCS, czesciowo ECS, do 2MB Chip RAM, do 8MB Fast RAM,
+do 1MB Slow RAM, cztery stacje dyskow 3.5' (DF0:, DF1:, itd), twardy dysk, 
+joystick, mysz, wiele kombinacji rozdzielczosc/ilosc kolorow, pelna obsluga 
+dzwieku, probna obsluga portu rownoleglego i kilka innych drobiazgow.
+
+[3. PARAMETRY PODAWANE Z LINII KOMEND]
+
+Po pierwsze, przeczytaj przeznaczone dla Twojego systemu dokumenty wyjasniajace
+uruchamianie i obsluge UAE. Powinienes miec plik wykonywalny "uae.exe" 
+(w przypadku niektorych sytemow musisz go dopiero skompilowac). Opcjonalnie 
+mozesz dodac w linii polecen nastepujace parametry:
+
+[Please refer to the English documentation for this section.  The option
+handling has changed and the translated docs were incorrect]
+
+UAE moze zignorowac niektore kombinacje tych parametrow, badz odmowic 
+dzialania. Niektore z tych trybow moga nie dzialac na Twoim systemie.
+
+Mozesz takze umiescic te opcje w pliku konfiguracyjnym: w glownym katalogu
+stworz plik ~/.uaerc i umiesc w nim te opcje. W przypadku systemow
+nieunixowych plik nalezy nazwac uae.rc i umiescic go w katalogu biezacym.
+
+[4. EMULACJA TWARDEGO DYSKU]
+
+UAE moze emulowac wiecej niz jeden dysk twardy, dyski te nazywac sie beda 
+UAE0:, UAE1:, itd. UAE bedzie inicjowac system z UAE0: jesli nie jest podany 
+zaden plik dyskietki dla DF0:
+
+a) Pliki z image'em twardego dysku (nie polecane)
+
+Mozesz stworzyc plik z image'em twadego dysku (niesformatowanego) komenda:
+
+dd if=/dev/zero of=hardfile bs=512 count=16384
+
+Zostanie stworzony plik o wielkosci 8 MB. Inne wielkosci tez powinny dzialac,
+z tym, ze powinny to byc potegi 2. Emulator zawiera rezydentny modul 
+(hardfile.device), ktory sluzy do obslugi emulowanego twardego dysku.
+
+Uzywajac Kickstartu 1.3 lub starszego nie mozna inicjowac systemu z image'u 
+twardego dysku. Bedziesz go musial zainicjowac z pliku dyskietki (lub z 
+oryginalnego systemu plikow - patrz ponizej), a dopiero pozniej poleceniem 
+mount zalozyc hardfile.device. Aby to zrobic, musisz dodac do "DEVS:mountlist" 
+nastepujace linie:
+
+UAE0:	   Device = hardfile.device
+	   Unit   = 0
+	   Flags  = 0
+	   Surfaces  = 1
+	   BlocksPerTrack = 32
+	   Reserved = 1
+	   Interleave = 0
+	   LowCyl = 0  ;  HighCyl = 511
+	   Buffers = 5
+	   DosType = 0x444F5300
+	   BufMemType = 1
+#
+
+Po zrobieniu tego napisz w oknie CLI "mount UAE0:" (lub dodaj te komende do
+startup-sequence). Nie zapomnij o sformatowaniu twardego dysku z poziomu
+AmigaDOS poleceniem:
+
+ format drive uae0: name Nazwa
+
+b) pobieranie danych z oryginalnego systemu plikow
+
+Metoda ta ma kilka istotnych plusow: nie ma klopotow z Kickstartem 1.3, jest
+wygodniejsza i nawet szybsza od prawdziwej Amigi czytajacej dyski.
+
+Jesli w linii komend podasz parametr -M lub -m, bedziesz mogl czytac swoj
+oryginalny system plikow z poziomu emulatora. Np. uruchomienie emulatora
+poleceniem
+
+uae -m sound:/usr/amiga/modules
+
+da ci dostep do wszystkich plikow w katalogu /usr/amiga/modules za
+posrednictwem Amigowskiego wolumenu "SOUND:".
+(uzytkownicy DOSa: sprobujcie "uae -m dh0:C:\" zeby miec dostep do swojego
+twardego dysku jako "DH0:")
+
+W ten sposob mozna utworzyc do 20 urzadzen pamieci zewnetrznej. Jest to takze
+sposob na uzyskanie dostepu do amigowskich CD-ROMow.
+
+[5. PRZENOSZENIE PLIKOW Z AMIGI]
+
+Poniewaz pecetowski kontroler stacji dyskow nie moze czytac Amigowskich dyskow,
+dostep do dyskietek Amigowskich jest rozwiazany w inny sposob. Dyskietki sa
+emulowane za pomoca plikow zawierajacych "image" dyskietki, ktora chcesz
+odczytac. Image jest to zapis sciezka-po-sciezce danych z dyskietki. Plik z
+image'em zawiera 901120 bajtow (880K) - standardowa pojemnosc Amigowskiej
+dyskietki. Aby uruchomic emulator musisz zainstalowac jeszcze zapis pamieci ROM
+z Twojej Amigi. Plik ten nie jest dolaczony, poniewaz chroniony jest prawami
+autorskimi. Nie pros o przyslanie go! Jesli nie masz Amigi i chcesz uzywac UAE,
+musisz kupic Amige lub co najmniej oprogramowanie systemowe (ROM i Workbench).
+Image Kickstartu (ROM-u) moze miec wielkosc 256K lub 512K. Standardowo powinien
+byc nazwany "kick.rom". Jesli nie masz image'u ROM-u, i tak bedziesz mogl
+uruchamiac NIEKTORE gry i dema. Emulator zawiera uproszczony kod, ktory proboje
+odczytac i zabootowac uzywany przez ciebie image. Nie oczekuj jednak zbyt
+wiele.
+
+Jest kilka sposobow na przesyl plikow z Amigi:
+
+- za pomoca kabla laczacego komputery, (tzw. null modem cable) i programu
+  terminala. Mozna uzyc standardowego Commodorowskiego sterownika
+  serial.device. Jednak szybszy jest nowszy sterownik BaudBandit.device
+  (osiagalny na Aminecie). Innym sposobem jest uzycie napisanego w BASICu
+  programu adfi.bas (dolaczonego w pakiecie z UAE).
+
+- jesli na swojej Amidze uzywasz CrossDOSa, mozesz spakowac plik dyskietki
+  lub ROMu za pomoca LHA (lub innego zgodnego z PC archiwizera) i skopiowac
+  go na pecetowska dyskietke 720K. Jesli nie masz CrossDOSa, istnieje darmowe
+  oprogramowanie o spelniajace podobna funkcje, jest to Msh (dostepny w
+  Aminecie lub na dysku Fisha nr 382 lub 327)
+
+W podkatalogu "AMIGA" znajduja sie dwa male programy, ktore pomoga ci stworzyc
+pliki image'ow dyskietek i ROMu. Programy nazywaja sie transdisk i transrom.
+Skopiuj je do swojej Amigi i napisz w oknie polecen "protect transrom rwed"
+i "protect transdisk rwed", aby programy byly wykonywalne. Transrom kopiuje
+zawartosc Kickstart ROM do pliku, a transdisk tworzy image dyskietki
+znajdujacej sie w jednym z napedow. Oba programy dokonuja zapisu na
+standardowym wyjsciu (tj. na ekranie), musisz wiec to zmienic. Napisz:
+
+      transrom >ram:kick.rom
+
+aby w RAM dysku stworzyc plik "kick.rom", lub
+
+      transdisk >ram:df0:adf
+
+aby w RAM dysku utworzyc plik "df0.adf". Pliki te sa dosyc duze, zapis ROMu
+zabiera 262144 lub 524288 bajtow, a image dysku 901120.
+
+Transdisk rozpoznaje nastepujace parametry:
+
+ -d stacja      : uzyj tej stacji zamiast DF0:
+ -s n           : rozpocznij transfer od sciezki n (domyslnie 0)
+ -e n           : zakoncz transfer na sciezce n (domyslnie 79)
+ -w nazwa       : nie czytaj z dyskietki, zamiast tego zapisz zawartosc pliku 
+                  "nazwa" na dyskietke
+ -h             : traktuj dysk jako dysk o podwojnej gestosci. Jednak image 
+                  takich dyskow nie sa jeszcze rozpoznawane przez UAE. 
+
+Jesli masz niewiele RAMu i caly image dyskietki nie miesci ci sie w RAM dysku,
+mozesz podzielic image na kilka czesci parametrami "-s" i "-e". Aby przeniesc
+dysk w czterech czesciach, uzyj nastepujacych polecen:
+
+  transdisk >ram:df0_1.adf -s 0 -e 19
+  transdisk >ram:df0_2.adf -s 20 -e 39
+  transdisk >ram:df0_3.adf -s 40 -e 59
+  transdisk >ram:df0_4.adf -s 60 -e 79
+
+Gdy juz masz te pliki na swoim pececie, napisz (pod Unixem):
+
+  cat df0_1.adf df0_2.adf df0_3.adf df0_4.adf >df0.adf
+
+a pod DOSem
+
+  COPY /B df0_1.adf+df0_2.adf+df0_3.adf+df0_4.adf df0.adf
+
+Na Mac'u mozna laczyc pliki binarne za pomoca narzedzi takich jak 
+"ChunkJoiner 2.1.2" lub "JoinFiles 1.0.1"
+
+W tej chwili program transdisk odczytuje tylko standardowy format dyskietek
+AmigaDOS. Oznacza to, ze niektore gry uzywajace pewnych typow zabezpieczenia
+przed skopiowaniem nie moga zostac przeniesione do formatu adf.
+
+  *********************************************************************
+  Jesli przenosisz oprogramowanie komercyjne, nie wolno ci rozprowadzac
+  stworzonych plikw image -  byloby to pogwalceniem obowiazujacyh praw.
+  Kickstart ROM *jest* oprogramowaniem komercyjnym. Mozesz uzywac pliku
+  Kickstartu pochodzacego wylacznie z Twojej Amigi, i nie wolno ci tego
+  pliku rozpowszechniac.
+  *********************************************************************
+
+[6. AUTOR]
+
+Autorem programu jest Bernd Schmidt. Mozna skontaktowac sie z nim w razie
+watpliwosci, jednak TYLKO po przeczytaniu wszystkich dokumentow (nie tylko
+tego STRESZCZENIA po polsku). Jego adres e-mail to:
+
+crux@pool.informatik.rwth-aachen.de
+
+natomiat adres pocztowy:
+
+Bernd Schmidt
+Schlossweiherstrasse 14
+52072 Aachen
+Niemcy
+
+Nie nalezy zanudzac go problemami wyjasnionymi w dokumentacji. Nie nalezy tez
+przysylac dyskow (nie beda odsylane), ani POD ZADNYM POZOREM prosic o Kickstart
+ani inne oprogramowanie. Pisac po angielsku.
+
+----------------------------------------------------------------------------------
+Od tlumacza:
+Jesli chcesz miec polska wersje dokumentacji DosUAE lub pliku FAQ
+(najczesciej zadawane pytania) popros mnie o nia via e-mail:
+tsca@rocketmail.com
+Od listopada 1997 mozesz prosic tez o polska wersje dokumentacji WinUAE.
+----------------------------------------------------------------------------------

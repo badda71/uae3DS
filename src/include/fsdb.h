@@ -1,0 +1,4 @@
+ /*
+  * No emulated filesystem
+  */
+

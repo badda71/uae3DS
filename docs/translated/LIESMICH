@@ -1,0 +1,192 @@
+[If the rest of this file is incomprehensible to you, that's because it
+contains german instructions.]
+Für Leute, die englische Texte nicht besonders gut verdauen, sind in dieser
+Datei noch einmal die wichtigsten Hinweise zu UAE zusammengefaßt. Die
+englische README-Datei enthält wesentlich mehr Information; diese deutsche
+Übersetzung ist nur eine Notlösung.
+
+UAE steht für Un*x Amiga Emulator, was den Kern der Sache nicht ganz trifft,
+da auch Versionen für Mac, DOS, NextStep, BeBox und Amiga verfügbar sind.
+
+[Anmerkung: Manche Versionen von UAE, etwa die DOS- und die Mac-Version haben
+zusätzliche Readme-Dateien, die Sie ebenfalls lesen sollten, da manche Details
+von der Unix-Version abweichen.]
+
+Lizenz
+======
+
+UAE unterliegt der GNU General Public License, die in der Datei "COPYING"
+im Hauptverzeichnis dieses Archivs enthalten ist.
+
+
+Übersicht
+=========
+
+UAE emuliert einen A500 mit bis zu 2MB Chipram und 8.5MB Fast-RAM. Die
+Emulation ist nahezu vollständig. Ursprünglich wurde UAE für Unix-ähnliche
+Systeme (ich selbst benutze Linux) geschrieben, hauptsächlich deswegen, weil
+Programmieren unter anderen Betriebssystemen Strafarbeit ist (Fehler=>Absturz).
+Die Hard-/Softwarevoraussetzungen für den Betrieb der Unix-Version sind:
+  - 8MB RAM, besser 12-16MB
+  - ein schneller Prozessor (i486 ist nicht das Gelbe vom Brot)
+  - X11, oder SVGAlib unter Linux
+  - ein ANSI-C-Compiler, am besten GCC.
+  - optional: Die gtk+-Bibliothek, Version 0.99.3 oder höher
+
+
+Vorbereitungen
+==============
+
+Zugriffe auf das Diskettenlaufwerk können nur über einen Umweg emuliert 
+werden, da PCs keine Amiga-Disketten lesen können. UAE verwendet 
+"Diskfiles", das sind genaue Abbilder des Inhalts einer Amiga-Diskette. Solche
+Diskfiles sind 901120 Bytes groß und können mit dem Tool "transdisk", das UAE 
+beiliegt erstellt werden. Um UAE laufenzulassen, benötigen Sie außerdem ein 
+Abbild eines Amiga-Kickstart-ROMs. Dieses kann aus Copyrightgründen nicht mit 
+UAE vertrieben werden. Es muß mit dem Tool "transrom" erzeugt werden.
+Die beiden Programme finden Sie im Unterverzeichnis "amiga". Sie müssen sie
+zunächst auf Ihren Amiga kopieren, entweder über ein serielles Nullmodem-Kabel
+oder mit Hilfe eines Amiga-Programms wie etwa CrossDOS oder MessyDOS, die es
+ermöglichen, PC-Disks mit einem Amiga zu lesen und zu beschreiben. Dieselbe
+Methode kann dann selbstverständlich auch benutzt werden, um Amiga-Dateien auf
+den PC zu kopieren. CrossDOS ist seit einiger Zeit Bestandteil des
+Amiga-Betriebssystems, und MessyDOS ist frei erhältlich (u.a. auf einer 
+älteren Fish-Disk, Nummer habe ich vergessen). Beachten Sie, daß in vielen
+Amigas nur DD-Laufwerke eingebaut sind, die PC-üblichen HD-Disketten lassen
+sich damit nicht verarbeiten.
+Wenn Sie die Lösung mit dem Nullmodemkabel benutzen wollen, werden Sie zwei
+Terminalprogramme benötigen, sowohl für den PC als auch für den Amiga.
+Bitte lesen Sie in den jeweiligen Anleitungen der Programme (etwa CrossDOS 
+oder die Terminalprogramme) nach, wie diese Programme zu bedienen sind.
+Nachdem Sie transrom und transdisk auf den Amiga kopiert haben, müssen Sie dem
+AmigaOS beibringen, daß diese Dateien ausführbare Programme sind. Das
+geschieht durch den CLI-Befehl
+
+  "protect transrom rwed" (bzw. "protect transdisk rwed")
+
+Danach können Sie die Programme aufrufen:
+
+  transrom >RAM:kick.rom
+  
+erzeugt eine 524288 Byte große Kickstart-Datei in der Ramdisk. Diese müssen
+Sie auf Ihren PC übertragen und dort in dasselbe Verzeichnis kopieren, in dem
+UAE installiert ist.
+Mit 
+  transdisk >RAM:df0.adf
+  
+kann die in Laufwerk 0 liegende Diskette in ein Diskettenabbild umgewandelt
+werden, welches wiederum in der Ramdisk gespeichert wird. Hierbei kann ein
+Problem auftreten, wenn Ihr Amiga wenig Speicher hat (wenn er _sehr_ wenig
+Speicher hat, funktioniert schon der obige transrom-Befehl nicht; dann haben
+Sie leider Pech gehabt). Sie können die Diskette in mehreren Stücken
+übertragen. Eine Amiga-Diskette hat 80 Spuren (0..79); mit den Befehlen
+ 
+  transdisk >ram:df0_1.adf -s 0 -e 19
+  transdisk >ram:df0_2.adf -s 20 -e 39
+  transdisk >ram:df0_3.adf -s 40 -e 59
+  transdisk >ram:df0_4.adf -s 60 -e 79
+
+werden vier Teil-Disketten-Abbilder erstellt, (z.B. enthält df0_1.adf gerade
+die Spuren 0 bis 19). Es macht natürlich keinen Sinn, die Befehle in obiger
+Reihenfolge aufzurufen, Sie sollten immer nur jeweils eine Datei erzeugen, auf
+den PC übertragen, aus der Amiga-Ramdisk löschen und dann fortfahren.
+Die vier Dateien lassen sich dann auf dem PC wieder zu einer zusammensetzen,
+entweder unter DOS mit
+
+  COPY /B df0_1.adf+df0_2.adf+df0_3.adf+df0_4.adf df0.adf
+
+oder unter Unix:
+
+  cat df0_1.adf df0_2.adf df0_3.adf df0_4.adf >df0.adf
+
+UAE benötigt die Datei "kick.rom" (524288 Byte) und eine Datei "df0.adf"
+(901120 Byte), um etwas Sinnvolles zu tun. Diese müssen im gleichen
+Verzeichnis stehen, wie UAE.
+Die Datei, die das Kickstartabbild enthält, dürfen Sie nicht weitergeben, da
+sie Code enthält, dessen Copyright Commodore-Amiga hält. Ebenso dürfen die
+meisten Diskettenabbilder (etwa die Workbench, oder kommerzielle Spiele) nicht
+weiterverbreitet werden. Sie dürfen mit UAE nur Software benutzen, für die Sie
+das Nutzungsrecht haben.
+
+
+Compilierung
+============
+
+Die Versionen für Unix, NextStep und BeBox müssen zunächst compiliert werden.
+Für die BeBox müssen Sie dafür ins Verzeichnis "src" gehen und
+
+  make -f Makefile.Be
+  
+eingeben, auf anderen Systemen müssen Sie zunächst
+
+  configure
+
+aufrufen; dieses Skript analysiert Ihr System und sammelt Informationen (aber
+im Gegensatz zu MessySoft-Produkten schickt es sie nicht übers Netz an andere
+Leute, sondern erstellt nur die Dateien "Makefile" und "sysconfig.h"). Danach
+können Sie mit
+
+  make
+  
+UAE compilieren. Am Ende sollte eine ausführbare Datei namens "uae" entstanden
+sein. Falls Sie unter Linux die SVGAlib- anstelle der X11-Version benutzen
+möchten, geben Sie statt "configure" "configure --with-svgalib" ein.
+Sie müssen root sein, um die SVGA-Version starten zu können. Machen Sie UAE
+besser nicht suid root, wenn Ihnen an der Sicherheit des Systems gelegen ist,
+oder Sie könnten böse Überraschungen erleben.
+
+
+Kommandozeilen-Optionen
+=======================
+
+Die folgenden Paramter können Sie UAE in der Kommandozeile übergeben. Sie 
+können häufig benötigte Optionen auch in eine Datei namens "~/.uaerc" (Unix)
+oder "uae.rc" (andere) schreiben, diese Datei wird von UAE beim Start
+gelesen (und wahlweise am Ende geschrieben).
+
+[alles, was hier stand, war leider falsch.  Jemand sollte die neue Doku
+übersetzen]
+
+
+Häufige Probleme
+================
+
+Manche Kickstart-ROM-Versionen (aus neueren A4000 und A1200) sind für den
+68020 compiliert, der von UAE derzeit noch nicht 100% emuliert wird, daher
+laufen diese Kickstarts nicht.
+
+Auf manchen Linux-Systemen ist ein kaputter Linker installiert. Falls Sie
+Fehlermeldungen der Sorte "final link failed: Bad value" beim Compilieren
+kriegen, sollten Sie sich von sunsite.unc.edu:/pub/Linux/GCC eine neuere
+Version der binutils besorgen. Allerdings sollten Sie die Hinweise, die in den
+"release.*"-Dateien stehen, genau beachten.
+
+
+Adresse des Autors
+==================
+
+crux@pool.informatik.rwth-aachen.de
+
+oder mit der gelben Post:
+
+Bernd Schmidt
+21 St Stephen's Place
+Cambridge CB3 0JE
+UK
+
+(bitte nicht anrufen, wenn's geht)
+
+Wenn Sie Verständnisprobleme mit diesem Text haben oder Teile der englischen
+Dokumentation nicht verstehen, versuchen Sie bitte, jemand in Ihrer Nähe zu 
+finden, der Ihnen die Dinge erklären/übersetzen kann. Ich kann nicht jedem 
+Computerneuling noch einmal lang und breit erklären, wie man (beispielsweise) 
+CrossDOS bedient: dazu gibt's bei CrossDOS auch eine Dokumentation. Ich
+versuche, zu helfen, aber manche Dinge sind zu zeitaufwendig.
+
+Bevor Sie eine Frage stellen, überprüfen Sie bitte, ob sie nicht in der
+Dokumentation bereits beantwortet wird.
+Ich verschicke keine Kickstart-ROM-Dateien oder Amiga-Spiele. Schicken Sie
+mir bitte auch keine Raubkopien, ich lösche so etwas sofort. Generell gilt
+auch, daß Sie keine Dateien, die größer als 50KB sind, per email verschicken
+sollten. Wenn ich 3MB Screenshots oder ähnliches Zeug per email kriege, freue
+ich mich nicht darüber.

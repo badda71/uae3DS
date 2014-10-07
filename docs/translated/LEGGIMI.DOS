@@ -1,0 +1,386 @@
+File LEGGIMI per la versione MS-DOS di UAE (0.7.x)
+
+(c) 1996-1998 Gustavo Goedert   <ggoedert@hephaestus.org>
+(c) 1997-1998 Brett Eden	<beden@eastwind.com.au>
+
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+Traduzione ed aggiunte a cura di Fulvio Leonardi, Copyright (c) 1998.
+
+Home Page italiana di UAE : http://www.panservice.it/uae/
+
+E-mail                    : uae@mbox.panservice.it
+
+Tutti i diritti sono riservati. E' concessa la distribuzione di questo
+documento in qualsiasi forma, a patto che avvenga gratuitamente. NON sono
+autorizzate modifiche di alcun tipo senza l'espresso consenso dell'autore,
+ne' tantomeno diverse attribuzioni di provenienza. Se parti di questo
+documento o l'intero documento stesso vengono inclusi in mezzi di
+informazione (come siti web o articoli di riviste), e' richiesta una
+citazione dell'autore, della sua e-mail ed eventualmente del suo sito. Per
+qualsiasi tipo di diffusione che vada al di la' della normale distribuzione
+del software di Pubblico Dominio, contattare l'autore.
+
+All trademarks used in this document are property of respective owners.
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+
+
+Leggere completamente i file "LEGGIMI" e "FAQ.ita" prima di tentare di
+eseguire UAE.
+
+
+1. Introduzione
+°°°°°°°°°°°°°°°
+
+Benvenuti ad UAE, il primo emulatore di Commodore Amiga pienamente
+funzionale. Questo documento e' stato scritto per la versione MS-DOS di UAE
+e contiene informazioni generiche su UAE, su come configurarlo ed usarlo al
+meglio delle sue possibilita'.
+
+
+2. Cos'e' un emulatore, e cos'e' esattamente UAE?
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Un emulatore e' un programma che ti permette di eseguire software di una
+macchina che ha hardware e sistema operativo proprietari, sul tuo computer.
+UAE e' un emulatore software che ti permette di eseguire la gran parte del
+software Amiga che e' disponibile commercialmente e nel circuito del
+Pubblico Dominio. Non e' necessario alcun hardware aggiuntivo per farlo,
+solo il pacchetto di UAE e, nel caso di questa versione, un PC IBM
+compatibile con la versione 5.0 di MS-DOS, od una successiva.
+
+UAE emula molte delle caratteristiche che puoi trovare in un Commodore
+Amiga, cosi' tante che puoi eseguire molti giochi e quasi tutte le
+applicazioni che sono disponibili per questa macchina. UAE ti permette di
+trasferire software da un Amiga e memorizzarlo sul tuo sistema, dove puo'
+essere letto dall'emulatore. Quando UAE verra' eseguito, la tua macchina si
+comportera' proprio come un vero Amiga -avrai il joystick, il mouse, il
+suono, uno schermo configurabile e, supposto che tu abbia il software, il
+sistema operativo nativo di Amiga-.
+
+La cosa importante da ricordare e' che UAE e' un VERO emulatore che si
+comporta come un VERO Amiga. Su una macchina di livello medio-basso (con un
+processore Pentium Classic), operera' ad una velocita' perfettamente
+utilizzabile.
+
+UAE e' un progetto che si sta evolvendo, cui si sta dedicando molta gente.
+Migliorera' tanto piu' quanti piu' saranno i contributi e quante piu'
+saranno le proposte che saranno fatte per migliorarlo.
+
+
+3. Suggerimenti importanti per l'utilizzo di DOSUAE
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+* Il supporto al file hard disk e' cambiato: ora devi montarlo manualmente,
+  tramite l'interfaccia grafica, oppure devi assicurarti di includere i
+  seguenti parametri nel file "UAE.RC": "-W 32:1:2:nomefile",
+  dove <nomefile> rappresenta il nome del file hard disk, col suo eventuale
+  percorso. Nel file "UAE.RC" c'e' un esempio.
+
+* Per l'emulazione Picasso96, usa il software Picasso96 versione 1.31 o
+  superiore, settando una CPU 68020 o superiore.
+
+* La sintassi dei parametri del sonoro e' cambiata, come segue:
+
+  "-S abilita:stereo:bit:frequenza:buffer massimo:buffer minimo:aggiusta
+  frequenza"
+
+  Non devi necessariamente specificare tutti i parametri, puoi fermarti ad
+  ogni campo.
+
+  abilita            : Accetta '0' (niente audio); '1' (audio emulato, ma
+		       senza output); '2' (audio emulato); '3' (emulazione
+		       completa ed accurata). Il valore suggerito e' '2'.
+  stereo	     : Accetta 's' (stereo) o 'm' (mono).
+  bit                : Numero di bit da usare per l'output sonoro, di solito
+		       8 o 16.
+  frequenza          : Frequenza dell'output sonoro, di solito 44100 o 22050
+		       (Kilohertz).
+  buffer massimo     : Dimensione del buffer massimo per l'output sonoro.
+  buffer minimo      : Dimensione del buffer minimo per l'output sonoro.
+  aggiusta frequenza : Accetta '0' (non aggiustare) o '1' (aggiusta).
+
+* La nuova opzione per attivare il filesystem virtuale e' comandata dai
+  parametri "-v" e "-V", simili a quelli "-m" ed "-M". Le directory ed i
+  file Amiga saranno gestite dal file MS-DOS "#UAE.VFS", che ne controllera'
+  anche gli attributi. Quest'opzione permette di condividere dispositivi
+  fisici, logici o directory con MS-DOS, senza la necessita' di creare un
+  file hard disk.
+
+  C'e' un parametro di quest'opzione che permette di definire come troncare
+  i nomi dei file, in accordanza con le specifiche MS-DOS di lunghezza dei
+  percorsi logici (circa 70 caratteri): poiche' certe persone necessitano di
+  un sacco di sottodirectory, definire questo parametro ad '1' permettera'
+  al filesystem virtuale di creare file con un nome molto corto,
+  massimizzando il numero delle directory disponibili, ma come effetto
+  contrario verranno creati file dai nomi quasi indecifrabili... quantita'
+  valide vanno da '1' ad '8'; il parametro viene passato con la sintassi
+  "*<dimensione troncamento>" dopo il percorso di attivazione (cosi'
+  potresti avere diverse dimensioni di troncamento per ogni directory
+  condivisa).
+
+  Quest'opzione creera' nomi dei file molto corti:
+
+  -v Test:C:\VFS*1
+
+  Questa, invece, della lunghezza standard (8 caratteri):
+
+  -v Work:C:\WORK*8
+
+  "-V" attiva la condivisione in sola lettura.
+
+* Riguardo ai joystick: si possono abilitare due joystick, rimappare il
+  secondo bottone del joystick, rimappare la pressione contemporanea dei due
+  bottoni come terzo pulsante, insieme ad un migliore codice di
+  calibrazione.
+
+* Implementato il parametro "-w <n>" per selezionare la velocita' della CPU:
+  usa valori alti come 8 o piu' per i giochi, demo e per ottenere una
+  migliore emulazione del sonoro e valori bassi come 1 per applicazioni che
+  fanno un uso intensivo della CPU, il valore predefinito e' '4'. Nota che
+  se usi valori molto bassi conviene disabilitare l'audio con "-S 0",
+  perche' l'emulazione audio attuale consuma un sacco di cicli CPU.
+
+* Il parametro "-x" permette di disabilitare il framebuffer lineare della
+  scheda video, anche se presente.
+
+* Il debugger puo' essere usato, usa Home (Freccia altosin.) + F2 per
+  attivarlo, oppure Ctrl+C. L'opzione 'g' lo termina.
+
+* Non c'e' piu' il file .log. Se vuoi attivarlo usa "uae >uae.log", vengono
+  mantenuti in memoria solo gli ultimi 100 messaggi.
+
+* Al momento DosUAE supporta solo i file disk .adf compressi con Gzip. Per
+  il supporto dei file .adz e .roz assicurati di avere il file "GZIP.EXE" in
+  una directory definita nel PATH (per esempio, C:\DOS). Vedi oltre dove
+  procurarti il Gzip.
+
+
+4. Sistema richiesto
+°°°°°°°°°°°°°°°°°°°°
+
+Per eseguire UAE, hai bisogno di:
+
+ un computer IBM compatibile, con una CPU x386 o superiore;
+ una versione di MS-DOS uguale o superiore alla 5.0;
+ 8 Megabyte di RAM;
+ una scheda video VGA;
+ un mouse.
+
+Comunque, e' RACCOMANDATA la seguente configurazione, se vuoi ottenere il
+minimo da UAE:
+
+ un computer IBM compatibile, con una CPU x486 o Pentium Classic almeno a
+  100 MHz;
+ una versione di MS-DOS uguale o superiore alla 5.0;
+ 16 Megabyte di RAM;
+ una scheda video PCI VGA che supporti le estensioni VESA 2.0;
+ un joystick analogico o digitale, connesso alla porta game;
+ una scheda audio compatibile Sound Blaster.
+
+UAE e' un programma che fa un uso *molto* intensivo della CPU e pertanto
+beneficera' immensamente di una CPU molto potente e di un sacco di RAM. Piu'
+veloce sara' il tuo computer, tanto piu' potrai ottenere da UAE in termini
+di velocita' d'emulazione. Non credere che UAE faccia scintille su un 386
+con una VGA da 256 Kb, con 4 Mb di RAM...
+
+
+5. Installare UAE
+°°°°°°°°°°°°°°°°°
+
+Nella sottodirectory "UTILS", troverai i programmi "MAKEDISK.EXE" e
+"READDISK.EXE". Makedisk ti permettera' di costruire un file hard disk
+virtuale che UAE utilizzera' come un hard disk "reale" quando emulera'
+l'Amiga. Altrimenti, puoi usarlo per creare un dischetto vuoto "virtuale" da
+usare quando l'emulatore e' in esecuzione. Readdisk ti permette di leggere
+un file immagine di un dischetto Amiga (.adf) e trasferirne il contenuto in
+una directory MS-DOS.
+
+Nella directory "AMIGA", troverai due eseguibili Amiga che ti permetteranno
+di riversare il contenuto di un dischetto Amiga da 880 Kb in un'immagine
+"virtuale" del dischetto stesso, nel formato usato dall'emulatore (.adf =
+Amiga Disk File), e di trasferire inoltre le ROM del Kickstart di Amiga (un
+componente essenziale) in un file chiamato "kick.rom" (predefinito, ma puo'
+essere cambiato), che UAE usa per avviare il sistema operativo nativo di
+Amiga (il Workbench).
+
+Una volta che sei certo di avere tutti i file della distribuzione MS-DOS di
+UAE, puoi eseguire l'emulatore dal prompt di MS-DOS, lanciando l'eseguibile
+"UAE.EXE".
+
+UAE ti offre una semplice interfaccia grafica pilotata da menu che ti
+permette di cambiare e configurare diversi aspetti dell'emulazione, per
+soddisfare le tue necessita'.
+
+Le opzioni possono essere passate anche manualmente, dalla linea di comando,
+oppure essere incluse nel file di configurazione "UAE.RC".
+
+Dato che la versione MS-DOS ricalca il piu' possibile quella Linux (salvo le
+eccezioni riportate), per una descrizione completa delle opzioni di
+configurazione di UAE e' opportuno leggere anche la documentazione generica
+(il file "LEGGIMI").
+
+
+6. Configurare UAE
+°°°°°°°°°°°°°°°°°°
+
+Dopo aver lanciato UAE, ti verra' presentata una interfaccia a menu pilotata
+da tastiera. Qui potrai configurare UAE nella maniera che ti sembrera' piu'
+opportuna. Il testo alla sinistra dello schermo ti dira' la configurazione
+attuale di UAE e quando interverrai sui vari menu, i cambiamenti verranno
+riportati qui.
+
+
+7. Comandi da tastiera
+°°°°°°°°°°°°°°°°°°°°°°
+
+Possono essere usate le seguenti combinazioni di tasti, quando UAE e' in
+esecuzione (Home e' il tasto "Freccia altosinistra", sopra il tasto "Fine"):
+
+ Home + Esc        Termina l'emulazione
+
+ Home + F1	   Menu opzioni
+
+ Home + F2	   Attiva il debugger
+
+ Stamp             Salva una copia dello schermo in un file grafico ".tga"
+
+ Bloc Scorr        Disabilita/Abilita l'aggiornamento della grafica
+
+ Pausa             Disabilita/Abilita l'aggiornamento del sonoro
+
+Per inserire ed espellere un'immagine disco usare il menu opzioni (Home+F1).
+
+La tastiera Amiga ha propri tasti speciali, cosi' come il Mac e i PC con
+tastiere Windows 9x. Il tasto Amiga sinistro e' usato per alcune funzioni
+speciali come accedere ai menu a tendina senza il mouse ed altre
+scorciatoie.
+
+Varie rimappature della tastiera
+================================
+
+I seguenti tasti sono stati rimappati in DosUAE:
+
+ Windows Destro
+ Pag Su'	     Tasto Amiga Destro
+
+ Windows Sinistro
+ Pag Giu'            Tasto Amiga Sinistro
+
+ Ins                 Tasto Help Amiga
+
+ F11                 Tasto "\"
+
+
+8. Risoluzione dei problemi / Alcune domande ricorrenti
+°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+
+Consultare il file "FAQ.ita" per un elenco piu' esauriente.
+
+D: Quali sono le differenze tra la versione DOS e quella Linux?
+R: I parametri "-v", "-V", "-x" e "-w".
+
+D: Che tipo di software non verra' eseguito da UAE?
+R: Sebbene UAE al momento attuale emuli un sacco di caratteristiche
+   dell'Amiga, ci sono ancora delle cose che non puo' fare. Per prima cosa,
+   UAE e' privo di una MMU (Memory Management Unit), e questo comporta che
+   il software che ne ha bisogno (utilita' per la memoria virtuale, Linux
+   68k, ecc.) semplicemente non funzioneranno. Una MMU potrebbe venire nelle
+   versioni future, ma al momento non e' supportata.
+
+   UAE e' anche incapace di eseguire il software che richiede il chipset AGA
+   (quello dei sistemi Amiga 1200 e 4000), poiche' non viene emulato per
+   niente. Potrebbe essere attivato nelle future versioni di UAE, poiche' e'
+   stato fatto del lavoro sperimentale.
+
+   Ci sono poche applicazioni Amiga che richiedono una CPU 68020 *ed* una
+   FPU 68881 per essere eseguite adeguatamente (alcune applicazioni di
+   raytracing sono le prime che mi vengono in mente), cosi' dovresti
+   attivare quest'opzione se le usi.
+
+D: Cosa devo fare se non voglio battere ogni volta tutti i parametri della
+   linea di comando?
+R: Metti tutti i parametri che usi nel file "UAE.RC". Nota che la
+   configurazione non verra' piu' salvata nel file "UAE.CFG", bensi' in
+   quello "UAE.RC", se usi l'opzione "-o".
+
+D: Devo chiamare il file disk "DF0.ADF"?
+R: No, basta che poi specifichi il file che devi usare con l'opzione "-0" (o
+   "-1", "-2", "-3", per i drive DF1:, DF2:, DF3:).
+
+D: Come posso usare i file disk disponibili sulla Rete?
+R: I file con estensione .gz o .gz.bin sono compressi con Gzip. Puoi
+   ottenerlo su <ftp://oak.oakland.edu/>. Scompattali col comando "Gzip -d
+   <nome file>".
+
+D: Perche' alcune demo si piantano sebbene la lista di compatibilita'
+   riporta che dovrebbero funzionare?
+R: Prova con l'opzione "-s 4". Dopo dovresti essere in grado di far girare
+   l'emulatore. Se non ne vieni a capo scrivimi.
+
+D: Come posso ottenere il sonoro?
+R: Abilitalo nella interfaccia grafica.
+
+D: Come posso spremere la velocita' massima di UAE?
+R: Esegui l'emulatore nella risoluzione piu' bassa (320x200), a 256 colori,
+   sii certo che la correzione dell'aspetto e' disabilitata e setta
+   l'aggiornamento dello schermo al terzo quadro. Per ultimo, disabilita il
+   sonoro. Non sembrera' granche', ma andra' quasi al massimo delle
+   possibilita' della tua macchina.
+
+D: Perche' le finestre ed i caratteri del Workbench sono distorti?
+R: I modi 320x200, 320x240 e 320x400 non sono proporzionali. Prova a
+   scegliere quelli 640x480 o 800x600 e ad abilitare la correzione
+   dell'aspetto (senza correzione dell'aspetto UAE salta delle linee nella
+   visualizzazione).
+
+D: Perche' DosUAE si pianta sotto Windows 9x?
+R: DosUAE fa delle cose che a Windows 9x non piacciono. Alcune volte puoi
+   riuscire a farlo funzionare, altre no. Dipende da come lo hai
+   configurato. DosUAE dovrebbe girare in un ambiente DOS puro con il
+   caching del disco fisso attivato. Se usi Windows 9x, potresti provare la
+   versione Win32/DirectX di UAE.
+
+D: Sembra che io non riesca ad ottenere le modalita' 640x480 e 800x600.
+R: Queste modalita' richiedono che la tua scheda video supporti le
+   estensioni VESA VBE. Puoi scaricare l'UniVBE (parte della suite di
+   programmi Display Doctor) dalla Scitech Soft
+   (http://www.scitechsoft.com/), oppure puoi contattare il produttore
+   della tua scheda video per un aggiornamento del BIOS o per un driver VBE.
+
+D: Non e' stato definito l'Unusable Amiga Emulator?
+R: Si, ma sembra piuttosto azzardato, adesso. Questo nome aveva un senso
+   solo con la versione 0.1, che non partiva nemmeno.
+
+D: Non funziona ancora, perche'?
+R: L'immagine del dischetto o delle ROM potrebbe essere corrotta. La tua
+   configurazione potrebbe causare conflitti. Prova a creare un dischetto
+   d'avvio solo con il driver VESA e quello per il mouse.
+
+D: Che devo fare se trovo un baco?
+R: Se ritieni che quello che hai scovato possa essere un baco, contatta
+   l'autore della versione DOS di UAE. Piu' informazioni potrai fornire sul
+   problema che hai incontrato, piu' probabilmente il problema potra' essere
+   risolto. Se possibile, includi un'immagine catturata dallo schermo in cui
+   si e' verificato il problema. I dettagli dell'autore sono alla fine di
+   questo documento.
+
+
+9. L'autore di DosUAE
+°°°°°°°°°°°°°°°°°°°°°
+
+La versione DOS di UAE ha un sito web, su:
+
+ http://www.hephaestus.org/uae/dosuae/
+
+UAE ha inoltre un proprio forum di discussione, su:
+
+ http://www.hephaestus.org/uae/uaeboard/
+
+L'autore di DosUAE, Gustavo Goedert, puo' essere contattato per posta
+elettronica (ma usate il forum, prima) a:
+
+ ggoedert@hephaestus.org
+
+Leggete il file "FAQ.ita" ed i vari "LEGGIMI" attentamente prima di porre
+domande. Non fate richieste ad alcun collaboratore/sviluppatore di UAE di
+immagini di dischi o delle ROM, tanto verranno ignorate.

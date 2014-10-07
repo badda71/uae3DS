@@ -179,6 +179,8 @@ void flush_screen (void)
 		vkbd_key=vkbd_process();
 #if defined(DOUBLEBUFFER) || defined(DINGOO)
 	SDL_Flip(prSDLScreen);
+	gfx_mem = (char*) prSDLScreen->pixels;
+	reset_drawing();
 #endif
 #ifdef USE_RASTER_DRAW
     }

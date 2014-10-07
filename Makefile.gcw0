@@ -182,6 +182,11 @@ $(PROG): $(OBJS)
 run: $(PROG)
 	./$(PROG)
 
+almostclean:
+	cp src/m68k/fame/famec.o src/m68k/fame/famec.preserved.o
+	$(RM) $(PROG) $(OBJS)
+	mv src/m68k/fame/famec.preserved.o src/m68k/fame/famec.o
+
 clean:
 	$(RM) $(PROG) $(OBJS)
 

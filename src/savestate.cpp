@@ -83,6 +83,8 @@ static char savestate_filename_default[]={
 char *savestate_filename=(char *)&savestate_filename_default[0];
 FILE *savestate_file=NULL;
 
+extern SDL_Surface* prSDLScreen;
+
 /* functions for reading/writing bytes, shorts and longs in big-endian
  * format independent of host machine's endianess */
 
@@ -458,6 +460,11 @@ void save_state (char *filename, char *description)
     int len,i;
     char name[5];
 
+#if !defined(DREAMCAST) && !defined(DINGOO)
+    if (SDL_MUSTLOCK(prSDLScreen))
+    	SDL_UnlockSurface (prSDLScreen);
+#endif
+
     gui_show_window_bar(0, 10, 0);
 #ifdef DREAMCAST
 	extern void reinit_sdcard(void);
@@ -624,6 +631,10 @@ void save_state (char *filename, char *description)
 #endif
 #ifdef START_DEBUG_SAVESTATE
 	DEBUG_AHORA=1;
+#endif
+#if !defined(DREAMCAST) && !defined(DINGOO)
+    if (SDL_MUSTLOCK(prSDLScreen))
+    	SDL_LockSurface (prSDLScreen);
 #endif
 }
 

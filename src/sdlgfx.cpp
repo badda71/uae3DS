@@ -546,6 +546,10 @@ void handle_events (void)
     dbg("Function: handle_events");
 #endif
 
+#if !defined(DREAMCAST) && !defined(DINGOO)
+    if (SDL_MUSTLOCK(prSDLScreen))
+    	SDL_UnlockSurface (prSDLScreen);
+#endif
 
 #if defined(MAX_AUTOEVENTS) || defined(AUTOEVENTS)
 	{
@@ -858,6 +862,10 @@ break;
     }
 #endif
 
+#if !defined(DREAMCAST) && !defined(DINGOO)
+    if (SDL_MUSTLOCK(prSDLScreen))
+    	SDL_LockSurface (prSDLScreen);
+#endif
 
     /* Handle UAE reset */
 /*

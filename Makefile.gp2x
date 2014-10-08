@@ -21,6 +21,7 @@ MORE_CFLAGS = -O3  -Isrc/ -Isrc/include/ -Isrc/menu -Isrc/vkbd -fomit-frame-poin
 
 MORE_CFLAGS+= -DROM_PATH_PREFIX=\"./\" -DDATA_PREFIX=\"./data/\" -DSAVE_PREFIX=\"./\"
 
+#MORE_CFLAGS+= -DSTATUS_ALWAYS
 #MORE_CFLAGS+= -DUSE_AUTOCONFIG
 #MORE_CFLAGS+= -DUAE_CONSOLE
 MORE_CFLAGS+= -DGP2X

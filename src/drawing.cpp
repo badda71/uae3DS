@@ -1736,10 +1736,6 @@ static __inline__ void do_flush_screen (int start, int stop)
 {
     if (first_block_line != -2) 
 	flush_block (first_block_line, last_block_line);
-    
-#if !defined(DREAMCAST) && !defined(DINGOO)
-    unlockscr ();
-#endif
 }
 #else
 #define do_flush_line(LNO)
@@ -1942,9 +1938,11 @@ static char *numbers = { /* ugly */
 "------ ------ ------ ------ ------ ------ ------ ------ ------ ------ "
 };
 
+#if !defined(DOUBLEBUFFER) && !defined(STATUS_ALWAYS)
 int back_drive_track0=-1,back_drive_motor0=-1;
 static int back_drive_track1=-1,back_drive_motor1=-1;
 static int back_powerled=-1;
+#endif
 
 static __inline__ void putpixel (int x, xcolnr c8)
 {
@@ -2028,13 +2026,6 @@ static _INLINE_ void finish_drawing_frame (void)
 {
     int i;
 
-#if !defined(DREAMCAST) && !defined(DINGOO)
-    if (! lockscr ()) {
-	notice_screen_contents_lost ();
-	return;
-    }
-#endif
-
     for (i = 0; i < max_ypos_thisframe; i++) {
 	int where,i1;
 	int line = i + thisframe_y_adjust_real;
@@ -2059,14 +2050,20 @@ static _INLINE_ void finish_drawing_frame (void)
 #else
     if (
 #endif
+#if !defined(DOUBLEBUFFER) && !defined(STATUS_ALWAYS)
 	   (back_drive_track0!=gui_data.drive_track[0])
 	|| (back_drive_motor0!=gui_data.drive_motor[0])
 #if NUM_DRIVES > 1
 	|| (back_drive_track1!=gui_data.drive_track[1])
 	|| (back_drive_motor1!=gui_data.drive_motor[1])
 #endif
-	|| (back_powerled!=gui_data.powerled)	)
+	|| (back_powerled!=gui_data.powerled)
+#else
+	1
+#endif
+	)
     {
+#if !defined(DOUBLEBUFFER) && !defined(STATUS_ALWAYS)
 	back_drive_track0=gui_data.drive_track[0];
 	back_drive_motor0=gui_data.drive_motor[0];
 #if NUM_DRIVES > 1
@@ -2074,6 +2071,7 @@ static _INLINE_ void finish_drawing_frame (void)
 	back_drive_motor1=gui_data.drive_motor[1];
 #endif
 	back_powerled=gui_data.powerled;
+#endif
  	for (i = 0; i < TD_TOTAL_HEIGHT; i++) {
 		int line = GFXVIDINFO_HEIGHT - TD_TOTAL_HEIGHT + i;
 		draw_status_line (line);

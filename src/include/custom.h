@@ -28,8 +28,10 @@ extern void do_copper (void);
 extern void notice_new_xcolors (void);
 #ifdef USE_RASTER_DRAW
 extern void notice_screen_contents_lost (void);
-#else
+#elif !defined(DOUBLEBUFFER) && !defined(STATUS_ALWAYS)
 #define notice_screen_contents_lost() { extern int back_drive_track0; back_drive_track0=-1; }
+#else
+#define notice_screen_contents_lost() { }
 #endif
 
 extern void custom_prepare_savestate (void);

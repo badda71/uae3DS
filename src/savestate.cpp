@@ -58,8 +58,13 @@
 
 #ifdef USE_LIB7Z
 #include "lib7z/lzma.h"
+#ifdef USE_LIB7Z_HIGH_COMPRESSION
 #define LZMA_COMPRESSION_LEVEL 9
 #define LZMA_DICT_SIZE (65536*4)
+#else
+#define LZMA_COMPRESSION_LEVEL 1
+#define LZMA_DICT_SIZE (65536*4)
+#endif
 #else
 #include <zlib.h>
 #endif

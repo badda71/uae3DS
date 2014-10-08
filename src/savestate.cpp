@@ -464,6 +464,13 @@ void save_state (char *filename, char *description)
     if (SDL_MUSTLOCK(prSDLScreen))
     	SDL_UnlockSurface (prSDLScreen);
 #endif
+#ifdef DOUBLEBUFFER
+	/* Avoid flickering the emulated screen around the progress window */
+	SDL_FillRect(prSDLScreen, NULL, SDL_MapRGB(prSDLScreen->format, 0, 0, 0));
+	SDL_Flip(prSDLScreen);
+	SDL_FillRect(prSDLScreen, NULL, SDL_MapRGB(prSDLScreen->format, 0, 0, 0));
+	SDL_Flip(prSDLScreen);
+#endif
 
     gui_show_window_bar(0, 10, 0);
 #ifdef DREAMCAST

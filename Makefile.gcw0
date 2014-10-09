@@ -12,6 +12,8 @@ all: $(PROG)
 FAME_CORE=1
 LIB7Z=1
 
+HOME_DIR=1
+
 DEFAULT_CFLAGS = -I/opt/gcw0-toolchain/usr/include/ -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/  -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
 
 LDFLAGS = -lSDL -lSDL_mixer -lSDL_image -lz -lpthread
@@ -158,6 +160,12 @@ OBJS+= \
 	src/lib7z/LzmaDec.o \
 	src/lib7z/LzmaEnc.o \
 	src/lib7z/lzma.o
+endif
+
+ifdef HOME_DIR
+CFLAGS+=-DHOME_DIR
+OBJS+= \
+	src/homedir.o
 endif
 
 ifdef FAME_CORE

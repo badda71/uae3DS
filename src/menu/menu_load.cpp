@@ -14,6 +14,10 @@
 #include "options.h"
 #include "sound.h"
 
+#ifdef HOME_DIR
+#include "homedir.h"
+#endif
+
 #define MAX_FILELEN 29
 
 typedef struct{
@@ -448,7 +452,11 @@ int getDefaultFiles(void)
 #ifdef DREAMCAST
 	strcpy(actual_dir,MENU_DIR_DEFAULT);
 #endif
+#ifdef HOME_DIR
+	return(getFiles(home_dir));
+#else
 	return(getFiles(MENU_DIR_DEFAULT));
+#endif
 }
 
 int run_menuLoad()

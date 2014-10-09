@@ -49,6 +49,9 @@ KOS_INIT_ROMDISK(romdisk);
 #ifdef DREAMCAST
 #include<SDL_dreamcast.h>
 #endif
+#ifdef HOME_DIR
+#include "homedir.h"
+#endif
 long int version = 256*65536L*UAEMAJOR + 65536L*UAEMINOR + UAESUBREV;
 
 int no_gui = 0;
@@ -99,14 +102,43 @@ void default_prefs ()
     produce_sound = 2;
 #endif
 
+#if defined(HOME_DIR)
+   get_config_dir();
+#endif
+
     prefs_gfx_framerate = 2;
 
+#if defined(HOME_DIR)
+    if(configDir)
+    {
+	strcpy (prefs_df[0], configDir);
+	strcat (prefs_df[0], "/df0.adf");
+	strcpy (prefs_df[1], configDir);
+	strcat (prefs_df[1], "/df1.adf");
+    }
+    else
+    {
+	strcpy (prefs_df[0], ROM_PATH_PREFIX "df0.adf");
+	strcpy (prefs_df[1], ROM_PATH_PREFIX "df1.adf");
+    }
+#else
     strcpy (prefs_df[0], ROM_PATH_PREFIX "df0.adf");
     strcpy (prefs_df[1], ROM_PATH_PREFIX "df1.adf");
+#endif
 
 #ifdef DREAMCAST
     strcpy (romfile, ROM_PATH_PREFIX "kick.rom");
     strcpy (romfile_sd, "/sd/uae4all/" "kick.rom");
+#elif defined(HOME_DIR)
+    if(configDir)
+    {
+	strcpy (romfile, configDir);
+	strcat (romfile, "/kick.rom");
+    }
+    else
+    {
+	strcpy (romfile, "kick.rom");
+    }
 #else
 //    strcpy (romfile, "/cdrom/kick.rom");
     strcpy (romfile, "kick.rom");

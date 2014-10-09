@@ -187,7 +187,7 @@ void flush_screen (void)
 #if defined(DOUBLEBUFFER) || defined(DINGOO)
 	gfx_mem = (char*) prSDLScreen->pixels;
 	prSDLScreenPixels = (uae_u16*) prSDLScreen->pixels;
-	reset_drawing();
+	reset_screen_pointers();
 #endif
 #ifdef USE_RASTER_DRAW
     }

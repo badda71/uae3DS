@@ -2205,6 +2205,12 @@ void reset_drawing (void)
     init_drawing_frame ();
 }
 
+void reset_screen_pointers (void)
+{
+	xlinebuffer = gfx_mem;
+	init_row_map();
+}
+
 void drawing_init ()
 {
     native2amiga_line_map = 0;

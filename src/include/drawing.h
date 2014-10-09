@@ -209,6 +209,7 @@ extern void hsync_record_line_state (int lineno, int changed);
 extern void vsync_handle_redraw (int long_frame, int lof_changed);
 extern void init_hardware_for_drawing_frame (void);
 extern void reset_drawing (void);
+extern void reset_screen_pointers (void);
 extern void drawing_init (void);
 extern void notice_interlace_seen (void);
 

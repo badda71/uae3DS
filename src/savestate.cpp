@@ -290,6 +290,18 @@ void restore_state (char *filename)
     long filepos;
     int i=0;
 
+#if !defined(DREAMCAST) && !defined(DINGOO)
+    if (SDL_MUSTLOCK(prSDLScreen))
+    	SDL_UnlockSurface (prSDLScreen);
+#endif
+#ifdef DOUBLEBUFFER
+	/* Avoid flickering the emulated screen around the progress window */
+	SDL_FillRect(prSDLScreen, NULL, SDL_MapRGB(prSDLScreen->format, 0, 0, 0));
+	SDL_Flip(prSDLScreen);
+	SDL_FillRect(prSDLScreen, NULL, SDL_MapRGB(prSDLScreen->format, 0, 0, 0));
+	SDL_Flip(prSDLScreen);
+#endif
+
     gui_show_window_bar(0, 10, 1);
 #ifdef DREAMCAST
 	extern void reinit_sdcard(void);
@@ -414,7 +426,7 @@ void restore_state (char *filename)
 #ifdef AUTO_SAVESTATE
 //	DEBUG_AHORA=1;
 #endif
-    return;
+    goto end;
 
     error:
 #ifdef DEBUG_SAVESTATE
@@ -431,6 +443,12 @@ void restore_state (char *filename)
     	update_audio();
     notice_screen_contents_lost();
     gui_set_message("Error loadstate", 50);
+
+    end:
+#if !defined(DREAMCAST) && !defined(DINGOO)
+    if (SDL_MUSTLOCK(prSDLScreen))
+    	SDL_LockSurface (prSDLScreen);
+#endif
 }
 
 void savestate_restore_finish (void)

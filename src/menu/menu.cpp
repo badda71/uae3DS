@@ -16,6 +16,10 @@
 #include "msg.h"
 #include "fade.h"
 
+#ifdef HOME_DIR
+#include "homedir.h"
+#endif
+
 #ifdef DREAMCAST
 void reinit_sdcard(void);
 #define VIDEO_FLAGS_INIT SDL_HWSURFACE|SDL_FULLSCREEN
@@ -308,7 +312,12 @@ void init_text(int splash)
 #endif
 #endif
 #endif
+
+#ifdef GCW0
+		for(i=0;i<1;i++)
+#else
 		for(i=0;i<10;i++)
+#endif
 		{
 			SDL_Event ev;
 			if (!uae4all_init_rom(romfile))
@@ -321,8 +330,27 @@ void init_text(int splash)
 
 			text_draw_background();
 			text_draw_window(54,110,250,64,"--- ERROR ---");
+#ifdef GCW0
+#ifdef HOME_DIR
+			write_text(9,14,"kick.rom not found in:");
+
+			if(strlen(config_dir) < 26) /* Center the text */
+			{
+				write_text(7 + 13 - strlen(config_dir)/2, 16, config_dir);
+			}
+			else
+			{
+				write_text(7,16,config_dir);
+			}
+
+#else
+			write_text(11,14,"kick.rom not found");
+			write_text(8,16,"Press any button to retry");
+#endif
+#else
 			write_text(11,14,"KICK.ROM not found");
 			write_text(8,16,"Press any button to retry");
+#endif
 			text_flip();
 			SDL_Delay(333);
 			while(SDL_PollEvent(&ev))
@@ -341,7 +369,11 @@ void init_text(int splash)
 			text_flip();
 			SDL_Delay(333);
 		}
+#ifdef GCW0
+		if (i>=1)
+#else
 		if (i>=10)
+#endif
 			exit(1);
 	}
 	else
@@ -459,6 +491,10 @@ void write_text(int x, int y, char * str)
 	c = -2;
       else if (str[i] == '-')
 	c = -3;
+      else if (str[i] == '/')
+	c = -4;
+      else if (str[i] == ':')
+	c = -5;
       else if (str[i] == '(')
 	c = 65;
       else if (str[i] == ')')
@@ -491,6 +527,45 @@ void write_text(int x, int y, char * str)
 	  dest.w = 8;
 	  dest.h = 1;
 	  
+	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
+	}
+      else if (c == -4)
+	{
+	  /* upper segment of '/' */
+	  dest.x = (x + i) * 8 + 4;
+	  dest.y = y * 8 /*10*/;
+	  dest.w = 1;
+	  dest.h = 2;
+	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
+
+	  /* middle segment of '/' */
+	  dest.x = (x + i) * 8 + 3;
+	  dest.y = y * 8 /*10*/ + 2;
+	  dest.w = 1;
+	  dest.h = 3;
+	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
+
+	  /* lower segment of '/' */
+	  dest.x = (x + i) * 8 + 2;
+	  dest.y = y * 8 /*10*/ + 5;
+	  dest.w = 1;
+	  dest.h = 2;
+	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
+	}
+      else if (c == -5)
+	{
+	  /* upper point of ':' */
+	  dest.x = (x + i) * 8 + 2;
+	  dest.y = y * 8 /*10*/ + 2;
+	  dest.w = 1;
+	  dest.h = 1;
+	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
+
+	  /* lower point of ':' */
+	  dest.x = (x + i) * 8 + 2;
+	  dest.y = y * 8 /*10*/ + 6;
+	  dest.w = 1;
+	  dest.h = 1;
 	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
 	}
     }

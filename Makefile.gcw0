@@ -17,7 +17,7 @@ LIB7Z=1
 
 HOME_DIR=1
 
-DEFAULT_CFLAGS = -I/opt/gcw0-toolchain/usr/include/ -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/  -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT
+DEFAULT_CFLAGS = -I/opt/gcw0-toolchain/usr/include/ -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/  -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -DGCW0
 
 LDFLAGS = -lSDL -lSDL_mixer -lSDL_image -lz -lpthread
 ifndef FAME_CORE

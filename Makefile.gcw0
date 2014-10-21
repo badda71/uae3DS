@@ -1,11 +1,14 @@
-NAME   = uae4all.dge
+NAME   = uae4all.elf
 O      = o
 RM     = rm -f
 CC     = mipsel-linux-gcc
 CXX    = mipsel-linux-g++
 STRIP  = mipsel-linux-strip
 
-PROG   = $(NAME)
+PROG		= $(NAME)
+RELEASEDIR	= release
+DATADIR		= data
+OPKDIR		= opk_data
 
 all: $(PROG)
 
@@ -194,6 +197,16 @@ $(PROG): $(OBJS)
 run: $(PROG)
 	./$(PROG)
 
+opk:
+	mkdir -p $(RELEASEDIR)
+	cp $(PROG) $(RELEASEDIR)
+	cp -R $(DATADIR) $(RELEASEDIR)
+	cp $(OPKDIR)/* $(RELEASEDIR)
+	cp ./docs/CREDITS $(RELEASEDIR)
+	cp ./docs/README $(RELEASEDIR)
+	mksquashfs $(RELEASEDIR) uae4all.opk -all-root -noappend -no-exports -no-xattrs
+	
+
 almostclean:
 	cp src/m68k/fame/famec.o src/m68k/fame/famec.preserved.o
 	$(RM) $(PROG) $(OBJS)
@@ -201,5 +214,4 @@ almostclean:
 
 clean:
 	$(RM) $(PROG) $(OBJS)
-
-
+	rm -rf $(RELEASEDIR)

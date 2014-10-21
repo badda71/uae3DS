@@ -21,6 +21,10 @@
 
 #include "vkbd.h"
 
+#ifdef GCW0
+#define DEADZONE 500
+#endif
+
 int nr_joysticks;
 
 SDL_Joystick *uae4all_joy0, *uae4all_joy1;
@@ -167,6 +171,16 @@ void init_joystick(void)
 	uae4all_joy1 = SDL_JoystickOpen (1);
     else
 	uae4all_joy1 = NULL;
+#ifdef GCW0
+    range0.minx = DEADZONE;
+    range0.maxx = DEADZONE;
+    range0.miny = DEADZONE;
+    range0.maxy = DEADZONE;
+    range1.minx = DEADZONE;
+    range1.maxx = DEADZONE;
+    range1.miny = DEADZONE;
+    range1.maxy = DEADZONE;
+#else
 #ifndef DREAMCAST
     range0.minx = INT_MAX;
     range0.maxx = INT_MIN;
@@ -176,6 +190,7 @@ void init_joystick(void)
     range1.maxx = INT_MIN;
     range1.miny = INT_MAX;
     range1.maxy = INT_MIN;
+#endif
 #endif
 }
 

@@ -9,7 +9,7 @@ PROG   = $(NAME)
 
 all: $(PROG)
 
-FAME_CORE=1
+#FAME_CORE=1
 LIB7Z=1
 
 HOME_DIR=1

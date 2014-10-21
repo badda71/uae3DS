@@ -11,7 +11,7 @@ char *config_dir;
 
 void get_config_dir()
 {
-	homeDir = getenv("HOME");
+	home_dir = getenv("HOME");
 
 	if(home_dir != NULL)
 	{

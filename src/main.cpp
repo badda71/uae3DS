@@ -109,11 +109,11 @@ void default_prefs ()
     prefs_gfx_framerate = 2;
 
 #if defined(HOME_DIR)
-    if(configDir)
+    if(config_dir)
     {
-	strcpy (prefs_df[0], configDir);
+	strcpy (prefs_df[0], config_dir);
 	strcat (prefs_df[0], "/df0.adf");
-	strcpy (prefs_df[1], configDir);
+	strcpy (prefs_df[1], config_dir);
 	strcat (prefs_df[1], "/df1.adf");
     }
     else
@@ -130,9 +130,9 @@ void default_prefs ()
     strcpy (romfile, ROM_PATH_PREFIX "kick.rom");
     strcpy (romfile_sd, "/sd/uae4all/" "kick.rom");
 #elif defined(HOME_DIR)
-    if(configDir)
+    if(config_dir)
     {
-	strcpy (romfile, configDir);
+	strcpy (romfile, config_dir);
 	strcat (romfile, "/kick.rom");
     }
     else

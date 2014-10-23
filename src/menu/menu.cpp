@@ -312,12 +312,9 @@ void init_text(int splash)
 #endif
 #endif
 #endif
+		toexit = 0;
 
-#ifdef GCW0
-		for(i=0;i<1;i++)
-#else
-		for(i=0;i<10;i++)
-#endif
+		while(!toexit)
 		{
 			SDL_Event ev;
 			if (!uae4all_init_rom(romfile))
@@ -345,36 +342,43 @@ void init_text(int splash)
 
 #else
 			write_text(11,14,"kick.rom not found");
-			write_text(8,16,"Press any button to retry");
+			write_text(8,16,"Press any button to exit");
 #endif
 #else
 			write_text(11,14,"KICK.ROM not found");
-			write_text(8,16,"Press any button to retry");
+			write_text(8,16,"Press any button to exit");
 #endif
 			text_flip();
-			SDL_Delay(333);
 			while(SDL_PollEvent(&ev))
+			{
 #ifndef DREAMCAST
 				if (ev.type==SDL_QUIT)
-					exit(1);
+					toexit = 1;
 				else
 #endif
-				SDL_Delay(10);
-			while(!SDL_PollEvent(&ev))
-				SDL_Delay(10);
-			while(SDL_PollEvent(&ev))
-				if (ev.type==SDL_QUIT)
-					exit(1);
-			text_draw_background();
+				if (ev.type==SDL_KEYDOWN)
+				{
+					if(ev.key.keysym.sym==SDLK_LCTRL)
+						toexit = 1;
+					else if(ev.key.keysym.sym==SDLK_RETURN)
+						toexit = 1;
+					else if(ev.key.keysym.sym==SDLK_ESCAPE)
+						toexit = 1;
+				}
+				else if (ev.type==SDL_JOYBUTTONDOWN)
+				{
+					toexit = 1;
+				}
+			}	
+
 			text_flip();
-			SDL_Delay(333);
 		}
-#ifdef GCW0
-		if (i>=1)
-#else
-		if (i>=10)
-#endif
+
+		if(toexit)
+		{
+			SDL_Quit();
 			exit(1);
+		}
 	}
 	else
 	{

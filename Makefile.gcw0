@@ -205,7 +205,6 @@ opk:
 	cp ./docs/CREDITS $(RELEASEDIR)
 	cp ./docs/README $(RELEASEDIR)
 	mksquashfs $(RELEASEDIR) uae4all.opk -all-root -noappend -no-exports -no-xattrs
-	
 
 almostclean:
 	cp src/m68k/fame/famec.o src/m68k/fame/famec.preserved.o

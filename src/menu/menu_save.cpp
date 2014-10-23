@@ -156,6 +156,15 @@ static inline int key_saveMenu(int *cp)
 				case SDLK_SPACE: hit4=1; break;
 				case SDLK_c:
 				case SDLK_LSHIFT: hit5=1; break;
+#elif defined(GCW0)
+				case SDLK_2:
+				case SDLK_BACKSPACE: hit3=1; break;
+				case SDLK_1:
+				case SDLK_TAB: hit2=1; break;
+				case SDLK_x:
+				case SDLK_LSHIFT: hit5=1; break;
+				case SDLK_c:
+				case SDLK_SPACE: hit4=1; break;
 #else
 				case SDLK_2:
 				case SDLK_BACKSPACE: hit3=1; break;

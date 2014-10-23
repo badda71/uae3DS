@@ -283,6 +283,15 @@ static int key_mainMenu(int *cp)
 				case SDLK_BACKSPACE: hit5=1; break;
 				case SDLK_2:
 				case SDLK_TAB: hit2=1; break;
+#elif defined(GCW0)
+				case SDLK_c:
+				case SDLK_SPACE: hit4=1; break;
+				case SDLK_x:
+				case SDLK_LSHIFT: hit3=1; break;
+				case SDLK_1:
+				case SDLK_BACKSPACE: hit2=1; break;
+				case SDLK_2:
+				case SDLK_TAB: hit5=1; break;
 #else
 				case SDLK_c:
 				case SDLK_LSHIFT: hit4=1; break;

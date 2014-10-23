@@ -21,9 +21,8 @@
 
 #include "vkbd.h"
 
-#ifdef GCW0
-#define DEADZONE 500
-#endif
+#define DEADZONE_J0 500
+#define DEADZONE_J1 500
 
 int nr_joysticks;
 
@@ -34,7 +33,7 @@ SDL_Joystick *uae4all_joy0, *uae4all_joy1;
 struct joy_range
 {
     int minx, maxx, miny, maxy;
-} range0, range1;
+} dzone0, dzone1;
 #endif
 
 void read_joystick(int nr, unsigned int *dir, int *button)
@@ -52,23 +51,18 @@ void read_joystick(int nr, unsigned int *dir, int *button)
 
     SDL_JoystickUpdate ();
 #ifndef DREAMCAST
-    struct joy_range *r = nr == 0 ? &range0 : &range1;
+    struct joy_range *r = nr == 0 ? &dzone0 : &dzone1;
     x_axis = SDL_JoystickGetAxis (joy, 0);
     y_axis = SDL_JoystickGetAxis (joy, 1);
 
-    if (x_axis < r->minx) r->minx = x_axis;
-    if (y_axis < r->miny) r->miny = y_axis;
-    if (x_axis > r->maxx) r->maxx = x_axis;
-    if (y_axis > r->maxy) r->maxy = y_axis;
-    
-    if (x_axis < (r->minx + (r->maxx - r->minx)/3))
+    if (x_axis < r->minx)
     	left = 1;
-    else if (x_axis > (r->minx + 2*(r->maxx - r->minx)/3))
+    else if (x_axis > r->maxx)
     	right = 1;
 
-    if (y_axis < (r->miny + (r->maxy - r->miny)/3))
+    if (y_axis < r->miny)
     	top = 1;
-    else if (y_axis > (r->miny + 2*(r->maxy - r->miny)/3))
+    else if (y_axis > r->maxy)
     	bot = 1;
 
     num = SDL_JoystickNumButtons (joy);
@@ -171,26 +165,16 @@ void init_joystick(void)
 	uae4all_joy1 = SDL_JoystickOpen (1);
     else
 	uae4all_joy1 = NULL;
-#ifdef GCW0
-    range0.minx = DEADZONE;
-    range0.maxx = DEADZONE;
-    range0.miny = DEADZONE;
-    range0.maxy = DEADZONE;
-    range1.minx = DEADZONE;
-    range1.maxx = DEADZONE;
-    range1.miny = DEADZONE;
-    range1.maxy = DEADZONE;
-#else
+
 #ifndef DREAMCAST
-    range0.minx = INT_MAX;
-    range0.maxx = INT_MIN;
-    range0.miny = INT_MAX;
-    range0.maxy = INT_MIN;
-    range1.minx = INT_MAX;
-    range1.maxx = INT_MIN;
-    range1.miny = INT_MAX;
-    range1.maxy = INT_MIN;
-#endif
+    dzone0.minx = -DEADZONE_J0;
+    dzone0.maxx = DEADZONE_J0;
+    dzone0.miny = -DEADZONE_J0;
+    dzone0.maxy = DEADZONE_J0;
+    dzone1.minx = -DEADZONE_J1;
+    dzone1.maxx = DEADZONE_J1;
+    dzone1.miny = -DEADZONE_J1;
+    dzone1.maxy = DEADZONE_J1;
 #endif
 }
 

@@ -602,8 +602,10 @@ void gui_handle_events (void)
 			savestate_state = STATE_DOSAVE;
 		}
 		else
-		if (!vkbd_mode)
+		if (!vkbd_mode && !goingVkbd)
+		{
 			goingEmouse=1;
+		}
 	}
 	else if (goingEmouse)
 	{
@@ -628,8 +630,10 @@ void gui_handle_events (void)
     				gui_set_message("Failed: Savestate not found", 100);
 		}
 		else
-		if (!emulated_mouse)
+		if (!emulated_mouse && !goingEmouse)
+		{
 			goingVkbd=1;
+		}
 		else
 		{
 			char str[40];

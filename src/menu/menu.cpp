@@ -317,6 +317,9 @@ void init_text(int splash)
 		while(!toexit)
 		{
 			SDL_Event ev;
+#ifdef HOME_DIR
+			int config_dir_len = strlen(config_dir);
+#endif
 			if (!uae4all_init_rom(romfile))
 				break;
 #ifdef DREAMCAST
@@ -331,9 +334,9 @@ void init_text(int splash)
 #ifdef HOME_DIR
 			write_text(9,14,"kick.rom not found in:");
 
-			if(strlen(config_dir) < 26) /* Center the text */
+			if(config_dir_len < 26) /* Center the text */
 			{
-				write_text(7 + 13 - strlen(config_dir)/2, 16, config_dir);
+				write_text(7 + 13 - config_dir_len/2, 16, config_dir);
 			}
 			else
 			{
@@ -405,7 +408,7 @@ void write_text_pos(int x, int y, char * str)
   int i, c;
   SDL_Rect src, dest;
   
-  for (i = 0; i < strlen(str); i++)
+  for (i = 0; str[i] != '\0'; i++)
     {
       c = -1;
       
@@ -475,7 +478,7 @@ void write_text(int x, int y, char * str)
   int i, c;
   SDL_Rect src, dest;
   
-  for (i = 0; i < strlen(str); i++)
+  for (i = 0; str[i] != '\0'; i++)
     {
       c = -1;
       

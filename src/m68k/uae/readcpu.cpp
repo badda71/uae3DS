@@ -692,7 +692,7 @@ static void build_insn (int insn)
 		    table68k[opc].mnemo = lookuptab[find].mnemo;
 		    break;
 		}
-		if (strlen(lookuptab[find].name) == 0) abort();
+		if (lookuptab[find].name == '\0') abort();
 	    }
 	}
 	else {

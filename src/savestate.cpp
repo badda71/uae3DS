@@ -276,8 +276,7 @@ static void restore_header (uae_u8 *src)
 
 static void clear_events(void) {
 	SDL_Event event;
-	while (SDL_PollEvent(&event))
-		SDL_Delay(20);
+	while (SDL_PollEvent(&event));
 }
 /* restore all subsystems */
 

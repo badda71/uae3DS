@@ -197,7 +197,7 @@ $(PROG): $(OBJS)
 run: $(PROG)
 	./$(PROG)
 
-opk:
+opk: $(PROG)
 	mkdir -p $(RELEASEDIR)
 	cp $(PROG) $(RELEASEDIR)
 	cp -R $(DATADIR) $(RELEASEDIR)

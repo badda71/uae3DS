@@ -53,6 +53,9 @@ static int min_in_dir=0, max_in_dir=SHOW_MAX_FILES;
 
 static int compare_names(fichero *a, fichero *b)
 {
+	if(a->d_type != b->d_type)
+		return 0;
+
 	return strcmp(a->d_name,b->d_name);
 }
 
@@ -177,6 +180,11 @@ static int getFiles(char *dir)
 			i--;
 			continue;
 		}
+		if (strcmp(actual->d_name,"..") && actual->d_name[0] == '.')
+		{
+			i--;
+			continue;
+		}
 		if (strlen(actual->d_name)>3)
 		{
 			char *final=(char *)&actual->d_name[strlen(actual->d_name)-3];
@@ -262,8 +270,20 @@ static int getFiles(char *dir)
 					break;
 				}
 	}
+//	for(i=0;i<text_dir_num_files;i++)
+//		if (text_dir_files[i].d_type==0)
+//		{
+//			qsort((void *)&text_dir_files[i],text_dir_num_files-i,sizeof(fichero),(int (*)(const void*, const void*))compare_names);
+//			break;
+//		}
 	for(i=0;i<text_dir_num_files;i++)
-		if (text_dir_files[i].d_type==0)
+		if (text_dir_files[i].d_type==DT_DIR || text_dir_files[i].d_type==DT_LNK)
+		{
+			qsort((void *)&text_dir_files[i],text_dir_num_files-i,sizeof(fichero),(int (*)(const void*, const void*))compare_names);
+			break;
+		}
+	for(i=0;i<text_dir_num_files;i++)
+		if (text_dir_files[i].d_type==DT_REG)
 		{
 			qsort((void *)&text_dir_files[i],text_dir_num_files-i,sizeof(fichero),(int (*)(const void*, const void*))compare_names);
 			break;

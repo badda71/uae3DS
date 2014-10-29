@@ -14,23 +14,23 @@
 #include "sound.h"
 #include "savestate.h"
 
-static char *text_str_title="SaveStates";
-static char *text_str_savestate="SaveState";
+static char *text_str_title="Saved States";
+static char *text_str_savestate="Saved state #";
 static char *text_str_0="0";
 static char *text_str_1="1";
 static char *text_str_2="2";
 static char *text_str_3="3";
 #ifdef DREAMCAST_SAVE_VMU
-static char *text_str_loadmem="Load From Memory (Y)";
-static char *text_str_savemem="Save To Memory (X)";
-static char *text_str_loadvmu="Load From VMU (L)";
-static char *text_str_savevmu="Save To VMU (R)";
+static char *text_str_loadmem="Load from memory (Y)";
+static char *text_str_savemem="Save to memory (X)";
+static char *text_str_loadvmu="Load from VMU (L)";
+static char *text_str_savevmu="Save to VMU (R)";
 #else
-static char *text_str_loadmem="Load State (Y)";
-static char *text_str_savemem="Save State (X)";
+static char *text_str_loadmem="Load state (Y)";
+static char *text_str_savemem="Save state (X)";
 #endif
 static char *text_str_separator="----------------------";
-static char *text_str_exit="Main Menu (B)";
+static char *text_str_exit="Main menu (B)";
 
 extern int emulating;
 

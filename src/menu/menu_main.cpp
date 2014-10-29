@@ -14,13 +14,13 @@
 extern int emulating;
 
 static char *text_str_title="----- UAE4ALL rc3 ------";
-static char *text_str_load="Select Image Disk (X)";
-static char *text_str_save="SaveStates (Y)";
-static char *text_str_throttle="Throttle ";
+static char *text_str_load="Load disk image (X)";
+static char *text_str_save="Saved states (Y)";
+static char *text_str_throttle="Throttle";
 static char *text_str_frameskip="Frameskip";
-static char *text_str_autosave="Save Disks";
+static char *text_str_autosave="Save disks";
 static char *text_str_eject="Eject DF1";
-static char *text_str_vpos="Screen Pos";
+static char *text_str_vpos="Screen pos";
 static char *text_str_8="8";
 static char *text_str_16="16";
 static char *text_str_20="20";
@@ -41,12 +41,12 @@ static char *text_str_sound="Sound";
 static char *text_str_on="on";
 static char *text_str_off="off";
 static char *text_str_separator="------------------------------";
-static char *text_str_reset="Reset (R)";
-static char *text_str_run="Run (L)";
+static char *text_str_reset="Reset Amiga (R)";
+static char *text_str_return="Return to Amiga (B)";
 #ifdef DREAMCAST
 static char *text_str_exit="Exit - Reboot Dreamcast";
 #else
-static char *text_str_exit="Exit";
+static char *text_str_exit="Exit UAE4ALL";
 #endif
 
 enum MainMenuEntry {
@@ -60,10 +60,9 @@ enum MainMenuEntry {
 	MAIN_MENU_ENTRY_SAVE_DISKS,
 	MAIN_MENU_ENTRY_EJECT_DF1,
 	MAIN_MENU_ENTRY_RESET_EMULATION,
-	MAIN_MENU_ENTRY_RESET_AND_RUN,
+	MAIN_MENU_ENTRY_RETURN_TO_EMULATION,
 	MAIN_MENU_ENTRY_EXIT_UAE,
 	MAIN_MENU_ENTRY_COUNT, /* the number of entries to be shown */
-	MAIN_MENU_ENTRY_RETURN_TO_EMULATION,
 };
 
 int mainMenu_vpos=1;
@@ -284,10 +283,10 @@ static void draw_mainMenu(enum MainMenuEntry c)
 
 	row += 2;
 
-	if (c == MAIN_MENU_ENTRY_RESET_AND_RUN && flash)
-		write_text_inv(6, row++, text_str_run);
+	if (c == MAIN_MENU_ENTRY_RETURN_TO_EMULATION && flash)
+		write_text_inv(6, row++, text_str_return);
 	else
-		write_text(6, row++, text_str_run);
+		write_text(6, row++, text_str_return);
 
 	write_text(6, row++, text_str_separator);
 
@@ -307,7 +306,7 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 	while (SDL_PollEvent(&event) > 0)
 	{
 		int left = 0, right = 0, up = 0, down = 0,
-		    activate = 0, cancel = 0, reset = 0, load = 0, toStates = 0, run = 0;
+		    activate = 0, cancel = 0, reset = 0, load = 0, toStates = 0;
 		if (event.type == SDL_QUIT)
 			return MAIN_MENU_ENTRY_EXIT_UAE;
 		else if (event.type == SDL_KEYDOWN)
@@ -328,8 +327,6 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				case SDLK_LSHIFT: load = 1; break;
 				case SDLK_x:
 				case SDLK_SPACE: toStates = 1; break;
-				case SDLK_1:
-				case SDLK_BACKSPACE: run = 1; break;
 				case SDLK_2:
 				case SDLK_TAB: reset = 1; break;
 #elif defined(GCW0)
@@ -339,8 +336,6 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				case SDLK_LSHIFT: load = 1; break;
 				case SDLK_1:
 				case SDLK_BACKSPACE: reset = 1; break;
-				case SDLK_2:
-				case SDLK_TAB: run = 1; break;
 #else
 				case SDLK_c:
 				case SDLK_LSHIFT: toStates = 1; break;
@@ -348,8 +343,6 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				case SDLK_SPACE: load = 1; break;
 				case SDLK_1:
 				case SDLK_BACKSPACE: reset = 1; break;
-				case SDLK_2:
-				case SDLK_TAB: run = 1; break;
 #endif
 				case SDLK_z:
 				case SDLK_RETURN:
@@ -366,8 +359,6 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				return MAIN_MENU_ENTRY_LOAD;
 			else if (toStates)
 				return MAIN_MENU_ENTRY_SAVED_STATES;
-			else if (run)
-				return MAIN_MENU_ENTRY_RESET_AND_RUN;
 			else if (up)
 			{
 				if (*sel > 0) *sel = (enum MainMenuEntry) ((*sel - 1) % MAIN_MENU_ENTRY_COUNT);
@@ -417,7 +408,7 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 					case MAIN_MENU_ENTRY_SAVED_STATES:
 					case MAIN_MENU_ENTRY_EJECT_DF1:
 					case MAIN_MENU_ENTRY_RESET_EMULATION:
-					case MAIN_MENU_ENTRY_RESET_AND_RUN:
+					case MAIN_MENU_ENTRY_RETURN_TO_EMULATION:
 					case MAIN_MENU_ENTRY_EXIT_UAE:
 						if (activate)
 							return *sel;
@@ -501,15 +492,11 @@ int run_mainMenu()
 				break;
 			case MAIN_MENU_ENTRY_EJECT_DF1:
 				return 3; /* leave, ejecting the floppy disk in DF1 */
-			case MAIN_MENU_ENTRY_RETURN_TO_EMULATION:
-				if (emulating)
-					return 1; /* leave, returning to the emulation */
-				break;
 			case MAIN_MENU_ENTRY_RESET_EMULATION:
 				if (emulating)
 					return 2; /* leave, resetting */
 				/* Fall through */
-			case MAIN_MENU_ENTRY_RESET_AND_RUN:
+			case MAIN_MENU_ENTRY_RETURN_TO_EMULATION:
 				return 1; /* leave, returning to the emulation */
 			case MAIN_MENU_ENTRY_EXIT_UAE:
 #ifdef DREAMCAST

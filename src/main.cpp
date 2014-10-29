@@ -75,7 +75,7 @@ char optionsfile[256];
 
 /* Slightly stupid place for this... */
 /* ncurses.c might use quite a few of those. */
-char *colormodes[] = { "256 colors", "32768 colors", "65536 colors",
+const char *colormodes[] = { "256 colors", "32768 colors", "65536 colors",
     "256 colors dithered", "16 colors dithered", "16 million colors",
     "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",

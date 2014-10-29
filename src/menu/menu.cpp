@@ -39,7 +39,7 @@ static Uint32 menu_inv_color2=0, menu_inv_color=0, menu_win0_color=0, menu_win1_
 static Uint32 menu_barra0_color=0, menu_barra1_color=0;
 static Uint32 menu_win0_color_base=0, menu_win1_color_base=0;
 
-void write_text_pos(int x, int y, char * str);
+void write_text_pos(int x, int y, const char* str);
 void write_num(int x, int y, int v);
 int menu_msg_pos=330;
 int menu_moving=1;
@@ -403,7 +403,7 @@ void quit_text(void)
 */
 }
 
-void write_text_pos(int x, int y, char * str)
+void write_text_pos(int x, int y, const char *str)
 {
   int i, c;
   SDL_Rect src, dest;
@@ -465,7 +465,7 @@ void write_text_pos(int x, int y, char * str)
     }
 }
 
-void _write_text_pos(SDL_Surface *sf, int x, int y, char * str)
+void _write_text_pos(SDL_Surface *sf, int x, int y, const char *str)
 {
 	SDL_Surface *back=text_screen;
 	text_screen=sf;
@@ -473,7 +473,7 @@ void _write_text_pos(SDL_Surface *sf, int x, int y, char * str)
 	text_screen=back;
 }
 
-void write_text(int x, int y, char * str)
+void write_text(int x, int y, const char *str)
 {
   int i, c;
   SDL_Rect src, dest;
@@ -578,7 +578,7 @@ void write_text(int x, int y, char * str)
     }
 }
 
-void _write_text(SDL_Surface *sf, int x, int y, char * str)
+void _write_text(SDL_Surface *sf, int x, int y, const char *str)
 {
 	SDL_Surface *back=text_screen;
 	text_screen=sf;
@@ -589,7 +589,7 @@ void _write_text(SDL_Surface *sf, int x, int y, char * str)
 
 /* Write text, inverted: */
 
-void write_text_inv(int x, int y, char * str)
+void write_text_inv(int x, int y, const char *str)
 {
   SDL_Rect dest;
   
@@ -604,7 +604,7 @@ void write_text_inv(int x, int y, char * str)
   write_text(x, y, str);
 }
 
-void _write_text_inv(SDL_Surface *sf, int x, int y, char * str)
+void _write_text_inv(SDL_Surface *sf, int x, int y, const char *str)
 {
 	SDL_Surface *back=text_screen;
 	text_screen=sf;
@@ -612,7 +612,7 @@ void _write_text_inv(SDL_Surface *sf, int x, int y, char * str)
 	text_screen=back;
 }
 
-void write_text_inv_n(int x, int y, int n, char * str)
+void write_text_inv_n(int x, int y, int n, const char *str)
 {
   SDL_Rect dest;
   
@@ -634,7 +634,7 @@ void write_text_inv_n(int x, int y, int n, char * str)
   write_text(x+1, y, str);
 }
 
-void _write_text_inv_n(SDL_Surface *sf, int x, int y, int n, char * str)
+void _write_text_inv_n(SDL_Surface *sf, int x, int y, int n, const char *str)
 {
 	SDL_Surface *back=text_screen;
 	text_screen=sf;
@@ -645,12 +645,12 @@ void _write_text_inv_n(SDL_Surface *sf, int x, int y, int n, char * str)
 
 /* Write text, horizontally centered... */
 
-void write_centered_text(int y, char * str)
+void write_centered_text(int y, const char *str)
 {
   write_text(20 - (strlen(str) / 2), y/2, str);
 }
 
-void _write_centered_text(SDL_Surface *sf, int x, int y, char * str)
+void _write_centered_text(SDL_Surface *sf, int x, int y, const char *str)
 {
 	SDL_Surface *back=text_screen;
 	text_screen=sf;
@@ -705,7 +705,7 @@ void _write_num_inv(SDL_Surface *sf, int x, int y, int v)
 	text_screen=back;
 }
 
-void text_draw_window(int x, int y, int w, int h, char *title)
+void text_draw_window(int x, int y, int w, int h, const char *title)
 {
 	int i,j;
 	int r8x = x / 8;
@@ -748,7 +748,7 @@ void text_draw_window(int x, int y, int w, int h, char *title)
 
 }
 
-void _text_draw_window(SDL_Surface *sf, int x, int y, int w, int h, char *title)
+void _text_draw_window(SDL_Surface *sf, int x, int y, int w, int h, const char *title)
 {
 	SDL_Surface *back=text_screen;
 	text_screen=sf;
@@ -773,14 +773,14 @@ if (h>5) h-=4;
 	SDL_FillRect(text_screen, &dest, menu_barra0_color); //0x8888);
 }
 
-void text_draw_window_bar(int x, int y, int w, int h, int per, int max, char *title)
+void text_draw_window_bar(int x, int y, int w, int h, int per, int max, const char *title)
 {
 	text_draw_window(x,y,w,h,title);
 	text_draw_barra(x+4, y+28, w-24, 12, per, max);
 	write_text((x/8)+4,(y/8)+1,"Please wait");
 }
 
-void _text_draw_window_bar(SDL_Surface *sf, int x, int y, int w, int h, int per, int max, char *title)
+void _text_draw_window_bar(SDL_Surface *sf, int x, int y, int w, int h, int per, int max, const char *title)
 {
 	SDL_Surface *back=text_screen;
 	text_screen=sf;

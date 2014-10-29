@@ -254,7 +254,7 @@ extern int canbang;
 
 #endif
 
-extern uae_u8 *mapped_malloc (size_t, char *);
+extern uae_u8 *mapped_malloc (size_t, const char *);
 extern void mapped_free (uae_u8 *);
 
 #if defined(DREAMCAST) && defined(DC_SQ)

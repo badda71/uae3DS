@@ -14,23 +14,23 @@
 #include "sound.h"
 #include "savestate.h"
 
-static char *text_str_title="Saved States";
-static char *text_str_savestate="Saved state #";
-static char *text_str_0="0";
-static char *text_str_1="1";
-static char *text_str_2="2";
-static char *text_str_3="3";
+static const char *text_str_title="Saved States";
+static const char *text_str_savestate="Saved state #";
+static const char *text_str_0="0";
+static const char *text_str_1="1";
+static const char *text_str_2="2";
+static const char *text_str_3="3";
 #ifdef DREAMCAST_SAVE_VMU
-static char *text_str_loadmem="Load from memory (Y)";
-static char *text_str_savemem="Save to memory (X)";
-static char *text_str_loadvmu="Load from VMU (L)";
-static char *text_str_savevmu="Save to VMU (R)";
+static const char *text_str_loadmem="Load from memory (Y)";
+static const char *text_str_savemem="Save to memory (X)";
+static const char *text_str_loadvmu="Load from VMU (L)";
+static const char *text_str_savevmu="Save to VMU (R)";
 #else
-static char *text_str_loadmem="Load state (Y)";
-static char *text_str_savemem="Save state (X)";
+static const char *text_str_loadmem="Load state (Y)";
+static const char *text_str_savemem="Save state (X)";
 #endif
-static char *text_str_separator="----------------------";
-static char *text_str_exit="Main menu (B)";
+static const char *text_str_separator="----------------------";
+static const char *text_str_exit="Main menu (B)";
 
 extern int emulating;
 
@@ -323,7 +323,7 @@ static inline void unraise_saveMenu()
 	text_flip();
 }
 
-static void show_error(char *str)
+static void show_error(const char *str)
 {
 	int i;
 	
@@ -340,7 +340,7 @@ static void show_error(char *str)
 }
 
 
-static void show_please_wait(char *title)
+static void show_please_wait(const char *title)
 {
 //	menu_moving=0;
 	text_draw_background();

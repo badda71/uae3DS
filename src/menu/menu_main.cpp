@@ -13,40 +13,40 @@
 
 extern int emulating;
 
-static char *text_str_title="----- UAE4ALL rc3 ------";
-static char *text_str_load="Load disk image (X)";
-static char *text_str_save="Saved states (Y)";
-static char *text_str_throttle="Throttle";
-static char *text_str_frameskip="Frameskip";
-static char *text_str_autosave="Save disks";
-static char *text_str_eject="Eject DF1";
-static char *text_str_vpos="Screen pos";
-static char *text_str_8="8";
-static char *text_str_16="16";
-static char *text_str_20="20";
-static char *text_str_24="24";
-static char *text_str_32="32";
-static char *text_str_40="40";
-static char *text_str_60="60";
-static char *text_str_80="80";
-static char *text_str_100="100";
-static char *text_str_0="0";
-static char *text_str_1="1";
-static char *text_str_2="2";
-static char *text_str_3="3";
-static char *text_str_4="4";
-static char *text_str_5="5";
-static char *text_str_auto="auto";
-static char *text_str_sound="Sound";
-static char *text_str_on="on";
-static char *text_str_off="off";
-static char *text_str_separator="------------------------------";
-static char *text_str_reset="Reset Amiga (R)";
-static char *text_str_return="Return to Amiga (B)";
+static const char *text_str_title="----- UAE4ALL rc3 ------";
+static const char *text_str_load="Load disk image (X)";
+static const char *text_str_save="Saved states (Y)";
+static const char *text_str_throttle="Throttle";
+static const char *text_str_frameskip="Frameskip";
+static const char *text_str_autosave="Save disks";
+static const char *text_str_eject="Eject DF1";
+static const char *text_str_vpos="Screen pos";
+static const char *text_str_8="8";
+static const char *text_str_16="16";
+static const char *text_str_20="20";
+static const char *text_str_24="24";
+static const char *text_str_32="32";
+static const char *text_str_40="40";
+static const char *text_str_60="60";
+static const char *text_str_80="80";
+static const char *text_str_100="100";
+static const char *text_str_0="0";
+static const char *text_str_1="1";
+static const char *text_str_2="2";
+static const char *text_str_3="3";
+static const char *text_str_4="4";
+static const char *text_str_5="5";
+static const char *text_str_auto="auto";
+static const char *text_str_sound="Sound";
+static const char *text_str_on="on";
+static const char *text_str_off="off";
+static const char *text_str_separator="------------------------------";
+static const char *text_str_reset="Reset Amiga (R)";
+static const char *text_str_return="Return to Amiga (B)";
 #ifdef DREAMCAST
-static char *text_str_exit="Exit - Reboot Dreamcast";
+static const char *text_str_exit="Exit - Reboot Dreamcast";
 #else
-static char *text_str_exit="Exit UAE4ALL";
+static const char *text_str_exit="Exit UAE4ALL";
 #endif
 
 enum MainMenuEntry {

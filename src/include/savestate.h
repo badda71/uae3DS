@@ -18,7 +18,7 @@ extern uae_u16 restore_u16_func (uae_u8 **);
 extern uae_u32 restore_u32_func (uae_u8 **);
 extern uae_u8 restore_u8_func (uae_u8 **);
 
-extern void save_string_func (uae_u8 **, char*);
+extern void save_string_func (uae_u8 **, const char*);
 extern char *restore_string_func (uae_u8 **);
 
 #define save_u16(x) save_u16_func (&dst, (x))
@@ -82,8 +82,8 @@ extern uae_u8 *save_zram (int *);
 extern uae_u8 *restore_rom (uae_u8 *);
 extern uae_u8 *save_rom (int, int *);
 
-extern void save_state (char *filename, char *description);
-extern void restore_state (char *filename);
+extern void save_state (const char *filename, const char *description);
+extern void restore_state (const char *filename);
 
 extern void custom_save_state (void);
 

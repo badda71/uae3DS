@@ -939,7 +939,7 @@ int good_address_fd;
 
 #ifndef NATMEM_OFFSET
 
-uae_u8 *mapped_malloc (size_t s, char *file)
+uae_u8 *mapped_malloc (size_t s, const char *file)
 {
     return (uae_u8 *)xmalloc (s);
 }
@@ -1067,7 +1067,7 @@ static void add_shmmaps (uae_u32 start, addrbank *what)
     shm_start = y;
 }
 
-uae_u8 *mapped_malloc (size_t s, char *file)
+uae_u8 *mapped_malloc (size_t s, const char *file)
 {
     int id;
     void *answer;

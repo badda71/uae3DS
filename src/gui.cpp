@@ -770,7 +770,7 @@ void gui_update_gfx (void)
 //	dbg("GUI: gui_update_gfx");
 }
 
-void gui_set_message(char *msg, int t)
+void gui_set_message(const char *msg, int t)
 {
 	show_message=t;
 	strncpy(show_message_str, msg, 36);
@@ -778,7 +778,7 @@ void gui_set_message(char *msg, int t)
 
 void gui_show_window_bar(int per, int max, int case_title)
 {
-	char *title;
+	const char *title;
 	if (case_title)
 		title="  Restore State";
 	else

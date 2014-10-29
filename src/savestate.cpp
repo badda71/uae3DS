@@ -115,7 +115,7 @@ void save_u8_func (uae_u8 **dstp, uae_u8 v)
     *dst++ = v;
     *dstp = dst;
 }
-void save_string_func (uae_u8 **dstp, char *from)
+void save_string_func (uae_u8 **dstp, const char *from)
 {
     uae_u8 *dst = *dstp;
     while(*from)
@@ -166,7 +166,7 @@ char *restore_string_func (uae_u8 **dstp)
 
 /* read and write IFF-style hunks */
 
-static void save_chunk (FILE *f, uae_u8 *chunk, long len, char *name)
+static void save_chunk (FILE *f, const uae_u8 *chunk, long len, const char *name)
 {
     uae_u8 tmp[4], *dst;
     uae_u8 zero[4]= { 0, 0, 0, 0 };
@@ -192,7 +192,7 @@ static void save_chunk (FILE *f, uae_u8 *chunk, long len, char *name)
 	fwrite (zero, 1, len, f);
 }
 
-static void save_chunk_compressed (FILE *f, uae_u8 *chunk, long len, char *name)
+static void save_chunk_compressed (FILE *f, const uae_u8 *chunk, long len, const char *name)
 {
 #ifndef DREAMCAST
 	void *tmp=malloc(len);
@@ -280,7 +280,7 @@ static void clear_events(void) {
 }
 /* restore all subsystems */
 
-void restore_state (char *filename)
+void restore_state (const char *filename)
 {
     FILE *f;
     uae_u8 *chunk,*end;
@@ -473,7 +473,7 @@ void savestate_restore_finish (void)
 
 /* Save all subsystems  */
 
-void save_state (char *filename, char *description)
+void save_state (const char *filename, const char *description)
 {
     uae_u8 header[1000];
     char tmp[100];

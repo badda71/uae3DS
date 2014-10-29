@@ -1,4 +1,4 @@
-static char *menu_msg="                         Amiga emulator "
+static const char *menu_msg="                         Amiga emulator "
 #ifdef DREAMCAST
  "for Dreamcast "
 #else 

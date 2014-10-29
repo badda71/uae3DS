@@ -32,9 +32,9 @@ typedef struct{
 extern char uae4all_image_file[];
 extern char uae4all_image_file2[];
 
-char *text_str_load_separator="----------------------------------";
-char *text_str_load_dir="#DIR#";
-char *text_str_load_title="            File manager           -";
+static const char *text_str_load_separator="----------------------------------";
+static const char *text_str_load_dir="#DIR#";
+static const char *text_str_load_title="            File manager           -";
 fichero *text_dir_files=NULL;
 int text_dir_num_files=0, text_dir_num_files_index=0;
 

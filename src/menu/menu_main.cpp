@@ -311,11 +311,8 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 		int left = 0, right = 0, up = 0, down = 0,
 		    activate = 0, cancel = 0, reset = 0, load = 0, toStates = 0, run = 0;
 		if (event.type == SDL_QUIT)
-		{
 			return MAIN_MENU_ENTRY_EXIT_UAE;
-		}
-		else
-		if (event.type == SDL_KEYDOWN)
+		else if (event.type == SDL_KEYDOWN)
 		{
 			uae4all_play_click();
 			switch(event.key.keysym.sym)
@@ -364,25 +361,15 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				case SDLK_LALT: cancel = 1; break;
 			}
 			if (cancel)
-			{
 				return MAIN_MENU_ENTRY_RETURN_TO_EMULATION;
-			}
 			else if (reset)
-			{
 				return MAIN_MENU_ENTRY_RESET_EMULATION;
-			}
 			else if (load)
-			{
 				return MAIN_MENU_ENTRY_LOAD;
-			}
 			else if (toStates)
-			{
 				return MAIN_MENU_ENTRY_SAVED_STATES;
-			}
 			else if (run)
-			{
 				return MAIN_MENU_ENTRY_RESET_AND_RUN;
-			}
 			else if (up)
 			{
 				if (*sel > 0) *sel = (enum MainMenuEntry) ((*sel - 1) % MAIN_MENU_ENTRY_COUNT);
@@ -396,45 +383,29 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				{
 					case MAIN_MENU_ENTRY_THROTTLE:
 						if (left)
-						{
-							if (mainMenu_throttle > 0)
-								mainMenu_throttle--;
-							else
-								mainMenu_throttle = 5;
-						}
+							mainMenu_throttle = (mainMenu_throttle > 0)
+								? mainMenu_throttle - 1
+								: 5;
 						else if (right)
-						{
 							mainMenu_throttle = (mainMenu_throttle + 1) % 6;
-						}
 						break;
 					case MAIN_MENU_ENTRY_FRAMESKIP:
 						if (left)
-						{
-							if (mainMenu_frameskip > -1)
-								mainMenu_frameskip--;
-							else
-								mainMenu_frameskip = 5;
-						}
+							mainMenu_frameskip = (mainMenu_frameskip > -1)
+								? mainMenu_frameskip - 1
+								: 5;
 						else if (right)
-						{
-							if (mainMenu_frameskip < 5)
-								mainMenu_frameskip++;
-							else
-								mainMenu_frameskip = -1;
-						}
+							mainMenu_frameskip = (mainMenu_frameskip < 5)
+								? mainMenu_frameskip + 1
+								: -1;
 						break;
 					case MAIN_MENU_ENTRY_SCREEN_POSITION:
 						if (left)
-						{
-							if (mainMenu_vpos > 0)
-								mainMenu_vpos--;
-							else
-								mainMenu_vpos = 5;
-						}
+							mainMenu_vpos = (mainMenu_vpos > 0)
+								? mainMenu_vpos - 1
+								: 5;
 						else if (right)
-						{
 							mainMenu_vpos = (mainMenu_vpos + 1) % 6;
-						}
 						break;
 					case MAIN_MENU_ENTRY_SOUND:
 						if (left || right)

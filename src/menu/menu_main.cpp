@@ -109,17 +109,16 @@ static void draw_mainMenu(enum MainMenuEntry c)
 {
 	static int frame = 0;
 	int flash = frame / 3;
-	int row = 3, column = 0;
+	int row = 4, column = 0;
 
 	text_draw_background();
-	text_draw_window(40,20,260,216,text_str_title);
+	text_draw_window(40,28,260,192,text_str_title);
 
 	if (c == MAIN_MENU_ENTRY_LOAD && flash)
 		write_text_inv(6, row++, text_str_load);
 	else
 		write_text(6, row++, text_str_load);
 
-	write_text(6, row++, text_str_separator);
 	write_text(6, row++, text_str_separator);
 	
 	if (c == MAIN_MENU_ENTRY_SAVED_STATES && flash)
@@ -128,7 +127,7 @@ static void draw_mainMenu(enum MainMenuEntry c)
 		write_text(6, row++, text_str_save);
 
 	write_text(6, row, text_str_separator);
-	row += 2;
+	row++;
 
 	write_text(6, row, text_str_throttle);
 	column = 17;
@@ -268,29 +267,28 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	else
 		write_text(column, row, text_str_on);
 
-	row += 2;
+	row++;
 	write_text(6, row++, text_str_separator);
 
 	if (c == MAIN_MENU_ENTRY_EJECT_DF1 && flash)
-		write_text_inv(6, row++, text_str_eject);
+		write_text_inv(6, row, text_str_eject);
 	else
-		write_text(6, row++, text_str_eject);
+		write_text(6, row, text_str_eject);
 
-	write_text(6, row++, text_str_separator);
+	row += 2;
 
 	if (c == MAIN_MENU_ENTRY_RESET_EMULATION && flash)
-		write_text_inv(6, row++, text_str_reset);
+		write_text_inv(6, row, text_str_reset);
 	else
-		write_text(6, row++, text_str_reset);
+		write_text(6, row, text_str_reset);
 
-	write_text(6, row++, text_str_separator);
+	row += 2;
 
 	if (c == MAIN_MENU_ENTRY_RESET_AND_RUN && flash)
 		write_text_inv(6, row++, text_str_run);
 	else
 		write_text(6, row++, text_str_run);
 
-	write_text(6, row++, text_str_separator);
 	write_text(6, row++, text_str_separator);
 
 	if (c == MAIN_MENU_ENTRY_EXIT_UAE && flash)

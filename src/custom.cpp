@@ -3524,7 +3524,7 @@ void customreset (void)
 	    for(i = 0 ; i < 32 ; i++)
 	    {
 		    vv = current_colors.color_uae_regs_ecs[i];
-		    current_colors.color_uae_regs_ecs[i] = (unsigned)-1;
+		    current_colors.color_uae_regs_ecs[i] = ~0; /* all ones */
 		    record_color_change (0, i, vv);
 		    remembered_color_entry = -1;
 		    current_colors.color_uae_regs_ecs[i] = vv;

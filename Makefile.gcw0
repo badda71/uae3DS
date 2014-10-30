@@ -19,7 +19,8 @@ HOME_DIR=1
 
 DEFAULT_CFLAGS = -I/opt/gcw0-toolchain/usr/include/ -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/  -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -DGCW0
 
-LDFLAGS = -lSDL -lSDL_mixer -lSDL_image -lz -lpthread -flto
+LDFLAGS = -lSDL -lSDL_image -lz -lpthread -flto
+# add -lSDL_mixer if -DMENU_MUSIC below
 ifndef FAME_CORE
 LDFLAGS += -lm
 endif

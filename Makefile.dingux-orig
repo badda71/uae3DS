@@ -14,7 +14,8 @@ LIB7Z=1
 
 DEFAULT_CFLAGS = -I/opt/mipsel-linux-uclibc/include -I/opt/mipsel-linux-uclibc/usr/include  -I/opt/mipsel-linux-uclibc/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -DDINGUX -DDINGOO
 
-LDFLAGS = -lSDL -lSDL_mixer -lSDL_image -lz -lpthread
+LDFLAGS = -lSDL -lSDL_image -lz -lpthread
+# add -lSDL_mixer if -DMENU_MUSIC below
 #-s -static
 
 

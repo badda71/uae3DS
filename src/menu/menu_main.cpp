@@ -67,7 +67,11 @@ enum MainMenuEntry {
 
 int mainMenu_vpos=1;
 #if !defined(DEBUG_UAE4ALL) && !defined(PROFILER_UAE4ALL) && !defined(AUTO_RUN) && !defined(AUTO_FRAMERATE)
+#if defined(NO_DEFAULT_THROTTLE)
+int mainMenu_throttle=0;
+#else
 int mainMenu_throttle=3;
+#endif
 int mainMenu_frameskip=-1;
 #else
 #ifdef PROFILER_UAE4ALL

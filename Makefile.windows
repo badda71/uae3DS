@@ -20,6 +20,7 @@ LDFLAGS        = `sdl-config --libs` -lz -lmingw32 -lmingwex -mwindows
 
 MORE_CFLAGS = -O3  -Isrc/ -Isrc/include/ -Isrc/menu -Isrc/vkbd -fomit-frame-pointer  -Wno-unused -Wno-format -DUSE_SDL -DGCCCONSTFUNC="__attribute__((const))" -DUSE_UNDERSCORE -fno-exceptions -DUNALIGNED_PROFITABLE -DREGPARAM="__attribute__((regparm(3)))" -DOPTIMIZED_FLAGS -D__inline__=__inline__ -DSHM_SUPPORT_LINKS=0 -DOS_WITHOUT_MEMORY_MANAGEMENT -DVKBD_ALWAYS -DMENU_MUSIC -DDOUBLEBUFFER 
 
+MORE_CFLAGS+= -DNO_DEFAULT_THROTTLE
 #MORE_CFLAGS+= -DSTATUS_ALWAYS
 #MORE_CFLAGS+= -DUSE_MAYBE_BLIT
 #MORE_CFLAGS+= -DUSE_BLITTER_DELAYED

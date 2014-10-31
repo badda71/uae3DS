@@ -196,6 +196,7 @@ opk: $(PROG)
 	mkdir -p $(RELEASEDIR)
 	cp $(PROG) $(RELEASEDIR)
 	cp -R $(DATADIR) $(RELEASEDIR)
+	rm $(RELEASEDIR)/$(DATADIR)/music.mod
 	cp $(OPKDIR)/* $(RELEASEDIR)
 	cp ./docs/CREDITS $(RELEASEDIR)
 	cp ./docs/README $(RELEASEDIR)

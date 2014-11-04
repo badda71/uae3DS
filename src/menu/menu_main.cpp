@@ -123,11 +123,18 @@ static void draw_mainMenu(enum MainMenuEntry c)
 		write_text(6, row++, text_str_load);
 
 	write_text(6, row++, text_str_separator);
-	
-	if (c == MAIN_MENU_ENTRY_SAVED_STATES && flash)
-		write_text_inv(6, row++, text_str_save);
+
+	if(emulating)
+	{
+		if (c == MAIN_MENU_ENTRY_SAVED_STATES && flash)
+			write_text_inv(6, row++, text_str_save);
+		else
+			write_text(6, row++, text_str_save);
+	}
 	else
-		write_text(6, row++, text_str_save);
+	{
+		row++;
+	}
 
 	write_text(6, row, text_str_separator);
 	row++;
@@ -287,10 +294,17 @@ static void draw_mainMenu(enum MainMenuEntry c)
 
 	row += 2;
 
-	if (c == MAIN_MENU_ENTRY_RETURN_TO_EMULATION && flash)
-		write_text_inv(6, row++, text_str_return);
+	if(emulating)
+	{
+		if (c == MAIN_MENU_ENTRY_RETURN_TO_EMULATION && flash)
+			write_text_inv(6, row++, text_str_return);
+		else
+			write_text(6, row++, text_str_return);
+	}
 	else
-		write_text(6, row++, text_str_return);
+	{
+		row++;
+	}
 
 	write_text(6, row++, text_str_separator);
 
@@ -355,21 +369,34 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				case SDLK_q:
 				case SDLK_LALT: cancel = 1; break;
 			}
-			if (cancel)
+			if (cancel && emulating)
 				return MAIN_MENU_ENTRY_RETURN_TO_EMULATION;
 			else if (reset)
 				return MAIN_MENU_ENTRY_RESET_EMULATION;
 			else if (load)
 				return MAIN_MENU_ENTRY_LOAD;
-			else if (toStates)
+			else if (toStates && emulating)
 				return MAIN_MENU_ENTRY_SAVED_STATES;
 			else if (up)
 			{
 				if (*sel > 0) *sel = (enum MainMenuEntry) ((*sel - 1) % MAIN_MENU_ENTRY_COUNT);
 				else *sel = (enum MainMenuEntry) (MAIN_MENU_ENTRY_COUNT - 1);
+
+				if(!emulating && (*sel == MAIN_MENU_ENTRY_SAVED_STATES || *sel == MAIN_MENU_ENTRY_RETURN_TO_EMULATION))
+				{
+					if (*sel > 0) *sel = (enum MainMenuEntry) ((*sel - 1) % MAIN_MENU_ENTRY_COUNT);
+					else *sel = (enum MainMenuEntry) (MAIN_MENU_ENTRY_COUNT - 1);
+				}
 			}
 			else if (down)
+			{
 				*sel = (enum MainMenuEntry) ((*sel + 1) % MAIN_MENU_ENTRY_COUNT);
+
+				if(!emulating && (*sel == MAIN_MENU_ENTRY_SAVED_STATES || *sel == MAIN_MENU_ENTRY_RETURN_TO_EMULATION))
+				{
+					*sel = (enum MainMenuEntry) ((*sel + 1) % MAIN_MENU_ENTRY_COUNT);
+				}
+			}
 			else
 			{
 				switch (*sel)

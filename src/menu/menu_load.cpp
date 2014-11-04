@@ -29,6 +29,7 @@ typedef struct{
 #define chdir(A) fs_chdir(A)
 #endif
 
+enum DiskOrder df_num;
 extern char uae4all_image_file[];
 extern char uae4all_image_file2[];
 
@@ -405,9 +406,12 @@ static int key_loadMenu(int *c)
 				else
 				{
 					if (hit0)
-						copyCompleteName(uae4all_image_file,text_dir_num_files_index);
-					else
-						copyCompleteName(uae4all_image_file2,text_dir_num_files_index);
+					{
+						if(df_num == DF_0)
+							copyCompleteName(uae4all_image_file,text_dir_num_files_index);
+						else if(df_num == DF_1)
+							copyCompleteName(uae4all_image_file2,text_dir_num_files_index);
+					}
 					end=1;
 				}
 			}
@@ -479,13 +483,15 @@ int getDefaultFiles(void)
 #endif
 }
 
-int run_menuLoad()
+int run_menuLoad(enum DiskOrder new_df_num)
 {
 	int end=0,c=0;
 #ifdef DREAMCAST
 	extern void reinit_sdcard(void);
 	reinit_sdcard();
 #endif
+
+	df_num = new_df_num;
 
 	if (text_dir_files==NULL)
 		end=getDefaultFiles();

@@ -492,7 +492,7 @@ int run_mainMenu()
 #endif
 				break;
 			case MAIN_MENU_ENTRY_LOAD:
-				run_menuLoad();
+				run_menuDfSel();
 				break;
 			case MAIN_MENU_ENTRY_EJECT_DF1:
 				return 3; /* leave, ejecting the floppy disk in DF1 */

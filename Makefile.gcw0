@@ -131,6 +131,7 @@ OBJS =	\
 	src/menu/menu.o \
 	src/menu/menu_save.o \
 	src/menu/menu_load.o \
+	src/menu/menu_df_selection.o \
 	src/menu/menu_main.o \
 	src/vkbd/vkbd.o \
 	src/dingoo.o \

@@ -17,6 +17,12 @@ extern SDL_Surface *prSDLScreen;
 #define MENU_DIR_DEFAULT "."
 #endif
 
+enum DiskOrder
+{
+	DF_0,
+	DF_1,
+};
+
 void text_draw_background();
 void init_text(int splash);
 void quit_text(void);
@@ -45,7 +51,8 @@ void menu_raise(void);
 void menu_unraise(void);
 
 int run_mainMenu();
-int run_menuLoad();
+int run_menuDfSel();
+int run_menuLoad(enum DiskOrder new_df_num);
 int run_menuSave();
 int run_menuGame();
 int run_menuControl();

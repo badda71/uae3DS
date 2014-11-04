@@ -66,35 +66,35 @@ static void draw_dfMenu(enum DfMenuEntry c)
 
 	row += 2;
 
-	if (c == DF_MENU_ENTRY_LOAD_DF0)
+	if (c == DF_MENU_ENTRY_LOAD_DF0 && flash)
 		write_text_inv(6, row++, text_str_load_df0);
 	else
 		write_text(6, row++, text_str_load_df0);
 
 	row++;
 
-	if (c == DF_MENU_ENTRY_LOAD_DF1)
+	if (c == DF_MENU_ENTRY_LOAD_DF1 && flash)
 		write_text_inv(6, row++, text_str_load_df1);
 	else
 		write_text(6, row++, text_str_load_df1);
 
 	write_text(6, row++, text_str_separator);
 
-	if (c == DF_MENU_ENTRY_EJECT_DF0)
+	if (c == DF_MENU_ENTRY_EJECT_DF0 && flash)
 		write_text_inv(6, row++, text_str_eject_df0);
 	else
 		write_text(6, row++, text_str_eject_df0);
 
 	row++;
 
-	if (c == DF_MENU_ENTRY_EJECT_DF1)
+	if (c == DF_MENU_ENTRY_EJECT_DF1 && flash)
 		write_text_inv(6, row++, text_str_eject_df1);
 	else
 		write_text(6, row++, text_str_eject_df1);
 
 	write_text(6, row++, text_str_separator);
 
-	if (c == DF_MENU_ENTRY_BACK)
+	if (c == DF_MENU_ENTRY_BACK && flash)
 		write_text_inv(6, row++, text_str_back);
 	else
 		write_text(6, row++, text_str_back);

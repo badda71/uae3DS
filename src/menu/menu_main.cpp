@@ -42,6 +42,7 @@ static const char *text_str_sound="Sound";
 static const char *text_str_on="on";
 static const char *text_str_off="off";
 static const char *text_str_separator="------------------------------";
+static const char *text_str_start="Start Amiga (R)";
 static const char *text_str_reset="Reset Amiga (R)";
 static const char *text_str_return="Return to Amiga (B)";
 #ifdef DREAMCAST
@@ -289,9 +290,15 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	row += 2;
 
 	if (c == MAIN_MENU_ENTRY_RESET_EMULATION && flash)
-		write_text_inv(6, row, text_str_reset);
+		if(emulating)
+			write_text_inv(6, row, text_str_reset);
+		else
+			write_text_inv(6, row, text_str_start);
 	else
-		write_text(6, row, text_str_reset);
+		if(emulating)
+			write_text(6, row, text_str_reset);
+		else
+			write_text(6, row, text_str_start);
 
 	row += 2;
 

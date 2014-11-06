@@ -9,6 +9,7 @@
 #include "options.h"
 #include "sound.h"
 #include "savestate.h"
+#include "gui.h"
 
 
 extern int emulating;
@@ -530,6 +531,7 @@ int run_mainMenu()
 			case MAIN_MENU_ENTRY_RETURN_TO_EMULATION:
 				return 1; /* leave, returning to the emulation */
 			case MAIN_MENU_ENTRY_EXIT_UAE:
+				storeConfig();
 #ifdef DREAMCAST
 //malloc(16*1024*1024);
 				arch_reboot();

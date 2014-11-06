@@ -38,6 +38,7 @@ static const char *text_str_load_dir="#DIR#";
 static const char *text_str_load_title="            File manager           -";
 fichero *text_dir_files=NULL;
 int text_dir_num_files=0, text_dir_num_files_index=0;
+char last_directory[PATH_MAX];
 
 char *text_load=NULL;
 
@@ -401,6 +402,8 @@ static int key_loadMenu(int *c)
 					strcpy(tmp,text_dir_files[text_dir_num_files_index].d_name);
 					if (getFiles(tmp))
 						end=-1;
+
+					strcpy(last_directory, getcwd(tmp, PATH_MAX));
 					free(tmp);
 				}
 				else
@@ -476,11 +479,15 @@ int getDefaultFiles(void)
 #ifdef DREAMCAST
 	strcpy(actual_dir,MENU_DIR_DEFAULT);
 #endif
-#ifdef HOME_DIR
-	return(getFiles(home_dir));
-#else
-	return(getFiles(MENU_DIR_DEFAULT));
-#endif
+//#ifdef HOME_DIR
+//	return(getFiles(home_dir));
+//#else
+//	return(getFiles(MENU_DIR_DEFAULT));
+//#endif
+	if(last_directory[0])
+		return(getFiles(last_directory));
+	else
+		return(getFiles(MENU_DIR_DEFAULT));
 }
 
 int run_menuLoad(enum DiskOrder new_df_num)

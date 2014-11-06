@@ -6,6 +6,8 @@
   * Copyright 1996 Bernd Schmidt
   */
 
+extern void loadConfig(void);
+extern void storeConfig(void);
 extern int gui_init (void);
 extern int gui_update (void);
 extern void gui_exit (void);

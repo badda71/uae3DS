@@ -25,6 +25,10 @@
 #include "disk.h"
 #include "savestate.h"
 
+#ifdef HOME_DIR
+#include "homedir.h"
+#endif
+
 #include <SDL.h>
 
 #ifdef PROFILER_UAE4ALL
@@ -87,6 +91,102 @@ int emulated_mouse=0;
 int emulated_mouse_button1=0;
 int emulated_mouse_button2=0;
 
+void loadConfig()
+{
+#if defined(HOME_DIR)
+	FILE *f;
+	char *config = (char *)malloc(strlen(config_dir) + strlen("/uae4all.cfg") + 1);
+	extern char last_directory[PATH_MAX];
+
+	if(config == NULL)
+		return;
+
+	sprintf(config, "%s/uae4all.cfg", config_dir);
+
+	f = fopen(config, "r");
+
+	if(f == NULL)
+	{
+		printf("Failed to open config file: \"%s\" for reading.\n", config);
+		return;
+	}
+
+	char line[PATH_MAX + 17];
+
+	while(fgets(line, sizeof(line), f))
+	{
+		char *arg = strchr(line, ' ');
+
+		if(!arg)
+		{
+			continue;
+		}
+		*arg = '\0';
+		arg++;
+
+		if(!strcmp(line, "THROTTLE"))
+			sscanf(arg, "%d", &mainMenu_throttle);
+		else if(!strcmp(line, "FRAMESKIP"))
+			sscanf(arg, "%d", &mainMenu_frameskip);
+		else if(!strcmp(line, "SCREEN_POS"))
+			sscanf(arg, "%d", &mainMenu_vpos);
+		else if(!strcmp(line, "SOUND"))
+			sscanf(arg, "%d", &mainMenu_sound);
+		else if(!strcmp(line, "SAVE_DISKS"))
+			sscanf(arg, "%d", &mainMenu_autosave);
+		else if(!strcmp(line, "LAST_DIR"))
+		{
+			int len = strlen(arg);
+
+			if(len == 0 || len > sizeof(last_directory) - 1)
+			{
+				continue;
+			}
+
+			if(arg[len-1] == '\n')
+			{
+				arg[len-1] = '\0';
+			}
+
+			strcpy(last_directory, arg);
+		}
+	}
+
+	fclose(f);
+#endif
+}
+
+void storeConfig()
+{
+#if defined(HOME_DIR)
+	FILE *f;
+	char *config = (char *)malloc(strlen(config_dir) + strlen("/uae4all.cfg") + 1);
+	extern char last_directory[PATH_MAX];
+
+	if(config == NULL)
+		return;
+
+	sprintf(config, "%s/uae4all.cfg", config_dir);
+
+	f = fopen(config, "w");
+
+	if(f == NULL)
+	{
+		printf("Failed to open config file: \"%s\" for writing.\n", config);
+		return;
+	}
+
+	fprintf(f, "THROTTLE %d\nFRAMESKIP %d\nSCREEN_POS %d\nSOUND %d\nSAVE_DISKS %d\n", mainMenu_throttle, mainMenu_frameskip, mainMenu_vpos, mainMenu_sound, mainMenu_autosave);
+
+	if(last_directory[0])
+	{
+		fprintf(f, "LAST_DIR %s\n", last_directory);
+	}
+
+	fclose(f);
+#endif
+}
+
 static void getChanges(void)
 {
     m68k_speed=mainMenu_throttle;
@@ -123,6 +223,7 @@ int gui_init (void)
 #endif
 	vkbd_init();
 	init_text(1);
+	loadConfig();
 	run_mainMenu();
 	quit_text();
 	uae4all_pause_music();

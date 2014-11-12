@@ -18,7 +18,11 @@
 #include "homedir.h"
 #endif
 
+#ifdef NAME_MAX
+#define MAX_FILELEN NAME_MAX
+#else
 #define MAX_FILELEN 29
+#endif
 
 typedef struct{
 	char d_name[MAX_FILELEN+2];

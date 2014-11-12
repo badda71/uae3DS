@@ -108,6 +108,7 @@ void loadConfig()
 	if(f == NULL)
 	{
 		printf("Failed to open config file: \"%s\" for reading.\n", config);
+		free(config);
 		return;
 	}
 
@@ -153,6 +154,7 @@ void loadConfig()
 	}
 
 	fclose(f);
+	free(config);
 #endif
 }
 
@@ -173,6 +175,7 @@ void storeConfig()
 	if(f == NULL)
 	{
 		printf("Failed to open config file: \"%s\" for writing.\n", config);
+		free(config);
 		return;
 	}
 
@@ -184,6 +187,7 @@ void storeConfig()
 	}
 
 	fclose(f);
+	free(config);
 #endif
 }
 

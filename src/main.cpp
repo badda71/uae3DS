@@ -208,6 +208,13 @@ void do_leave_program (void)
     SDL_Quit ();
 #endif
     memory_cleanup ();
+
+#if defined(HOME_DIR)
+    if(config_dir)
+    {
+	free(config_dir);
+    }
+#endif
 }
 
 #if defined(DREAMCAST) && !defined(DEBUG_UAE4ALL)

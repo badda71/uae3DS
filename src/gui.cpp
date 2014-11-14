@@ -6,6 +6,7 @@
   * Copyright 1996 Bernd Schmidt
   */
 
+#include <math.h>
 #include "sysconfig.h"
 #include "sysdeps.h"
 #include "config.h"
@@ -24,6 +25,7 @@
 #include "keybuf.h"
 #include "disk.h"
 #include "savestate.h"
+#include "joystick.h"
 
 #ifdef HOME_DIR
 #include "homedir.h"
@@ -557,6 +559,7 @@ static int in_goMenu=0;
 void gui_handle_events (void)
 {
 #ifndef DREAMCAST
+	int i;
 	Uint8 *keystate = SDL_GetKeyState(NULL);
 
 #ifdef EMULATED_JOYSTICK
@@ -628,6 +631,44 @@ void gui_handle_events (void)
 			lastmy += emulated_mouse_speed;
 	    		newmousecounters = 1;
 		}
+
+#ifndef DREAMCAST
+		for(i = 0; i < SDL_NumJoysticks(); i++)
+		{
+			SDL_Joystick *joy = i == 0 ? uae4all_joy0 : uae4all_joy1;
+			int joyx = SDL_JoystickGetAxis(joy, 0);	// left-right
+			int joyy = SDL_JoystickGetAxis(joy, 1);	// up-down
+			struct joy_range *dzone = i == 0 ? &dzone0 : &dzone1;
+
+			if(i > 1)
+			{
+				break;
+			}
+
+			if (joyx < dzone->minx)
+			{
+				lastmx -= emulated_mouse_speed;
+				newmousecounters = 1;
+			}
+			else
+			if (joyx > dzone->maxx)
+			{
+				lastmx += emulated_mouse_speed;
+				newmousecounters = 1;
+			}
+			if (joyy < dzone->miny)
+			{
+				lastmy -= emulated_mouse_speed;
+				newmousecounters = 1;
+			}
+			else
+			if (joyy > dzone->maxy)
+			{
+				lastmy += emulated_mouse_speed;
+				newmousecounters = 1;
+			}
+		}
+#endif
 	}
 	else
 	{

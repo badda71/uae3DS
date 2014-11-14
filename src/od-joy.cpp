@@ -24,16 +24,14 @@
 #define DEADZONE_J0 500
 #define DEADZONE_J1 500
 
+extern int emulated_mouse;
 int nr_joysticks;
 
 SDL_Joystick *uae4all_joy0, *uae4all_joy1;
 
 
 #ifndef DREAMCAST
-struct joy_range
-{
-    int minx, maxx, miny, maxy;
-} dzone0, dzone1;
+struct joy_range dzone0, dzone1;
 #endif
 
 void read_joystick(int nr, unsigned int *dir, int *button)
@@ -43,6 +41,9 @@ void read_joystick(int nr, unsigned int *dir, int *button)
     int left = 0, right = 0, top = 0, bot = 0;
     int len, i, num;
     SDL_Joystick *joy = nr == 0 ? uae4all_joy0 : uae4all_joy1;
+
+    if (emulated_mouse)
+	return;
 
     *dir = 0;
     *button = 0;

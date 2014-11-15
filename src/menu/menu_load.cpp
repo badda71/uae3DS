@@ -141,7 +141,7 @@ static int checkFiles(void)
 	return ret;
 }
 
-static int getFiles(char *dir)
+static int getFiles(const char *dir)
 {
 	int i,j;
 	DIR *d;

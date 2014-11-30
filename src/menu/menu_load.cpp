@@ -308,7 +308,7 @@ static void draw_loadMenu(int c)
 	int bb=(b%6)/3;
 	SDL_Rect r;
 	extern SDL_Surface *text_screen;
-	r.x=80-64; r.y=0; r.w=110+64+64; r.h=240;
+	r.x=80-64; r.y=0; r.h=240;
 
 	text_draw_background();
 	text_draw_window(80-64,12,160+64+64,220,text_str_load_title);
@@ -332,6 +332,14 @@ static void draw_loadMenu(int c)
 	{
 		write_text(3,j,text_str_load_separator);
 
+		if (text_dir_files[i].d_type==4)
+		{
+			r.w=110+64+64;
+		}
+		else
+		{
+			r.w=110+64+64+40;
+		}
 		SDL_SetClipRect(text_screen,&r);
 
 		if ((text_dir_num_files_index==i)&&(bb))

@@ -46,7 +46,11 @@ char last_directory[PATH_MAX];
 
 char *text_load=NULL;
 
+#ifdef DREAMCAST
 #define MAX_FILES_PER_DIR 1024
+#else
+#define MAX_FILES_PER_DIR 16384
+#endif
 #define SHOW_MAX_FILES 13
 
 #ifdef DREAMCAST

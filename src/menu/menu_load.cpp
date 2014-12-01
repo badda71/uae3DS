@@ -195,10 +195,10 @@ static int getFiles(const char *dir)
 			i--;
 			continue;
 		}
-		if (strlen(actual->d_name)>3)
+		if (actual->d_type==DT_REG && strlen(actual->d_name)>3)
 		{
 			char *final=(char *)&actual->d_name[strlen(actual->d_name)-3];
-			if ((!strcmp(final,"asf"))||(!strcmp(final,"ASF"))||(!strcmp(final,"ads"))||(!strcmp(final,"ADS")))
+			if (!((!strcasecmp(final,"adf"))||(!strcasecmp(final,"adz"))))
 			{
 				i--;
 				continue;

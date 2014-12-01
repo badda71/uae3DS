@@ -28,6 +28,11 @@ static const char *text_str_empty="empty";
 extern char uae4all_image_file[];
 extern char uae4all_image_file2[];
 
+static int scroll = 0;
+static int scroll2 = 0;
+static int pause_scroll_timer = 0;
+static int pause_scroll_timer2 = 0;
+
 enum DfMenuEntry {
 	DF_MENU_ENTRY_NONE = -1 /* pseudo-entry */,
 	DF_MENU_ENTRY_LOAD_DF0,
@@ -46,6 +51,10 @@ static void draw_dfMenu(enum DfMenuEntry c)
 	static int frame = 0;
 	int flash = frame / 3;
 	int row = 4, column = 0;
+	char image_text[27];
+	static int b = 0;
+	int update_scroll = !(b%5);
+	int visible_len = 26;
 
 	text_draw_background();
 
@@ -53,14 +62,89 @@ static void draw_dfMenu(enum DfMenuEntry c)
 
 	write_text(6, row, text_str_df0);
 	if(uae4all_image_file[0])
-		write_text(10, row++, uae4all_image_file);
+	{
+		int len = strlen(uae4all_image_file);
+
+		if(len > visible_len)
+		{
+			if(!pause_scroll_timer)
+			{
+				if(update_scroll)
+					scroll++;
+				if(scroll >= len - visible_len)
+					pause_scroll_timer = 60;
+			}
+			else
+			{
+				pause_scroll_timer--;
+
+				if(!pause_scroll_timer)
+				{
+					if(scroll2 > 0)
+						pause_scroll_timer = 1;
+					else
+						scroll = 0;
+				}
+
+				// Wait for scroll2
+				if(!pause_scroll_timer && scroll2 > 0)
+				{
+					pause_scroll_timer = 1;
+				}
+			}
+		}
+		else
+		{
+			scroll = 0;
+			pause_scroll_timer = 0;
+		}
+
+		strncpy(image_text, &uae4all_image_file[scroll], visible_len);
+		image_text[26] = '\0';
+		write_text(10, row++, image_text);
+	}
 	else
 		write_text(10, row++, text_str_empty);
 	row++;
 
 	write_text(6, row, text_str_df1);
 	if(uae4all_image_file2[0])
-		write_text(10, row++, uae4all_image_file2);
+	{
+		int len = strlen(uae4all_image_file2);
+
+		if(len > visible_len)
+		{
+			if(!pause_scroll_timer2)
+			{
+				if(update_scroll)
+					scroll2++;
+				if(scroll2 >= len - visible_len)
+					pause_scroll_timer2 = 60;
+			}
+			else
+			{
+				pause_scroll_timer2--;
+
+				if(!pause_scroll_timer2)
+				{
+					// Wait for scroll
+					if(scroll > 0)
+						pause_scroll_timer = 1;
+					else
+						scroll2 = 0;
+				}
+			}
+		}
+		else
+		{
+			scroll2 = 0;
+			pause_scroll_timer2 = 0;
+		}
+
+		strncpy(image_text, &uae4all_image_file2[scroll2], visible_len);
+		image_text[26] = '\0';
+		write_text(10, row++, image_text);
+	}
 	else
 		write_text(10, row++, text_str_empty);
 
@@ -101,6 +185,16 @@ static void draw_dfMenu(enum DfMenuEntry c)
 
 	text_flip();
 	frame = (frame + 1) % 6;
+
+	if(pause_scroll_timer == 1 && pause_scroll_timer2 == 1)
+	{
+		pause_scroll_timer = 0;
+		pause_scroll_timer2 = 0;
+		scroll = 0;
+		scroll2 = 0;
+	}
+
+	b++;
 }
 
 static enum DfMenuEntry key_dfMenu(enum DfMenuEntry *sel)
@@ -223,6 +317,12 @@ int run_menuDfSel()
 #if defined(AUTO_RUN) || defined(AUTO_FRAMERATE) || defined(AUTO_PROFILER)
 	return 1;
 #else
+	// Reset df file name scroll variables
+	scroll = 0;
+	scroll2 = 0;
+	pause_scroll_timer = 0;
+	pause_scroll_timer2 = 0;
+
 	static enum DfMenuEntry c = DF_MENU_ENTRY_LOAD_DF0;
 
 	while (1)

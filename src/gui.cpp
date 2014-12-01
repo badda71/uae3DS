@@ -448,35 +448,6 @@ static void goMenu(void)
     	    }
 #endif
     }
-    if (exitmode==3)
-    {
-    	    extern char *savestate_filename;
-#ifndef NO_SAVE_MENU
-    	    extern int saveMenu_n_savestate;
-#endif
-	    changed_df[1][0]=0;
-	    if (strcmp(changed_df[0],uae4all_image_file))
-	    { 
-            	strcpy(changed_df[0],uae4all_image_file);
-	    	real_changed_df[0]=1;
-	    }
-    	    strcpy(savestate_filename,uae4all_image_file);
-#ifndef NO_SAVE_MENU
-    	    switch(saveMenu_n_savestate)
-    	    {
-	   	 case 1:
-    			strcat(savestate_filename,"-1.asf");
-	    	case 2:
-    			strcat(savestate_filename,"-2.asf");
-	    	case 3:
-    			strcat(savestate_filename,"-3.asf");
-	    	default: 
-    	  	 	strcat(savestate_filename,".asf");
-    	    }
-#endif
-	    uae4all_image_file2[0]=0;
-	    disk_eject(1);
-    }
     if (exitmode==2)
     {
 	    if (autosave!=mainMenu_autosave)

@@ -20,7 +20,6 @@ static const char *text_str_save="Saved states (Y)";
 static const char *text_str_throttle="Throttle";
 static const char *text_str_frameskip="Frameskip";
 static const char *text_str_autosave="Save disks";
-static const char *text_str_eject="Eject DF1";
 static const char *text_str_vpos="Screen pos";
 static const char *text_str_8="8";
 static const char *text_str_16="16";
@@ -60,7 +59,6 @@ enum MainMenuEntry {
 	MAIN_MENU_ENTRY_SCREEN_POSITION,
 	MAIN_MENU_ENTRY_SOUND,
 	MAIN_MENU_ENTRY_SAVE_DISKS,
-	MAIN_MENU_ENTRY_EJECT_DF1,
 	MAIN_MENU_ENTRY_RESET_EMULATION,
 	MAIN_MENU_ENTRY_RETURN_TO_EMULATION,
 	MAIN_MENU_ENTRY_EXIT_UAE,
@@ -282,11 +280,6 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	row++;
 	write_text(6, row++, text_str_separator);
 
-	if (c == MAIN_MENU_ENTRY_EJECT_DF1 && flash)
-		write_text_inv(6, row, text_str_eject);
-	else
-		write_text(6, row, text_str_eject);
-
 	row += 2;
 
 	if (c == MAIN_MENU_ENTRY_RESET_EMULATION && flash)
@@ -445,7 +438,6 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 						break;
 					case MAIN_MENU_ENTRY_LOAD:
 					case MAIN_MENU_ENTRY_SAVED_STATES:
-					case MAIN_MENU_ENTRY_EJECT_DF1:
 					case MAIN_MENU_ENTRY_RESET_EMULATION:
 					case MAIN_MENU_ENTRY_RETURN_TO_EMULATION:
 					case MAIN_MENU_ENTRY_EXIT_UAE:
@@ -529,8 +521,6 @@ int run_mainMenu()
 			case MAIN_MENU_ENTRY_LOAD:
 				run_menuDfSel();
 				break;
-			case MAIN_MENU_ENTRY_EJECT_DF1:
-				return 3; /* leave, ejecting the floppy disk in DF1 */
 			case MAIN_MENU_ENTRY_RESET_EMULATION:
 				if (emulating)
 					return 2; /* leave, resetting */

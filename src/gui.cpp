@@ -563,6 +563,7 @@ void gui_handle_events (void)
 	Uint8 *keystate = SDL_GetKeyState(NULL);
 
 #ifdef EMULATED_JOYSTICK
+#if !defined(GCW0)
 	if (keystate[SDLK_ESCAPE])
 	{
 		if (keystate[SDLK_LCTRL])
@@ -607,6 +608,7 @@ void gui_handle_events (void)
 		}
 	}
 	else
+#endif
 	if (emulated_mouse)
 	{
 		if (keystate[SDLK_LEFT])
@@ -688,14 +690,18 @@ void gui_handle_events (void)
 	else
 		leftSuperThrottle();
 #endif
-#if !defined(DINGOO) && !defined(DREAMCAST)
+#if !defined(DINGOO) && !defined(GCW0) && !defined(DREAMCAST)
 	if ( keystate[SDLK_F12] )
 		SDL_WM_ToggleFullScreen(prSDLScreen);
 	else
 #endif
 	if (( keystate[SDLK_F11] )
 #ifdef EMULATED_JOYSTICK
+#if defined(GCW0)
+			||(keystate[SDLK_ESCAPE])
+#else
 			||((keystate[SDLK_RETURN])&&(keystate[SDLK_ESCAPE]))
+#endif
 #endif
 	   )
 #else

@@ -81,7 +81,7 @@ char uae4all_image_file2[128];
 
 int drawfinished=0;
 
-extern int mainMenu_throttle, mainMenu_frameskip, mainMenu_sound, mainMenu_case, mainMenu_autosave, mainMenu_vpos;
+extern int mainMenu_throttle, mainMenu_frameskip, mainMenu_sound, mainMenu_case, mainMenu_autosave, mainMenu_vpos, mainMenu_usejoy;
 
 int emulated_left=0;
 int emulated_right=0;
@@ -137,6 +137,8 @@ void loadConfig()
 			sscanf(arg, "%d", &mainMenu_sound);
 		else if(!strcmp(line, "SAVE_DISKS"))
 			sscanf(arg, "%d", &mainMenu_autosave);
+		else if(!strcmp(line, "USE_JOY"))
+			sscanf(arg, "%d", &mainMenu_usejoy);
 		else if(!strcmp(line, "LAST_DIR"))
 		{
 			int len = strlen(arg);
@@ -181,7 +183,7 @@ void storeConfig()
 		return;
 	}
 
-	fprintf(f, "THROTTLE %d\nFRAMESKIP %d\nSCREEN_POS %d\nSOUND %d\nSAVE_DISKS %d\n", mainMenu_throttle, mainMenu_frameskip, mainMenu_vpos, mainMenu_sound, mainMenu_autosave);
+	fprintf(f, "THROTTLE %d\nFRAMESKIP %d\nSCREEN_POS %d\nSOUND %d\nSAVE_DISKS %d\nUSE_JOY %d\n", mainMenu_throttle, mainMenu_frameskip, mainMenu_vpos, mainMenu_sound, mainMenu_autosave, mainMenu_usejoy);
 
 	if(last_directory[0])
 	{
@@ -612,6 +614,11 @@ void gui_handle_events (void)
 			int joyx = SDL_JoystickGetAxis(joy, 0);	// left-right
 			int joyy = SDL_JoystickGetAxis(joy, 1);	// up-down
 			struct joy_range *dzone = i == 0 ? &dzone0 : &dzone1;
+
+			if(!mainMenu_usejoy)
+			{
+				break;
+			}
 
 			if(i > 1)
 			{

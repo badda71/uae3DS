@@ -24,7 +24,7 @@
 #define DEADZONE_J0 500
 #define DEADZONE_J1 500
 
-extern int emulated_mouse;
+extern int emulated_mouse, mainMenu_usejoy;
 int nr_joysticks;
 
 SDL_Joystick *uae4all_joy0, *uae4all_joy1;
@@ -53,24 +53,28 @@ void read_joystick(int nr, unsigned int *dir, int *button)
     SDL_JoystickUpdate ();
 #ifndef DREAMCAST
     struct joy_range *r = nr == 0 ? &dzone0 : &dzone1;
-    x_axis = SDL_JoystickGetAxis (joy, 0);
-    y_axis = SDL_JoystickGetAxis (joy, 1);
 
-    if (x_axis < r->minx)
-    	left = 1;
-    else if (x_axis > r->maxx)
-    	right = 1;
+    if (mainMenu_usejoy)
+    {
+	x_axis = SDL_JoystickGetAxis (joy, 0);
+	y_axis = SDL_JoystickGetAxis (joy, 1);
 
-    if (y_axis < r->miny)
-    	top = 1;
-    else if (y_axis > r->maxy)
-    	bot = 1;
+	if (x_axis < r->minx)
+	left = 1;
+	else if (x_axis > r->maxx)
+	right = 1;
 
-    num = SDL_JoystickNumButtons (joy);
-    if (num > 16)
+	if (y_axis < r->miny)
+	top = 1;
+	else if (y_axis > r->maxy)
+	bot = 1;
+
+	num = SDL_JoystickNumButtons (joy);
+	if (num > 16)
 	num = 16;
-    for (i = 0; i < num; i++)
+	for (i = 0; i < num; i++)
 	*button |= (SDL_JoystickGetButton (joy, i) & 1) << i;
+     }
 #ifdef EMULATED_JOYSTICK
     extern int emulated_left, emulated_right, emulated_top, emulated_bot, emulated_button1, emulated_button2, emulated_mouse_button1, emulated_mouse_button2;
     if (nr)
@@ -85,18 +89,21 @@ void read_joystick(int nr, unsigned int *dir, int *button)
     }
 #endif
 #else
-    int hat=/*15^*/(SDL_JoystickGetHat(joy,0));
-    if (hat & SDL_HAT_LEFT)
+    if (mainMenu_usejoy)
+    {
+	int hat=/*15^*/(SDL_JoystickGetHat(joy,0));
+	if (hat & SDL_HAT_LEFT)
 	    left = 1;
-    else if (hat & SDL_HAT_RIGHT)
+	else if (hat & SDL_HAT_RIGHT)
 	    right = 1;
-    if (hat & SDL_HAT_UP)
+	if (hat & SDL_HAT_UP)
 	    top = 1;
-    else if (hat & SDL_HAT_DOWN)
+	else if (hat & SDL_HAT_DOWN)
 	    bot = 1;
-    if (vkbd_button2==(SDLKey)0)
-    	top |= SDL_JoystickGetButton(joy,6) & 1;
-    *button = SDL_JoystickGetButton(joy,2) & 1;
+	if (vkbd_button2==(SDLKey)0)
+	top |= SDL_JoystickGetButton(joy,6) & 1;
+	*button = SDL_JoystickGetButton(joy,2) & 1;
+    }
 #endif
     
     if(vkbd_mode && nr)

@@ -306,6 +306,13 @@ static void draw_loadMenu(int c)
 	int i,j;
 	static int b=0;
 	int bb=(b%6)/3;
+	static int lastSelected = 0;
+	static int scroll = 0;
+	static int pauseScrollTimer = 15;
+	int updateScroll = !(b%5);
+	int padding;
+	int len;
+	int visibleLen;
 	SDL_Rect r;
 	extern SDL_Surface *text_screen;
 	r.x=80-64; r.y=0; r.h=240;
@@ -335,17 +342,61 @@ static void draw_loadMenu(int c)
 		if (text_dir_files[i].d_type==4)
 		{
 			r.w=110+64+64;
+			visibleLen = 29;
 		}
 		else
 		{
 			r.w=110+64+64+40;
+			visibleLen = 34;
 		}
-		SDL_SetClipRect(text_screen,&r);
 
-		if ((text_dir_num_files_index==i)&&(bb))
-			write_text_inv(4,j+1,(char *)&text_dir_files[i].d_name);
+		len = strlen(text_dir_files[i].d_name);
+		if ((text_dir_num_files_index==i) && (len > visibleLen))
+		{
+			if(lastSelected != text_dir_num_files_index)
+			{
+				lastSelected = text_dir_num_files_index;
+				scroll = 0;
+				pauseScrollTimer = 15;
+			}
+
+			if(!pauseScrollTimer)
+			{
+				if(updateScroll)
+					scroll++;
+				if(scroll > len - visibleLen)
+					pauseScrollTimer = 60;
+			}
+			else
+			{
+				pauseScrollTimer--;
+
+				if(pauseScrollTimer == 0)
+					scroll = 0;
+			}
+
+			padding = 4 - scroll;
+			r.x += 16;
+			r.w -= 16;
+		}
 		else
-			write_text(4,j+1,(char *)&text_dir_files[i].d_name);
+		{
+			if(lastSelected != text_dir_num_files_index)
+			{
+				lastSelected = text_dir_num_files_index;
+				scroll = 0;
+				pauseScrollTimer = 15;
+			}
+
+			padding = 4;
+			r.x=16;
+		}
+
+		SDL_SetClipRect(text_screen,&r);
+		if ((text_dir_num_files_index==i)&&(bb))
+			write_text_inv(padding,j+1,(char *)&text_dir_files[i].d_name);
+		else
+			write_text(padding,j+1,(char *)&text_dir_files[i].d_name);
 
 		SDL_SetClipRect(text_screen,NULL);
 

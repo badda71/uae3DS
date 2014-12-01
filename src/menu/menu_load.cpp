@@ -546,11 +546,6 @@ int getDefaultFiles(void)
 #ifdef DREAMCAST
 	strcpy(actual_dir,MENU_DIR_DEFAULT);
 #endif
-//#ifdef HOME_DIR
-//	return(getFiles(home_dir));
-//#else
-//	return(getFiles(MENU_DIR_DEFAULT));
-//#endif
 	if(last_directory[0])
 		return(getFiles(last_directory));
 	else

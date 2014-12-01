@@ -14,7 +14,7 @@
 
 extern int emulating;
 
-static const char *text_str_title="----- UAE4ALL rc3 ------";
+static const char *text_str_title="   -- UAE4ALL release 1 ------";
 static const char *text_str_load="Load disk image (X)";
 static const char *text_str_save="Saved states (Y)";
 static const char *text_str_throttle="Throttle";

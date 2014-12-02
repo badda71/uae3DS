@@ -37,6 +37,17 @@ Adjusting the frame rate:
 Setting the frameskip value to "auto" will limit the emulated program speed to 50 frames per second. Use this option for programs meant to be run on PAL Amiga machines. Most Amiga programs were designed for this frame rate.
 Setting the frameskip value to "0" will limit the emulated program speed to 60 frames per second. Use this option for programs meant to be run on NTSC Amiga machines.
 
+Controls (during emulation):
+D-PAD/analog joystick - control amiga joystick (if mouse emulation turned off) / amiga mouse (if mouse emulation turned on)
+A - joystick button #1
+B - joystick button #2
+Y - mouse button #1
+X - mouse button #2
+L - enable/disable mouse emulation
+R - enable/disable on-screen-keyboard
+START - super throttle
+SELECT - emulator menu
+
 [Changelog]
 2014.12.02 - Release 1
 * add double buffering (Nebuleon)

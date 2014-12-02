@@ -199,8 +199,7 @@ opk: $(PROG)
 	cp -R $(DATADIR) $(RELEASEDIR)
 	rm $(RELEASEDIR)/$(DATADIR)/music.mod
 	cp $(OPKDIR)/* $(RELEASEDIR)
-	cp ./docs/CREDITS $(RELEASEDIR)
-	cp ./docs/README $(RELEASEDIR)
+	cp -R ./docs/ $(RELEASEDIR)
 	mksquashfs $(RELEASEDIR) uae4all.opk -all-root -noappend -no-exports -no-xattrs
 
 almostclean:

@@ -6,5 +6,5 @@ Terminal=false
 Type=Application
 StartupNotify=true
 Icon=uae4all
-X-OD-Manual=README
+X-OD-Manual=readme.man.txt
 Categories=emulators;

@@ -4,7 +4,7 @@
 #include "config.h"
 #include "menu.h"
 
-#include <SDL_mixer.h>
+#include <SDL/SDL_mixer.h>
 
 #include "sysconfig.h"
 #include "sysdeps.h"

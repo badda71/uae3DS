@@ -23,8 +23,8 @@ void guarda(void);
 #include <unistd.h>
 #include <signal.h>
 
-#include <SDL.h>
-#include <SDL_endian.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_endian.h>
 
 #include "config.h"
 #include "uae.h"
@@ -43,7 +43,7 @@ void guarda(void);
 #include "vkbd/vkbd.h"
 
 #ifdef DREAMCAST
-#include <SDL_dreamcast.h>
+#include <SDL/SDL_dreamcast.h>
 extern int __sdl_dc_emulate_mouse;
 #endif
 

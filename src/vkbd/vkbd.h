@@ -1,4 +1,4 @@
-#include<SDL.h>
+#include<SDL/SDL.h>
 
 #define VKBD_X 20
 #define VKBD_Y 200

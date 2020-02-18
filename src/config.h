@@ -106,3 +106,7 @@
 #define swab_l(A) (A)
 
 #define MUSIC_VOLUME 80
+
+#define ROM_PATH_PREFIX "/"
+#define DATA_PREFIX "romfs:/"
+#define SAVE_PREFIX "/"

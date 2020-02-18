@@ -31,7 +31,7 @@
 #include "homedir.h"
 #endif
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 #ifdef PROFILER_UAE4ALL
 unsigned long long uae4all_prof_initial[UAE4ALL_PROFILER_MAX];
@@ -40,7 +40,7 @@ unsigned long long uae4all_prof_executed[UAE4ALL_PROFILER_MAX];
 #endif
 
 #ifdef DREAMCAST
-#include <SDL_dreamcast.h>
+#include <SDL/SDL_dreamcast.h>
 #define VIDEO_FLAGS_INIT SDL_HWSURFACE|SDL_FULLSCREEN
 #else
 #ifdef DINGOO

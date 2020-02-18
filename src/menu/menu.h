@@ -1,5 +1,5 @@
 #include<stdio.h>
-#include<SDL.h>
+#include<SDL/SDL.h>
 
 extern SDL_Surface *prSDLScreen;
 

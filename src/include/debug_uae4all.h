@@ -1,4 +1,4 @@
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 #ifndef DEBUG_UAE4ALL_H
 #define DEBUG_UAE4ALL_H

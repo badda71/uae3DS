@@ -13,6 +13,9 @@ KOS_INIT_ROMDISK(romdisk);
   * Copyright 1995 Ed Hanway
   * Copyright 1995, 1996, 1997 Bernd Schmidt
   */
+#include <stdlib.h>
+#include <3ds.h>
+
 #include "sysconfig.h"
 #include "sysdeps.h"
 #include <assert.h>
@@ -47,7 +50,7 @@ KOS_INIT_ROMDISK(romdisk);
 #include "SDL.h"
 #endif
 #ifdef DREAMCAST
-#include<SDL_dreamcast.h>
+#include<SDL/SDL_dreamcast.h>
 #endif
 #ifdef HOME_DIR
 #include "homedir.h"
@@ -289,6 +292,10 @@ void real_main (int argc, char **argv)
 #endif
 	);
 #endif
+	
+	// init romfs file system
+	romfsInit();
+	atexit((void *)romfsExit);
 
     default_prefs ();
     

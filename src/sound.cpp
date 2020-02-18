@@ -25,7 +25,7 @@
 #include "drawing.h"
 
 #ifdef DREAMCAST
-#include <SDL_dreamcast.h>
+#include <SDL/SDL_dreamcast.h>
 #endif
 
 
@@ -122,7 +122,7 @@ void uae4all_resume_music(void) { }
 #else 
 
 #include "thread.h"
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 #ifdef USE_SOUND_SEMS
 static uae_sem_t data_available_sem,callback_done_sem;
@@ -130,7 +130,7 @@ static uae_sem_t data_available_sem,callback_done_sem;
 
 
 #ifdef MENU_MUSIC
-#include <SDL_mixer.h>
+#include <SDL/SDL_mixer.h>
 enum{
 	SAMPLE_CLICK,
 	NUM_SAMPLES

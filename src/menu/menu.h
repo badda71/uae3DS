@@ -13,8 +13,9 @@ extern SDL_Surface *prSDLScreen;
 #else
 #define MENU_DIR_DEFAULT "/"
 #endif
-#elif defined(GCW0)
-#define MENU_DIR_DEFAULT "/media/"
+#elif defined(_3DS)
+//#define MENU_DIR_DEFAULT "/media/"
+#define MENU_DIR_DEFAULT "."	// 3DS
 #else
 #define MENU_DIR_DEFAULT "."
 #endif

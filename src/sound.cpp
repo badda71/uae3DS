@@ -352,7 +352,7 @@ static int open_sound (void)
 	if (SDL_OpenAudio (&spec, NULL) < 0)
 	{
 //puts(SDL_GetError()); exit(0);
-		write_log (stderr, "Couldn't open audio: %s\n", SDL_GetError());
+		write_log ("Couldn't open audio: %s\n", SDL_GetError());
 		return 0;
     	}
 //puts("DESPUES");

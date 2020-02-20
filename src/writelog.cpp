@@ -7,16 +7,26 @@
   */
 #include "sysconfig.h"
 #include "sysdeps.h"
+#include <3ds.h>
 
 #if defined(DEBUG_UAE4ALL) && defined(UAE_CONSOLE)
+
+void log_citra(const char *format, ...)
+{
+	char buf[2000];
+
+    va_list argptr;
+    va_start(argptr, format);
+    vsprintf(buf, format, argptr);
+    va_end(argptr);
+	svcOutputDebugString(buf, strlen(buf));
+}
 
 void write_log_standard (const char *fmt, ...)
 {
     va_list ap;
     va_start (ap, fmt);
-#ifdef HAVE_VFPRINTF
     vfprintf (stdout, fmt, ap);
-#else
     /* Technique stolen from GCC.  */
     {
 	int x1, x2, x3, x4, x5, x6, x7, x8;
@@ -28,9 +38,8 @@ void write_log_standard (const char *fmt, ...)
 	x6 = va_arg (ap, int);
 	x7 = va_arg (ap, int);
 	x8 = va_arg (ap, int);
-	fprintf (stdout, fmt, x1, x2, x3, x4, x5, x6, x7, x8);
+	log_citra(fmt, x1, x2, x3, x4, x5, x6, x7, x8);
     }
-#endif
 }
 
 #endif

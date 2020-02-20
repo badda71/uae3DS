@@ -448,6 +448,7 @@ void restore_state (const char *filename)
     if (SDL_MUSTLOCK(prSDLScreen))
     	SDL_LockSurface (prSDLScreen);
 #endif
+	return;
 }
 
 void savestate_restore_finish (void)

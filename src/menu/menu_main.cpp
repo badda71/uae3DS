@@ -14,7 +14,7 @@
 
 extern int emulating;
 
-static const char *text_str_title="   -- UAE4ALL release 1 ------";
+static const char *text_str_title="   -- UAE3DS v" VERSION3DS " ------";
 static const char *text_str_load="Load disk image (X)";
 static const char *text_str_save="Saved states (Y)";
 static const char *text_str_throttle="Throttle";
@@ -48,7 +48,7 @@ static const char *text_str_return="Return to Amiga (B)";
 #ifdef DREAMCAST
 static const char *text_str_exit="Exit - Reboot Dreamcast";
 #else
-static const char *text_str_exit="Exit UAE4ALL";
+static const char *text_str_exit="Exit UAE3DS";
 #endif
 
 enum MainMenuEntry {
@@ -68,46 +68,9 @@ enum MainMenuEntry {
 };
 
 int mainMenu_vpos=1;
-#if !defined(DEBUG_UAE4ALL) && !defined(PROFILER_UAE4ALL) && !defined(AUTO_RUN) && !defined(AUTO_FRAMERATE)
-#if defined(NO_DEFAULT_THROTTLE)
 int mainMenu_throttle=0;
-#else
-int mainMenu_throttle=3;
-#endif
 int mainMenu_frameskip=-1;
-#else
-#ifdef PROFILER_UAE4ALL
-#ifndef AUTO_PROFILER
-int mainMenu_frameskip=0;
-#else
-int mainMenu_frameskip=-1;
-#endif
-#ifndef AUTO_PROFILER_THROTTLE
-int mainMenu_throttle=0;
-#else
-int mainMenu_throttle=3;
-#endif
-#else
-#ifdef DEBUG_FRAMERATE
-int mainMenu_frameskip=-1;
-#ifndef AUTO_FRAMERATE_THROTTLE
-int mainMenu_throttle=0;
-#else
-int mainMenu_throttle=3;
-#endif
-#else
-int mainMenu_throttle=0;
-int mainMenu_frameskip=0;
-#endif
-#endif
-#endif
-
-
-#if !defined(DEBUG_UAE4ALL) && !defined(PROFILER_UAE4ALL) && !defined(AUTO_RUN) && !defined(AUTO_FRAMERATE)
 int mainMenu_sound=-1;
-#else
-int mainMenu_sound=0;
-#endif
 int mainMenu_autosave=-1;
 int mainMenu_usejoy=-1;
 
@@ -364,7 +327,7 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				case SDLK_SPACE: toStates = 1; break;
 				case SDLK_2:
 				case SDLK_TAB: reset = 1; break;
-#elif defined(GCW0)
+#elif defined(_3DS)
 				case SDLK_c:
 				case SDLK_SPACE: toStates = 1; break;
 				case SDLK_x:
@@ -513,11 +476,7 @@ int run_mainMenu()
 #if defined(AUTO_RUN) || defined(AUTO_FRAMERATE) || defined(AUTO_PROFILER)
 	return 1;
 #else
-#if !defined(DEBUG_UAE4ALL) && !defined(PROFILER_UAE4ALL)
-	static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
-#else
-	static enum MainMenuEntry c = MAIN_MENU_ENTRY_SOUND;
-#endif
+static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 
 	while (1)
 	{

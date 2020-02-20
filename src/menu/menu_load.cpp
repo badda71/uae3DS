@@ -61,12 +61,12 @@ static char actual_dir[128];
 
 static int min_in_dir=0, max_in_dir=SHOW_MAX_FILES;
 
-static int compare_names(fichero *a, fichero *b)
+static int compare_names(const void *a, const void *b)
 {
-	if(a->d_type != b->d_type)
-		return 0;
+	if(((fichero *)a)->d_type != ((fichero *)b)->d_type)
+		return (((fichero *)a)->d_type==DT_DIR ? -1 : 1);
 
-	return strcmp(a->d_name,b->d_name);
+	return strcasecmp(((fichero *)a)->d_name,((fichero *)b)->d_name);
 }
 
 static void copyCompleteName(char *dest, int n)
@@ -156,26 +156,8 @@ static int getFiles(const char *dir)
 
 	if (text_dir_files!=NULL)
 		free(text_dir_files);
-
-	text_draw_window(96,64,140,32,"-------");
-	write_text(14,9,"Please wait");
-	text_flip();
-
 	text_dir_files=(fichero *)calloc(sizeof(fichero),MAX_FILES_PER_DIR);
-#ifdef DREAMCAST
-        if (!strcmp(dir,".."))
-        {
-                int ind;
-                for(ind=strlen(actual_dir)-1;ind>0;ind--)
-                        if (actual_dir[ind]=='/')
-                        {
-                                actual_dir[ind]=0;
-                                break;
-                        }
-                d=opendir(actual_dir);
-        }
-        else
-#endif
+
 	d=opendir(dir);
 	if (d==NULL)
 		return -1;
@@ -214,90 +196,21 @@ static int getFiles(const char *dir)
 						indice++;
 			text_dir_files[jjg].d_name[MAX_FILELEN+1]=indice;
 		}
-#ifndef DREAMCAST
-		{
-			struct stat sstat;
-			char *tmp=(char *)calloc(1,256);
-			strcpy(tmp,dir);
-			strcat(tmp,"/");
-			strcat(tmp,text_dir_files[i].d_name);
-			if (!stat(tmp, &sstat))
-		        	if (S_ISDIR(sstat.st_mode))
-					text_dir_files[i].d_type=4;
-			free(tmp);
-		}
-#else
-		text_dir_files[i].d_type=actual->d_type & 4;
-#endif
+		text_dir_files[i].d_type=actual->d_type & DT_DIR;
 	}
 	closedir(d);
-	text_dir_num_files=i;
 
-#ifndef DREAMCAST
-        chdir(dir);
-#else
-        if (strcmp(dir,MENU_DIR_DEFAULT))
-        {
-                if (strcmp(dir,".."))
-                {
-                        strcat(actual_dir,"/");
-                        strcat(actual_dir,dir);
-                }
-        }
-        chdir(actual_dir);
-        if (strcmp(actual_dir,MENU_DIR_DEFAULT))
-        {
+	chdir(dir);
+	getcwd(last_directory, PATH_MAX);
+
+	// add the '..' - ctrulib does not include it
+	if (strcmp("/",last_directory)) {
 		strcpy(text_dir_files[i].d_name,"..");
-                text_dir_files[i].d_type=4;
-                if (text_dir_num_files>0)
-                {
-                        char *pptmp=(char *)calloc(1,256);
-                        int tmptype=text_dir_files[0].d_type;
-                        strcpy(pptmp,text_dir_files[0].d_name);
-                        text_dir_files[0].d_type=text_dir_files[text_dir_num_files].d_type;
-                        text_dir_files[text_dir_num_files].d_type=tmptype;
-                        strcpy(text_dir_files[0].d_name,text_dir_files[text_dir_num_files].d_name);
-                        strcpy(text_dir_files[text_dir_num_files].d_name,pptmp);
-                        free(pptmp);
-                }
-                text_dir_num_files++;
+		text_dir_files[i++].d_type=DT_DIR;
 	}
-#endif
+	text_dir_num_files=i;
+	qsort(text_dir_files, text_dir_num_files, sizeof(fichero), compare_names);
 
-	for(i=0;i<text_dir_num_files;i++)
-	{
-		if (text_dir_files[i].d_type==0)
-			for(j=i;j<text_dir_num_files;j++)
-				if (text_dir_files[j].d_type==4)
-				{
-					char *ctmp=(char *)calloc(1,256);
-					strcpy(ctmp,text_dir_files[j].d_name);
-					strcpy(text_dir_files[j].d_name,text_dir_files[i].d_name);
-					strcpy(text_dir_files[i].d_name,ctmp);
-					text_dir_files[i].d_type=4;
-					text_dir_files[j].d_type=0;
-					free(ctmp);
-					break;
-				}
-	}
-//	for(i=0;i<text_dir_num_files;i++)
-//		if (text_dir_files[i].d_type==0)
-//		{
-//			qsort((void *)&text_dir_files[i],text_dir_num_files-i,sizeof(fichero),(int (*)(const void*, const void*))compare_names);
-//			break;
-//		}
-	for(i=0;i<text_dir_num_files;i++)
-		if (text_dir_files[i].d_type==DT_DIR || text_dir_files[i].d_type==DT_LNK)
-		{
-			qsort((void *)&text_dir_files[i],text_dir_num_files-i,sizeof(fichero),(int (*)(const void*, const void*))compare_names);
-			break;
-		}
-	for(i=0;i<text_dir_num_files;i++)
-		if (text_dir_files[i].d_type==DT_REG)
-		{
-			qsort((void *)&text_dir_files[i],text_dir_num_files-i,sizeof(fichero),(int (*)(const void*, const void*))compare_names);
-			break;
-		}
 	return 0;
 }
 
@@ -469,8 +382,6 @@ static int key_loadMenu(int *c)
 					strcpy(tmp,text_dir_files[text_dir_num_files_index].d_name);
 					if (getFiles(tmp))
 						end=-1;
-
-					strcpy(last_directory, getcwd(tmp, PATH_MAX));
 					free(tmp);
 				}
 				else

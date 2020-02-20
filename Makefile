@@ -1,19 +1,20 @@
 DFLAGS = -DUSE_SDL -DGCCCONSTFUNC="__attribute__((const))" -DUSE_UNDERSCORE -fno-exceptions -DUNALIGNED_PROFITABLE -DREGPARAM="__attribute__((regparm(3)))" -DOPTIMIZED_FLAGS -D__inline__=__inline__ -DSHM_SUPPORT_LINKS=0 -DOS_WITHOUT_MEMORY_MANAGEMENT -DVKBD_ALWAYS 
 
+DFLAGS+= -DVERSION3DS=\"0.1\"
 DFLAGS+= -DEMULATED_JOYSTICK
-DFLAGS+= -DMENU_MUSIC
+#DFLAGS+= -DMENU_MUSIC
 #DFLAGS+= -DNO_SOUND
 
-DFLAGS+= -DDEBUG_UAE4ALL -DUAE_CONSOLE
+DFLAGS+= -DDEBUG_UAE4ALL -DUAE_CONSOLE -DDOUBLEBUFFER
 
 #DFLAGS+= -DUSE_AUTOCONFIG
-#DFLAGS+= -DUAE_CONSOLE
+DFLAGS+= -DUAE_CONSOLE
 DFLAGS+= -DGP2X
 DFLAGS+= -DUSE_ZFILE
 #DFLAGS+= -DUAE4ALL_NO_USE_RESTRICT
 DFLAGS+= -DNO_THREADS
 #DFLAGS+= -DDEBUG_TIMESLICE
-#DFLAGS+= -DFAME_INTERRUPTS_PATCH
+DFLAGS+= -DFAME_INTERRUPTS_PATCH
 #DFLAGS+= -DFAME_INTERRUPTS_SECURE_PATCH
 #DFLAGS+= -DFAME_GLOBAL_CONTEXT
 
@@ -83,7 +84,7 @@ SRCS =	\
 INCLUDES = $(addprefix -I,$(shell find -L src -type d 2> /dev/null))
 INCLUDES += -I/opt/devkitpro/portlibs/3ds/include \
 	-I/opt/devkitpro/libctru/include
-GCCFLAGS = -fpermissive -fomit-frame-pointer -Wno-unused -Wno-format -g -Wall -O2 -Wshadow -fdata-sections -ffunction-sections -march=armv6k -mfloat-abi=hard -mtp=soft -mtune=mpcore -mword-relocations -DARM11 -D_3DS
+GCCFLAGS = -Wno-switch -fpermissive -fomit-frame-pointer -Wno-unused -Wno-format -g -Wall -O2 -Wshadow -fdata-sections -ffunction-sections -march=armv6k -mfloat-abi=hard -mtp=soft -mtune=mpcore -mword-relocations -DARM11 -D_3DS
 
 CFLAGS = $(GCCFLAGS) $(DFLAGS) $(INCLUDES)
 
@@ -106,7 +107,7 @@ LIBS = -L/opt/devkitpro/portlibs/3ds/lib\
 CXX = arm-none-eabi-g++
 ODIR = obj
 RDIR = resources
-NAME = uae4all
+NAME = uae3DS
 VERSION = 0.1
 
 OBJ = $(addsuffix .o,$(addprefix $(ODIR)/,$(subst /,.,$(basename $(SRCS)))))
@@ -117,7 +118,7 @@ POSTCOMPILE = @mv -f $(ODIR)/$*.Td $(ODIR)/$*.d && touch $@
 all: $(NAME).3dsx
 
 $(NAME).3dsx: $(NAME).elf $(RDIR)/icon.png
-	smdhtool --create "uae4all" "uae4all" "badda71" $(RDIR)/icon.png $(ODIR)/$(NAME).smdh
+	smdhtool --create "uae3DS" "Amiga 500 emulator" "badda71" $(RDIR)/icon.png $(ODIR)/$(NAME).smdh
 	3dsxtool $(NAME).elf $(NAME).3dsx --romfs=romfs --smdh=$(ODIR)/$(NAME).smdh
 
 $(NAME).elf: $(OBJ)

@@ -225,7 +225,7 @@ static enum DfMenuEntry key_dfMenu(enum DfMenuEntry *sel)
 				case SDLK_LSHIFT: load_df0 = 1; break;
 				case SDLK_x:
 				case SDLK_SPACE: load_df1 = 1; break;
-#elif defined(GCW0)
+#elif defined(_3DS)
 				case SDLK_c:
 				case SDLK_SPACE: load_df1 = 1; break;
 				case SDLK_x:

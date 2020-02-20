@@ -330,7 +330,7 @@ void init_text(int splash)
 
 			text_draw_background();
 			text_draw_window(54,110,250,64,"--- ERROR ---");
-#ifdef GCW0
+#ifdef _3DS
 #ifdef HOME_DIR
 			write_text(9,14,"kick.rom not found in:");
 

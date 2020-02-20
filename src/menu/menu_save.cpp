@@ -156,7 +156,7 @@ static inline int key_saveMenu(int *cp)
 				case SDLK_SPACE: hit4=1; break;
 				case SDLK_c:
 				case SDLK_LSHIFT: hit5=1; break;
-#elif defined(GCW0)
+#elif defined(_3DS)
 				case SDLK_2:
 				case SDLK_BACKSPACE: hit3=1; break;
 				case SDLK_1:

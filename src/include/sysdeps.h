@@ -368,33 +368,10 @@ extern void mallocemu_free (void *ptr);
 
 #include "target.h"
 
-#ifdef UAE_CONSOLE
-#undef write_log
 #define write_log write_log_standard
-#else
-#undef write_log
-#define write_log(FORMATO, RESTO...)
-#endif
-
-#ifdef DEBUG_UAE4ALL
-#if __GNUC__ - 1 > 1 || __GNUC_MINOR__ - 1 > 6
-extern void write_log_standard (const char *, ...) __attribute__ ((format (printf, 1, 2)));
-#else
 
 extern void write_log_standard (const char *, ...);
-extern void console_out (const char *, ...);
-extern void console_flush (void);
-extern int console_get (char *, int);
-#endif
-#else
-#ifdef write_log
-#undef write_log
-#endif
-#define write_log(FORMATO, RESTO...)
-#define write_log_standar(FORMATO, RESTO...)
-#define console_out(FORMATO, RESTO...)
-#define console_get(FORMATO, RESTO...)
-#endif
+extern void log_citra(const char *format, ...);
 
 #ifndef O_BINARY
 #define O_BINARY 0

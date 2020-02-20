@@ -102,7 +102,7 @@ void default_prefs ()
 #ifdef NO_SOUND
     produce_sound = 0;
 #else
-    produce_sound = 2;
+    produce_sound = 1;
 #endif
 
 #if defined(HOME_DIR)
@@ -282,6 +282,38 @@ void leave_program (void)
     do_leave_program ();
 }
 
+typedef struct {
+	unsigned int sdlkey, key;
+	const char *name;
+} sdl_3dsbuttons;
+
+// mappings like dingoo SDL
+static sdl_3dsbuttons buttons3ds[] = {
+	{KEY_A, SDLK_LCTRL, "A btn"},
+	{KEY_B, SDLK_LALT, "B btn"},
+	{KEY_X, SDLK_LSHIFT, "X btn"},
+	{KEY_Y, SDLK_SPACE, "Y btn"},
+	{KEY_L, SDLK_TAB, "L btn"},
+	{KEY_R, SDLK_BACKSPACE, "R btn"},
+	{KEY_ZL, SDLK_TAB, "ZL btn"},
+	{KEY_ZR, SDLK_BACKSPACE, "ZR btn"},
+	{KEY_START, SDLK_RETURN, "START btn"},
+	{KEY_SELECT, SDLK_ESCAPE, "SELECT btn"},
+	{KEY_UP, SDLK_UP, "DPAD UP"},
+	{KEY_DOWN, SDLK_DOWN, "DPAD DOWN"},
+	{KEY_LEFT, SDLK_LEFT, "DPAD LEFT"},
+	{KEY_RIGHT, SDLK_RIGHT, "DPAD RIGHT"},
+	{KEY_CSTICK_UP, SDLK_UP, "CSTK UP"},
+	{KEY_CSTICK_DOWN, SDLK_DOWN, "CSTK DOWN"},
+	{KEY_CSTICK_LEFT, SDLK_LEFT, "CSTK LEFT"},
+	{KEY_CSTICK_RIGHT, SDLK_RIGHT, "CSTK RIGHT"},
+//	{KEY_CPAD_UP, 218, "CPAD UP"},
+//	{KEY_CPAD_DOWN, 219, "CPAD DOWN"},
+//	{KEY_CPAD_LEFT, 220, "CPAD LEFT"},
+//	{KEY_CPAD_RIGHT, 221, "CPAD RIGHT"},
+	{0,0,0}
+};
+
 void real_main (int argc, char **argv)
 {
 #ifdef USE_SDL
@@ -295,7 +327,11 @@ void real_main (int argc, char **argv)
 	
 	// init romfs file system
 	romfsInit();
-	atexit((void *)romfsExit);
+	atexit((void (*)())romfsExit);
+
+	// init 3DS buttons to their values
+	for (int i=0; buttons3ds[i].key!=0; ++i)
+		SDL_N3DSKeyBind(buttons3ds[i].sdlkey, (SDLKey)buttons3ds[i].key);
 
     default_prefs ();
     

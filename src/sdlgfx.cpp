@@ -98,16 +98,7 @@ void uae4all_show_time(void)
 }
 #endif
 
-
-#ifdef DREAMCAST
-#define VIDEO_FLAGS_INIT SDL_HWSURFACE|SDL_FULLSCREEN
-#else
-#ifdef DINGOO
-#define VIDEO_FLAGS_INIT SDL_SWSURFACE
-#else
-#define VIDEO_FLAGS_INIT SDL_HWSURFACE
-#endif
-#endif
+#define VIDEO_FLAGS_INIT SDL_HWSURFACE // | SDL_CONSOLEBOTTOM
 
 #ifdef DOUBLEBUFFER
 #define VIDEO_FLAGS VIDEO_FLAGS_INIT | SDL_DOUBLEBUF
@@ -299,11 +290,8 @@ static void graphics_subinit (void)
 #endif
 
 	if (prSDLScreen==NULL)
-#ifdef DREAMCAST
 		prSDLScreen = SDL_SetVideoMode(current_width, current_height, 16, uiSDLVidModFlags|VIDEO_FLAGS);
-#else
-		prSDLScreen = SDL_SetVideoMode(current_width, current_height, 16, uiSDLVidModFlags|VIDEO_FLAGS);
-#endif
+
 	if (prSDLScreen == NULL)
 	{
 		fprintf(stderr, "Unable to set video mode: %s\n", SDL_GetError());
@@ -554,89 +542,6 @@ void handle_events (void)
 #if defined(MAX_AUTOEVENTS) || defined(AUTOEVENTS)
 	{
 		static unsigned cuenta=0;
-/*
-		switch(cuenta&63)
-		{
-			case 8:
-				if ((cuenta<6500)||(cuenta>8000))
-					joy1button=1;
-				break;
-			case 16:
-				buttonstate[0]=1; break;
-			case 24:
-				joy1button=0; break;
-			case 28:
-				if (cuenta>11000)
-					joy1dir=3;
-				break;
-			case 32:
-				buttonstate[0]=0; break;
-			case 62:
-				joy1dir=0; break;
-		}
-//		lastmy+=8;
-		switch(cuenta&127)
-		{
-			case 20:
-				record_key(0x12); break;
-			case 40:
-				record_key(0x13); break;
-			case 60:
-				record_key(0x88); break;
-			case 80:
-				record_key(0x89); break;
-		}
-*/
-/*
-if (cuenta==7700)
-{
-strcpy(changed_df[0],"prueba2.adz");
-real_changed_df[0]=1;
-joy1button=1;
-}
-*/
-
-// Defender of the Crown
- /*
-switch(cuenta)
-{
-case 2600:
-lastmx+=80;
-break;
-case 2610:
-buttonstate[0]=1; break;
-break;
-case 2615:
-buttonstate[0]=0; break;
-break;
-case 4500:
-lastmy+=100;
-break;
-case 4510:
-buttonstate[0]=1; break;
-break;
-case 4515:
-buttonstate[0]=0; break;
-break;
-case 4640:
-lastmy-=60;
-lastmx+=550;
-break;
-case 4700:
-lastmx+=200;
-break;
-case 4710:
-buttonstate[0]=1; break;
-break;
-case 4715:
-buttonstate[0]=0; break;
-break;
-
-
-}
-// printf("%i -> %.8X\n",cuenta,chipmem_checksum());
- */
-
 
 #if defined(START_DEBUG) && !defined(START_DEBUG_SAVESTATE)
 		if (cuenta==START_DEBUG)

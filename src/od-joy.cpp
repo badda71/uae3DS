@@ -21,6 +21,8 @@
 
 #include "vkbd.h"
 
+#define SDL_NumJoysticks(x) 0
+
 #define DEADZONE_J0 500
 #define DEADZONE_J1 500
 

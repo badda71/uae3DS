@@ -32,6 +32,7 @@
 #endif
 
 #include <SDL/SDL.h>
+#define SDL_NumJoysticks(x) 0
 
 #ifdef PROFILER_UAE4ALL
 unsigned long long uae4all_prof_initial[UAE4ALL_PROFILER_MAX];
@@ -39,16 +40,7 @@ unsigned long long uae4all_prof_sum[UAE4ALL_PROFILER_MAX];
 unsigned long long uae4all_prof_executed[UAE4ALL_PROFILER_MAX];
 #endif
 
-#ifdef DREAMCAST
-#include <SDL/SDL_dreamcast.h>
-#define VIDEO_FLAGS_INIT SDL_HWSURFACE|SDL_FULLSCREEN
-#else
-#ifdef DINGOO
-#define VIDEO_FLAGS_INIT SDL_SWSURFACE
-#else
-#define VIDEO_FLAGS_INIT SDL_HWSURFACE
-#endif
-#endif
+#define VIDEO_FLAGS_INIT SDL_HWSURFACE // |SDL_CONSOLEBOTTOM
 
 #ifdef DOUBLEBUFFER
 #define VIDEO_FLAGS VIDEO_FLAGS_INIT | SDL_DOUBLEBUF
@@ -217,18 +209,13 @@ int gui_init (void)
     if (prSDLScreen==NULL)
 	prSDLScreen=SDL_SetVideoMode(320,240,16,VIDEO_FLAGS);
     SDL_ShowCursor(SDL_DISABLE);
-    SDL_JoystickEventState(SDL_ENABLE);
+    SDL_JoystickEventState(SDL_IGNORE);
     SDL_JoystickOpen(0);
     if (prSDLScreen!=NULL)
     {
 	emulating=0;
-#if !defined(DEBUG_UAE4ALL) && !defined(PROFILER_UAE4ALL) && !defined(AUTO_RUN) && !defined(AUTO_FRAMERATE)
 	uae4all_image_file[0]=0;
 	uae4all_image_file2[0]=0;
-#else
-	strcpy(uae4all_image_file,"prueba.adz");
-	strcpy(uae4all_image_file2,"prueba2.adz");
-#endif
 	vkbd_init();
 	init_text(1);
 	loadConfig();
@@ -531,6 +518,9 @@ static int in_goMenu=0;
 
 void gui_handle_events (void)
 {
+
+//write_log("enter %s",__func__);
+
 #ifndef DREAMCAST
 	int i;
 	Uint8 *keystate = SDL_GetKeyState(NULL);

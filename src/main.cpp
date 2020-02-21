@@ -111,41 +111,9 @@ void default_prefs ()
 
     prefs_gfx_framerate = 2;
 
-#if defined(HOME_DIR)
-    if(config_dir)
-    {
-	strcpy (prefs_df[0], config_dir);
-	strcat (prefs_df[0], "/df0.adf");
-	strcpy (prefs_df[1], config_dir);
-	strcat (prefs_df[1], "/df1.adf");
-    }
-    else
-    {
 	strcpy (prefs_df[0], ROM_PATH_PREFIX "df0.adf");
 	strcpy (prefs_df[1], ROM_PATH_PREFIX "df1.adf");
-    }
-#else
-    strcpy (prefs_df[0], ROM_PATH_PREFIX "df0.adf");
-    strcpy (prefs_df[1], ROM_PATH_PREFIX "df1.adf");
-#endif
-
-#ifdef DREAMCAST
     strcpy (romfile, ROM_PATH_PREFIX "kick.rom");
-    strcpy (romfile_sd, "/sd/uae4all/" "kick.rom");
-#elif defined(HOME_DIR)
-    if(config_dir)
-    {
-	strcpy (romfile, config_dir);
-	strcat (romfile, "/kick.rom");
-    }
-    else
-    {
-	strcpy (romfile, "kick.rom");
-    }
-#else
-//    strcpy (romfile, "/cdrom/kick.rom");
-    strcpy (romfile, "kick.rom");
-#endif
 
     prefs_chipmem_size=0x00100000;
 }

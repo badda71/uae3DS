@@ -353,17 +353,8 @@ void real_main (int argc, char **argv)
 #ifndef NO_MAIN_IN_MAIN_C
 int main (int argc, char **argv)
 {
-#ifdef DREAMCAST
-#if defined(DEBUG_UAE4ALL) || defined(DEBUG_FRAMERATE) || defined(PROFILER_UAE4ALL) || defined(AUTO_RUN)
-	{
-		SDL_DC_ShowAskHz(SDL_FALSE);
-    		puts("MAIN !!!!");
-	}
-#endif
-#endif
-#ifdef DEBUG_FILE
-    DEBUG_STR_FILE=fopen(DEBUG_FILE,"wt");
-#endif
+    // set 804 MHz
+	osSetSpeedupEnable(1);
 
     real_main (argc, argv);
     return 0;

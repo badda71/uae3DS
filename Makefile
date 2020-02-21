@@ -52,42 +52,7 @@ DFLAGS+= -DFAME_INTERRUPTS_PATCH
 #DFLAGS+= -DPROFILER_UAE4ALL
 DFLAGS+=-DUSE_FAME_CORE -DUSE_FAME_CORE_C -DFAME_INLINE_LOOP -DFAME_IRQ_CLOCKING -DFAME_CHECK_BRANCHES -DFAME_EMULATE_TRACE -DFAME_DIRECT_MAPPING -DFAME_BYPASS_TAS_WRITEBACK -DFAME_ACCURATE_TIMING -DFAME_GLOBAL_CONTEXT -DFAME_FETCHBITS=8 -DFAME_DATABITS=8 -DFAME_GOTOS -DFAME_EXTRA_INLINE=__inline__ -DFAME_NO_RESTORE_PC_MASKED_BITS
 
-SRCS =	\
-	src/m68k/fame/famec.cpp \
-	src/m68k/fame/m68k_intrf.cpp \
-	src/savestate.cpp \
-	src/audio.cpp \
-	src/autoconf.cpp \
-	src/blitfunc.cpp \
-	src/blittable.cpp \
-	src/blitter.cpp \
-	src/cia.cpp \
-	src/savedisk.cpp \
-	src/compiler.cpp \
-	src/custom.cpp \
-	src/disk.cpp \
-	src/drawing.cpp \
-	src/ersatz.cpp \
-	src/gfxutil.cpp \
-	src/keybuf.cpp \
-	src/main.cpp \
-	src/md-support.cpp \
-	src/memory.cpp \
-	src/missing.cpp \
-	src/gui.cpp \
-	src/od-joy.cpp \
-	src/sound.cpp \
-	src/sdlgfx.cpp \
-	src/writelog.cpp \
-	src/zfile.cpp \
-	src/menu/fade.cpp \
-	src/menu/menu.cpp \
-	src/menu/menu_load.cpp \
-	src/menu/menu_main.cpp \
-	src/menu/menu_save.cpp \
-	src/menu/menu_df_selection.cpp \
-	src/vkbd/vkbd.cpp
-
+SRCS := $(shell find src -name \*.cpp -o -name \*.c)
 INCLUDES = $(addprefix -I,$(shell find -L src -type d 2> /dev/null))
 INCLUDES += -I/opt/devkitpro/portlibs/3ds/include \
 	-I/opt/devkitpro/libctru/include

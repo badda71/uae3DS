@@ -6,6 +6,7 @@
 /* Ultima actualizacion: 28-10-2009                                         */
 /* Based on the excellent FAMEC emulator by Stephane Dallongueville         */
 /****************************************************************************/
+#include "sysconfig.h"
 
 #include <stdio.h>
 #include <stdlib.h>

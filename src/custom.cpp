@@ -8,6 +8,7 @@
   * Copyright 2000-2002 Toni Wilen
   */
 
+#include "sysconfig.h"
 
 // #define USE_CUSTOM_EXTRA_INLINE
 #define USE_IMASK_TABLE
@@ -27,7 +28,6 @@
 extern signed int IO_CYCLE;
 #endif
 
-#include "sysconfig.h"
 #include "sysdeps.h"
 
 #include <ctype.h>

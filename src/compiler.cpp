@@ -5,8 +5,9 @@
   *
   * Copyright 1996 Bernd Schmidt
   */
-#ifndef USE_FAME_CORE
 #include "sysconfig.h"
+
+#ifndef USE_FAME_CORE
 #include "sysdeps.h"
 
 #include "config.h"

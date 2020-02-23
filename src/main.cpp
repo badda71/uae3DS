@@ -1,3 +1,5 @@
+#include "sysconfig.h"
+
 #ifdef DREAMCAST
 #include <kos.h>
 extern uint8 romdisk[];
@@ -16,7 +18,6 @@ KOS_INIT_ROMDISK(romdisk);
 #include <stdlib.h>
 #include <3ds.h>
 
-#include "sysconfig.h"
 #include "sysdeps.h"
 #include <assert.h>
 

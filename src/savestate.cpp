@@ -41,9 +41,8 @@
   * set savestate_state = STATE_DORESTORE, savestate_filename = "..."
   *
   */
-
-#include "uae.h"
 #include "sysconfig.h"
+#include "uae.h"
 #include "sysdeps.h"
 
 #include "config.h"

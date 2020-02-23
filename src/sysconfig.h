@@ -1,6 +1,76 @@
 /* src/sysconfig.h.  Generated automatically by configure.  */
 /* src/sysconfig.h.in.  Generated automatically from configure.in by autoheader.  */
 
+#define USE_SDL
+#define GCCCONSTFUNC "__attribute__((const))"
+#define USE_UNDERSCORE
+#define UNALIGNED_PROFITABLE
+#define REGPARAM "__attribute__((regparm(3)))"
+#define OPTIMIZED_FLAGS
+#define __inline__ __inline__
+#define SHM_SUPPORT_LINKS 0
+#define OS_WITHOUT_MEMORY_MANAGEMENT
+#define VKBD_ALWAYS 
+#define EMULATED_JOYSTICK
+//#define MENU_MUSIC
+//#define NO_SOUND
+
+#define DEBUG_UAE4ALL
+#define UAE_CONSOLE
+#define DOUBLEBUFFER
+
+//#define USE_AUTOCONFIG
+#define UAE_CONSOLE
+#define GP2X
+#define USE_ZFILE
+//#define UAE4ALL_NO_USE_RESTRICT
+#define NO_THREADS
+//#define DEBUG_TIMESLICE
+#define FAME_INTERRUPTS_PATCH
+//#define FAME_INTERRUPTS_SECURE_PATCH
+//#define FAME_GLOBAL_CONTEXT
+
+//#define UAE_MEMORY_ACCESS
+//#define SAFE_MEMORY_ACCESS
+//#define ERROR_WHEN_MEMORY_OVERRUN
+
+//#define DEBUG_FILE \"stdout.txt\"
+//#define DEBUG_UAE4ALL_FFLUSH
+//#define DEBUG_M68K
+//#define DEBUG_INTERRUPTS
+//#define DEBUG_CIA
+//#define DEBUG_SOUND
+//#define DEBUG_MEMORY
+//#define DEBUG_MAPPINGS
+//#define DEBUG_DISK
+//#define DEBUG_CUSTOM
+//#define DEBUG_EVENTS
+//#define DEBUG_GFX -DDEBUG_BLITTER
+//#define DEBUG_FRAMERATE
+//#define AUTO_FRAMERATE 1400
+//#define MAX_AUTO_FRAMERATE 4400
+//#define AUTO_FRAMERATE_SOUND
+//#define START_DEBUG 999999
+//#define MAX_AUTOEVENTS 999990
+//#define AUTO_RUN
+//#define PROFILER_UAE4ALL
+
+#define USE_FAME_CORE
+#define USE_FAME_CORE_C
+#define FAME_INLINE_LOOP
+#define FAME_IRQ_CLOCKING
+#define FAME_CHECK_BRANCHES
+#define FAME_EMULATE_TRACE
+#define FAME_DIRECT_MAPPING
+#define FAME_BYPASS_TAS_WRITEBACK
+#define FAME_ACCURATE_TIMING
+#define FAME_GLOBAL_CONTEXT
+#define FAME_FETCHBITS 8
+#define FAME_DATABITS 8
+#define FAME_GOTOS
+#define FAME_EXTRA_INLINE __inline__
+#define FAME_NO_RESTORE_PC_MASKED_BITS
+
 /* Define if on AIX 3.
    System headers sometimes define this.
    We just want to avoid a redefinition error message.  */

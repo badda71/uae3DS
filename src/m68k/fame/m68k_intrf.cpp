@@ -1,3 +1,5 @@
+#include "sysconfig.h"
+
 #ifdef DREAMCAST
 #include<kos.h>
 #endif
@@ -9,7 +11,6 @@
 #include<stdlib.h>
 #include<string.h>
 
-#include "sysconfig.h"
 #include "sysdeps.h"
 #include "debug_uae4all.h"
 #include "config.h"

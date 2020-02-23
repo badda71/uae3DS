@@ -1,3 +1,5 @@
+#include "sysconfig.h"
+
 #ifdef DREAMCAST
 #include <kos.h>
 #endif

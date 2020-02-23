@@ -1,3 +1,4 @@
+#include "sysconfig.h"
 
 #ifndef NO_MENU
 #ifndef NO_SAVE_MENU
@@ -7,7 +8,6 @@
 #include<string.h>
 
 #include "menu.h"
-#include "sysconfig.h"
 #include "sysdeps.h"
 #include "uae.h"
 #include "options.h"

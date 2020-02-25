@@ -63,7 +63,7 @@ ENABLE_L2_CACHE :=	true
 SYSTEM_MODE_EXT :=	124MB
 BANNER_AUDIO	:=	$(TOPDIR)/$(META)/audio.wav
 BANNER_IMAGE	:=	$(TOPDIR)/$(META)/banner.png
-LOGO			:=	$(TOPDIR)/$(META)/logo.bcma.lz
+LOGO			:=	$(TOPDIR)/$(META)/logo.lz11
 
 #---------------------------------------------------------------------------------
 # options for code generation

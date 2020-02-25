@@ -41,6 +41,7 @@ void guarda(void);
 #include "savestate.h"
 #include "menu/menu.h"
 #include "vkbd/vkbd.h"
+#include "uibottom.h"
 
 #ifdef DREAMCAST
 #include <SDL/SDL_dreamcast.h>
@@ -766,6 +767,8 @@ void handle_events (void)
 	}
     }
 #endif
+
+	uib_update();
 
 #if !defined(DREAMCAST) && !defined(DINGOO)
     if (SDL_MUSTLOCK(prSDLScreen))

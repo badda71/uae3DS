@@ -15,6 +15,7 @@
 
 #include "msg.h"
 #include "fade.h"
+#include "uibottom.h"
 
 #ifdef HOME_DIR
 #include "homedir.h"
@@ -193,6 +194,7 @@ void text_flip(void)
 {
 	SDL_Delay(10);
 	SDL_BlitSurface(text_screen,NULL,prSDLScreen,NULL);
+	uib_update();
 	SDL_Flip(prSDLScreen);
 }
 

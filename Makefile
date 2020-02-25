@@ -70,7 +70,7 @@ LOGO			:=	$(TOPDIR)/$(META)/logo.lz11
 #---------------------------------------------------------------------------------
 ARCH		:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-COMMON_CFLAGS := -fdata-sections -Wno-sign-compare -fno-exceptions -g -Wall -Wno-format -Wno-switch -Wno-unused -O2 -mword-relocations -fomit-frame-pointer -ffunction-sections -ffast-math $(ARCH) $(INCLUDE) -DARM11 -D_3DS -DVERSION3DS=\"$(VERSION)\"
+COMMON_CFLAGS := -fpermissive -fdata-sections -Wno-sign-compare -fno-exceptions -g -Wall -Wno-format -Wno-switch -Wno-unused -O2 -mword-relocations -fomit-frame-pointer -ffunction-sections -ffast-math $(ARCH) $(INCLUDE) -DARM11 -D_3DS -DVERSION3DS=\"$(VERSION)\"
 
 CFLAGS		:= $(COMMON_CFLAGS) -std=gnu11 -Wno-discarded-qualifiers
 CXXFLAGS	:= $(COMMON_CFLAGS) -fno-rtti -std=gnu++11
@@ -78,9 +78,9 @@ CXXFLAGS	:= $(COMMON_CFLAGS) -fno-rtti -std=gnu++11
 ASFLAGS		:=	-g $(ARCH)
 LDFLAGS		=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-#SUBLIBS		:=  UAE3DS_SDL
+SUBLIBS		:=  UAE3DS_SDL
 
-LIBS		:=	-lmikmod -lSDL -lSDL_mixer -lSDL_image -logg -lmad -lvorbisidec -lpng -lz -lcitro3d -lctru -lm
+LIBS		:=	-lmikmod -lSDL_mixer -lSDL_image -logg -lmad -lvorbisidec -lpng -lz -lcitro3d -lctru -lm
 
 #---------------------------------------------------------------------------------
 # makerom options (cia/3ds build)

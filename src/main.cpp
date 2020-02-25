@@ -46,6 +46,7 @@ KOS_INIT_ROMDISK(romdisk);
 #include "compiler.h"
 #include "bsdsocket.h"
 #include "drawing.h"
+#include "uibottom.h"
 
 #ifdef USE_SDL
 #include "SDL.h"
@@ -328,6 +329,8 @@ void real_main (int argc, char **argv)
 	write_log ("Sound driver unavailable: Sound output disabled\n");
 	produce_sound = 0;
     }
+
+	uib_init();
 
     /* Install resident module to get 8MB chipmem, if requested */
     rtarea_setup ();

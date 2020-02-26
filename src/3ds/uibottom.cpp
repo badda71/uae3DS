@@ -476,9 +476,13 @@ void uib_update(void)
 //	requestRepaint();
 }
 
+#define DOUBLECLICK_TIME 500
+
 int uib_handle_event(SDL_Event *e) {
 	static SDL_Event sdl_e;
 	int i,x,y;
+	static Uint32 gesture1_time=0;
+	static int gesture1_active=0;
 
 	if (e->type == SDL_KEYDOWN) {
 		if (e->key.keysym.sym == 255) {
@@ -491,6 +495,13 @@ int uib_handle_event(SDL_Event *e) {
 		case SDL_MOUSEMOTION:
 			return 0;
 		case SDL_MOUSEBUTTONUP:
+			if (gesture1_active) {
+				sdl_e.type = SDL_KEYUP;
+				sdl_e.key.keysym.sym = sdl_e.key.keysym.unicode = DS_ZL;
+				SDL_PushEvent(&sdl_e);
+				gesture1_active=0;
+				return 0;
+			}
 			if (kb_activekey==-1) return 0; // did not get the button down, so ignore button up
 			i=kb_activekey;
 			kb_activekey=-1;
@@ -506,6 +517,16 @@ int uib_handle_event(SDL_Event *e) {
 					y <  uikbd_keypos[i].y + uikbd_keypos[i].h + kb_y_pos) break;
 			}
 			if (uikbd_keypos[i].key == -1) {
+				// touch outside of keyboard - check for gesture
+				Uint32 t = SDL_GetTicks();
+				if (t-gesture1_time < DOUBLECLICK_TIME) {
+					sdl_e.type = SDL_KEYDOWN;
+					sdl_e.key.keysym.sym = sdl_e.key.keysym.unicode = DS_ZL;
+					SDL_PushEvent(&sdl_e);
+					gesture1_active=1;
+				} else {
+					gesture1_time = t;
+				}
 				return 0;
 			}
 			if (i==kb_activekey) return 1; // ignore button down on an already pressed key

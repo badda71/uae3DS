@@ -445,10 +445,10 @@ void gui_handle_events (SDL_Event *e)
 		case DS_B:
 			emulated_button2=v; break;
 		case DS_Y:
-		case DS_L:
-			buttonstate[0] = v; break;
 		case DS_ZL:
+			buttonstate[0] = v; break;
 		case DS_X:
+		case DS_L:
 			buttonstate[2] = v; break;
 		case DS_UP1:
 		case DS_UP2:

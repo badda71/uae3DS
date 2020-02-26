@@ -525,264 +525,81 @@ int keycode2amiga(SDL_keysym *prKeySym)
 
 static int refresh_necessary = 0;
 
+#define MSENSITIVITY 2
+
 void handle_events (void)
 {
     SDL_Event rEvent;
     int iAmigaKeyCode;
     int i, j;
     int iIsHotKey = 0;
-#ifdef DEBUG_EVENTS
-    dbg("Function: handle_events");
-#endif
 
-#if !defined(DREAMCAST) && !defined(DINGOO)
     if (SDL_MUSTLOCK(prSDLScreen))
     	SDL_UnlockSurface (prSDLScreen);
-#endif
-
-#if defined(MAX_AUTOEVENTS) || defined(AUTOEVENTS)
-	{
-		static unsigned cuenta=0;
-
-#if defined(START_DEBUG) && !defined(START_DEBUG_SAVESTATE)
-		if (cuenta==START_DEBUG)
-		{
-#ifdef DEBUG_FILE
-			if (!DEBUG_STR_FILE)
-				DEBUG_STR_FILE=fopen(DEBUG_FILE,"wt");
-#endif
-			DEBUG_AHORA=1;
-		}
-#else
-#ifdef START_DEBUG_SAVESTATE
-		if (cuenta==START_DEBUG)
-			savestate_state = STATE_DOSAVE;
-#endif
-#endif
-#ifdef AUTO_SAVESTATE
-		if (cuenta==AUTO_SAVESTATE)
-			savestate_state = STATE_DORESTORE;
-#endif
-
-#ifdef MAX_AUTOEVENTS
-#ifdef DEBUG_EVENTS
-		dbgf(" AUTO EVENTS: %i =?= %i\n",cuenta,MAX_AUTOEVENTS);
-#endif
-		if (cuenta>MAX_AUTOEVENTS)
-		{
-			int i;
-#ifdef DEBUG_FILE
-			fclose(DEBUG_STR_FILE);
-			SDL_Delay(100);
-			for(i=0;i<0x10000;i+=78)
-			{
-				SDL_FillRect(prSDLScreen, NULL, i);
-				SDL_Flip(prSDLScreen);
-			}
-			SDL_Delay(333);
-#endif
-			exit(0);
-		}
-		else
-			dbgf("handle_events %i\n",cuenta);
-#endif
-		cuenta++;
-	}
-#else
-    /* Handle GUI events */
-    gui_handle_events ();
-
-#ifdef EMULATED_JOYSTICK
-	{
-		if ((vkbd_button3==(SDLKey)0)&&(!vkbd_mode))
-			buttonstate[0]=emulated_mouse_button1;
-		if ((vkbd_button4==(SDLKey)0)&&(!vkbd_mode))
-			buttonstate[2]=emulated_mouse_button2;
-	}
-#endif
 
     while (SDL_PollEvent(&rEvent))
     {
-	switch (rEvent.type)
-	{
-	case SDL_QUIT:
-#ifdef DEBUG_EVENTS
-	    dbg("Event: quit");
-#endif
-	    uae_quit();
-	    break;
-	    break;
-	case SDL_JOYBUTTONDOWN:
-	    if (vkbd_mode) break;
-	    if ((rEvent.jbutton.button==6) && (vkbd_button2!=(SDLKey)0))
-		    rEvent.key.keysym.sym=vkbd_button2;
-	    else if ((rEvent.jbutton.button==5) && (vkbd_button3!=(SDLKey)0))
-		    rEvent.key.keysym.sym=vkbd_button3;
-	    else if ((rEvent.jbutton.button==1) && (vkbd_button4!=(SDLKey)0))
-		    rEvent.key.keysym.sym=vkbd_button4;
-	    else
-	    	break;
-        case SDL_KEYDOWN:
-#ifdef DEBUG_EVENTS
-	    dbg("Event: key down");
-#endif
-#ifndef DREAMCAST
-	    if ((rEvent.key.keysym.sym!=SDLK_F11)&&(rEvent.key.keysym.sym!=SDLK_F12)&&(rEvent.key.keysym.sym!=SDLK_PAGEUP)
-#ifdef EMULATED_JOYSTICK
-		&&(rEvent.key.keysym.sym!=SDLK_ESCAPE)&&((rEvent.key.keysym.sym!=SDLK_SPACE)||((rEvent.key.keysym.sym==SDLK_SPACE)&&(vkbd_button3!=(SDLKey)0)&&(!vkbd_mode)))&&(rEvent.key.keysym.sym!=SDLK_LCTRL)&&((rEvent.key.keysym.sym!=SDLK_LALT)||((rEvent.key.keysym.sym==SDLK_LALT)&&(vkbd_button2!=(SDLKey)0)&&(!vkbd_mode)))&&(rEvent.key.keysym.sym!=SDLK_RETURN)&&((rEvent.key.keysym.sym!=SDLK_LSHIFT)||((rEvent.key.keysym.sym==SDLK_LSHIFT)&&(vkbd_button4!=(SDLKey)0)&&(!vkbd_mode)))&&(rEvent.key.keysym.sym!=SDLK_TAB)&&(rEvent.key.keysym.sym!=SDLK_BACKSPACE)&&(rEvent.key.keysym.sym!=SDLK_UP)&&(rEvent.key.keysym.sym!=SDLK_DOWN)&&(rEvent.key.keysym.sym!=SDLK_LEFT)&&(rEvent.key.keysym.sym!=SDLK_RIGHT)
-#endif
-			    )
-	    {
-		    if ((rEvent.key.keysym.sym==SDLK_LALT)&&(vkbd_button2!=(SDLKey)0)&&(!vkbd_mode))
-			    rEvent.key.keysym.sym=vkbd_button2;
-		    else
-		    if ((rEvent.key.keysym.sym==SDLK_LSHIFT)&&(vkbd_button4!=(SDLKey)0)&&(!vkbd_mode))
-			    rEvent.key.keysym.sym=vkbd_button4;
-		    else
-		    if ((rEvent.key.keysym.sym==SDLK_SPACE)&&(vkbd_button3!=(SDLKey)0)&&(!vkbd_mode))
-			    rEvent.key.keysym.sym=vkbd_button3;
-#else
-	    {
-#endif
-		iAmigaKeyCode = keycode2amiga(&(rEvent.key.keysym));
-		if (iAmigaKeyCode >= 0)
+		if (uib_handle_event(&rEvent)) continue;
+		
+	    gui_handle_events (&rEvent);
+
+		switch (rEvent.type)
 		{
-		    if (!uae4all_keystate[iAmigaKeyCode])
-		    {
-			uae4all_keystate[iAmigaKeyCode] = 1;
-			record_key(iAmigaKeyCode << 1);
-		    }
+		case SDL_QUIT:
+			uae_quit();
+			break;
+		case SDL_KEYDOWN:
+			if ((rEvent.key.keysym.sym & 0x100) == 0)
+			{
+				iAmigaKeyCode = rEvent.key.keysym.sym;
+				if (iAmigaKeyCode >= 0)
+				{
+					if (!uae4all_keystate[iAmigaKeyCode])
+					{
+					uae4all_keystate[iAmigaKeyCode] = 1;
+log_citra("record key down: %d",iAmigaKeyCode);
+
+					record_key(iAmigaKeyCode << 1);
+					}
+				}
+			}
+			break;
+		case SDL_KEYUP:
+			if ((rEvent.key.keysym.sym & 0x100) == 0)
+			{
+				iAmigaKeyCode = rEvent.key.keysym.sym;
+				if (iAmigaKeyCode >= 0)
+				{
+log_citra("record key up: %d",iAmigaKeyCode);
+					uae4all_keystate[iAmigaKeyCode] = 0;
+					record_key((iAmigaKeyCode << 1) | 1);
+				}
+			}
+			break;
+/*
+		case SDL_MOUSEBUTTONDOWN:
+			buttonstate[(rEvent.button.button-1)%3] = 1;
+			break;
+		case SDL_MOUSEBUTTONUP:
+			buttonstate[(rEvent.button.button-1)%3] = 0;
+			break;
+*/
+		case SDL_MOUSEMOTION:
+			if (rEvent.motion.state) {
+				lastmx += rEvent.motion.xrel * MSENSITIVITY;
+				lastmy += rEvent.motion.yrel * MSENSITIVITY;
+				newmousecounters = 1;
+			}
+			break;
+		default:
+			break;
 		}
-	    }
-	    break;
-	case SDL_JOYBUTTONUP:
-	    if (vkbd_mode) break;
-	    if ((rEvent.jbutton.button==6) && (vkbd_button2!=(SDLKey)0))
-		    rEvent.key.keysym.sym=vkbd_button2;
-	    else if ((rEvent.jbutton.button==5) && (vkbd_button3!=(SDLKey)0))
-		    rEvent.key.keysym.sym=vkbd_button3;
-	    else if ((rEvent.jbutton.button==1) && (vkbd_button4!=(SDLKey)0))
-		    rEvent.key.keysym.sym=vkbd_button4;
-	    else
-	    	break;
-	case SDL_KEYUP:
-#ifdef DEBUG_EVENTS
-	    dbg("Event: key up");
-#endif
-#ifndef DREAMCAST
-	    if ((rEvent.key.keysym.sym!=SDLK_F11)&&(rEvent.key.keysym.sym!=SDLK_F12)&&(rEvent.key.keysym.sym!=SDLK_PAGEUP)
-#ifdef EMULATED_JOYSTICK
-		&&(rEvent.key.keysym.sym!=SDLK_ESCAPE)&&((rEvent.key.keysym.sym!=SDLK_SPACE)||((rEvent.key.keysym.sym==SDLK_SPACE)&&(vkbd_button3!=(SDLKey)0)&&(!vkbd_mode)))&&(rEvent.key.keysym.sym!=SDLK_LCTRL)&&((rEvent.key.keysym.sym!=SDLK_LALT)||((rEvent.key.keysym.sym==SDLK_LALT)&&(vkbd_button2!=(SDLKey)0)&&(!vkbd_mode)))&&(rEvent.key.keysym.sym!=SDLK_RETURN)&&((rEvent.key.keysym.sym!=SDLK_LSHIFT)||((rEvent.key.keysym.sym==SDLK_LSHIFT)&&(vkbd_button4!=(SDLKey)0)&&(!vkbd_mode)))&&(rEvent.key.keysym.sym!=SDLK_TAB)&&(rEvent.key.keysym.sym!=SDLK_BACKSPACE)&&(rEvent.key.keysym.sym!=SDLK_UP)&&(rEvent.key.keysym.sym!=SDLK_DOWN)&&(rEvent.key.keysym.sym!=SDLK_LEFT)&&(rEvent.key.keysym.sym!=SDLK_RIGHT)
-#endif
-			    )
-	    {
-		    if ((rEvent.key.keysym.sym==SDLK_LALT)&&(vkbd_button2!=(SDLKey)0)&&(!vkbd_mode))
-			    rEvent.key.keysym.sym=vkbd_button2;
-		    else
-		    if ((rEvent.key.keysym.sym==SDLK_LSHIFT)&&(vkbd_button4!=(SDLKey)0)&&(!vkbd_mode))
-			    rEvent.key.keysym.sym=vkbd_button4;
-		    else
-		    if ((rEvent.key.keysym.sym==SDLK_SPACE)&&(vkbd_button3!=(SDLKey)0)&&(!vkbd_mode))
-			    rEvent.key.keysym.sym=vkbd_button3;
-#else
-	    {
-#endif
-		iAmigaKeyCode = keycode2amiga(&(rEvent.key.keysym));
-		if (iAmigaKeyCode >= 0)
-		{
-		    uae4all_keystate[iAmigaKeyCode] = 0;
-		    record_key((iAmigaKeyCode << 1) | 1);
-		}
-	    }
-	    break;
-	case SDL_MOUSEBUTTONDOWN:
-#ifdef DEBUG_EVENTS
-	    dbg("Event: mouse button down");
-#endif
-#ifdef DREAMCAST
-	    if (__sdl_dc_emulate_mouse)
-	    {
-	    	if (vkbd_mode) break;
-	    	if (rEvent.button.button==5 ) {
-			if (vkbd_button3==(SDLKey)0)
-			    buttonstate[0] = 1;
-			else 
-				break;
-		}
-	    	else if (rEvent.button.button==1)  {
-			if (vkbd_button4==(SDLKey)0)
-		 	   buttonstate[2] = 1;
-			else
-				break;
-		}
-	    }
-	    else
-	    	if (rEvent.button.button)
-			buttonstate[2]=1;
-		else
-			buttonstate[0]=1;
-#else
-	    	buttonstate[(rEvent.button.button-1)%3] = 1;
-#endif
-	    break;
-	case SDL_MOUSEBUTTONUP:
-#ifdef DEBUG_EVENTS
-	    dbg("Event: mouse button up");
-#endif
-#ifdef DREAMCAST
-	    if (__sdl_dc_emulate_mouse)
-	    {
-	    	if (vkbd_mode) break;
-	    	if (rEvent.button.button==5) {
-			if (vkbd_button3==(SDLKey)0)
-			    buttonstate[0] = 0;
-			else
-				break;
-		}
-	    	else if (rEvent.button.button==1) {
-			if (vkbd_button4==(SDLKey)0)
-			    buttonstate[2] = 0;
-			else
-				break;
-		}
-	    }
-	    else
-	    	if (rEvent.button.button)
-			buttonstate[2]=0;
-		else
-			buttonstate[0]=0;
-				
-#else
-	    	buttonstate[(rEvent.button.button-1)%3] = 0;
-#endif
-	    break;
-	case SDL_MOUSEMOTION:
-#ifdef DEBUG_EVENTS
-	    dbg("Event: mouse motion");
-#endif
-	    lastmx += rEvent.motion.xrel<<1;
-	    lastmy += rEvent.motion.yrel<<1;
-	    newmousecounters = 1;
-	    break;
-	}
     }
-#endif
 
 	uib_update();
 
-#if !defined(DREAMCAST) && !defined(DINGOO)
     if (SDL_MUSTLOCK(prSDLScreen))
     	SDL_LockSurface (prSDLScreen);
-#endif
-
-    /* Handle UAE reset */
-/*
-    if ((uae4all_keystate[AK_CTRL] || uae4all_keystate[AK_RCTRL]) && uae4all_keystate[AK_LAMI] && uae4all_keystate[AK_RAMI])
-	uae_reset ();
-*/
-#ifdef DEBUG_EVENTS
-    dbg(" handle_events -> terminado");
-#endif
 }
 
 int check_prefs_changed_gfx (void)

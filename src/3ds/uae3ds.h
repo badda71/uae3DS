@@ -1,0 +1,42 @@
+/*
+  * UAE3DS - Amiga 500 emulator for Nintendo 3DS
+  *
+  * uae3ds.h - functions specific to uae3ds port
+  *
+  * Copyright 2020 Sebastian Weber
+  */
+ 
+typedef struct {
+	Handle mutex;
+	void **queue;
+	int size;
+	int head;
+	int tail;
+	int locked;
+} tsq_object;
+
+typedef struct {
+	char *key;
+	void *val;
+} tsh_item;
+
+typedef struct {
+	Handle mutex;
+	tsh_item *hash;
+	int size;
+	int locked;
+	void (*free_callback)(void *val);
+} tsh_object;
+
+extern u32 hashKey(u8 *key);
+extern void tsh_init(tsh_object *o, int size, void (*free_callback)(void *val));
+extern void *tsh_get(tsh_object *o, char *key);
+extern int tsh_put(tsh_object *o, char *key, void *val);
+extern void tsh_free(tsh_object *o);
+
+extern void tsq_init(tsq_object *o, int size);
+extern void tsq_lock(tsq_object *o, int lock);
+extern void tsq_free(tsq_object *o);
+extern void *tsq_get(tsq_object *o);
+extern void *tsq_put(tsq_object *o, void *p);
+extern int start_worker(int (*fn)(void *), void *data);

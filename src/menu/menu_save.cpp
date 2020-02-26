@@ -13,6 +13,8 @@
 #include "options.h"
 #include "sound.h"
 #include "savestate.h"
+#include "keyboard.h"
+#include "uibottom.h"
 
 static const char *text_str_title="Saved States";
 static const char *text_str_savestate="Saved state #";
@@ -124,6 +126,8 @@ static inline int key_saveMenu(int *cp)
 
 	while (SDL_PollEvent(&event) > 0)
 	{
+		if (uib_handle_event(&event)) continue;
+
 		if (event.type == SDL_QUIT)
 		{
 			saveMenu_case=SAVE_MENU_CASE_EXIT;
@@ -135,48 +139,36 @@ static inline int key_saveMenu(int *cp)
 			uae4all_play_click();
 			switch(event.key.keysym.sym)
 			{
-				case SDLK_d:
-				case SDLK_RIGHT: right=1; break;
-				case SDLK_a:
-				case SDLK_LEFT: left=1; break;
-				case SDLK_w:
-				case SDLK_UP: up=1; break;
-				case SDLK_s:
-				case SDLK_DOWN: down=1; break;
-				case SDLK_z:
-				case SDLK_RETURN:
-				case SDLK_e:
-				case SDLK_LCTRL: hit0=1; break;
-#ifdef DREAMCAST_SAVE_VMU
-				case SDLK_2:
-				case SDLK_BACKSPACE: hit2=1; break;
-				case SDLK_1:
-				case SDLK_TAB: hit3=1; break;
-				case SDLK_x:
-				case SDLK_SPACE: hit4=1; break;
-				case SDLK_c:
-				case SDLK_LSHIFT: hit5=1; break;
-#elif defined(_3DS)
-				case SDLK_2:
-				case SDLK_BACKSPACE: hit3=1; break;
-				case SDLK_1:
-				case SDLK_TAB: hit2=1; break;
-				case SDLK_x:
-				case SDLK_LSHIFT: hit5=1; break;
-				case SDLK_c:
-				case SDLK_SPACE: hit4=1; break;
-#else
-				case SDLK_2:
-				case SDLK_BACKSPACE: hit3=1; break;
-				case SDLK_1:
-				case SDLK_TAB: hit2=1; break;
-				case SDLK_x:
-				case SDLK_SPACE: hit5=1; break;
-				case SDLK_c:
-				case SDLK_LSHIFT: hit4=1; break;
-#endif
-				case SDLK_q:
-				case SDLK_LALT: hit1=1; break;
+				case DS_RIGHT1:
+				case DS_RIGHT2:
+				case DS_RIGHT3:
+				case AK_RT: right = 1; break;
+				case DS_LEFT1:
+				case DS_LEFT2:
+				case DS_LEFT3:
+				case AK_LF: left = 1; break;
+				case DS_UP1:
+				case DS_UP2:
+				case DS_UP3:
+				case AK_UP: up = 1; break;
+				case DS_DOWN1:
+				case DS_DOWN2:
+				case DS_DOWN3:
+				case AK_DN: down = 1; break;
+				case AK_RET:
+				case AK_SPC:
+				case DS_START:
+				case DS_A: hit0=1; break;
+				case DS_R:
+				case AK_R: hit3=1; break;
+				case DS_L:
+				case AK_L: hit2=1; break;
+				case AK_X:
+				case DS_X: hit5=1; break;
+				case AK_Y:
+				case DS_Y: hit4=1; break;
+				case AK_ESC:
+				case DS_B: hit1=1; break;
 			}
 			if (hit1)
 			{

@@ -26,6 +26,7 @@
 #include "disk.h"
 #include "savestate.h"
 #include "joystick.h"
+#include "uibottom.h"
 
 #ifdef HOME_DIR
 #include "homedir.h"
@@ -257,87 +258,11 @@ int gui_init (void)
 	uae4all_prof_add("22");		// 22
 */
 #endif
-#ifdef DREAMCAST
-	SDL_DC_EmulateKeyboard(SDL_FALSE);
-#endif
 	return 0;
     }
     return -1;
 }
 
-#ifdef DINGOO
-static void show_mhz(void)
-{
-    extern int dingoo_get_clock(void);
-    char n[40];
-    sprintf((char *)&n[0],"Dingoo at %iMHz",dingoo_get_clock());
-    gui_set_message((char *)&n[0], 50);
-}
-
-static void show_brightness(void)
-{
-    extern int dingoo_get_brightness(void);
-    char n[40];
-    sprintf((char *)&n[0],"Brightness %i%%",dingoo_get_brightness());
-    gui_set_message((char *)&n[0], 40);
-}
-
-static void show_volumen(void)
-{
-    extern int dingoo_get_volumen(void);
-    char n[40];
-    sprintf((char *)&n[0],"Volumen %i%%",dingoo_get_volumen());
-    gui_set_message((char *)&n[0], 40);
-}
-
-static void inc_dingoo_mhz(void)
-{
-	extern void dingoo_set_clock(unsigned int);
-	extern unsigned int dingoo_get_clock(void);
-	dingoo_set_clock(dingoo_get_clock()+5);
-	show_mhz();
-}
-
-static void dec_dingoo_mhz(void)
-{
-	extern void dingoo_set_clock(unsigned int);
-	extern unsigned int dingoo_get_clock(void);
-	dingoo_set_clock(dingoo_get_clock()-5);
-	show_mhz();
-}
-
-static void inc_dingoo_brightness(void)
-{
-	extern void dingoo_set_brightness(int);
-	extern int dingoo_get_brightness(void);
-	dingoo_set_brightness(dingoo_get_brightness()+2);
-	show_brightness();
-}
-
-static void dec_dingoo_brightness(void)
-{
-	extern void dingoo_set_brightness(int);
-	extern int dingoo_get_brightness(void);
-	dingoo_set_brightness(dingoo_get_brightness()-2);
-	show_brightness();
-}
-static void inc_dingoo_volumen(void)
-{
-	extern void dingoo_set_volumen(int);
-	extern int dingoo_get_volumen(void);
-	dingoo_set_volumen(dingoo_get_volumen()+1);
-	show_volumen();
-}
-
-static void dec_dingoo_volumen(void)
-{
-	extern void dingoo_set_volumen(int);
-	extern int dingoo_get_volumen(void);
-	dingoo_set_volumen(dingoo_get_volumen()-1);
-	show_volumen();
-}
-
-#else
 #define show_mhz()
 #define inc_dingoo_mhz()
 #define dec_dingoo_mhz()
@@ -345,7 +270,6 @@ static void dec_dingoo_volumen(void)
 #define dec_dingoo_brightness()
 #define inc_dingoo_volumen()
 #define dec_dingoo_volumen()
-#endif
 
 int gui_update (void)
 {
@@ -516,367 +440,52 @@ static void inc_throttle(int sgn)
 
 static int in_goMenu=0;
 
-void gui_handle_events (void)
+void gui_handle_events (SDL_Event *e)
 {
-
-//write_log("enter %s",__func__);
-
-#ifndef DREAMCAST
-	int i;
-	Uint8 *keystate = SDL_GetKeyState(NULL);
-
-#ifdef EMULATED_JOYSTICK
-#if !defined(_3DS)
-	if (keystate[SDLK_ESCAPE])
-	{
-		if (keystate[SDLK_LCTRL])
-		{
-			keystate[SDLK_LCTRL]=0;
-			inc_dingoo_mhz();
-		}
-		else if (keystate[SDLK_LALT])
-		{
-			keystate[SDLK_LALT]=0;
-			dec_dingoo_mhz();
-		}
-		else if (keystate[SDLK_SPACE])
-		{
-			keystate[SDLK_SPACE]=0;
-			inc_throttle(1);
-		}
-		else if (keystate[SDLK_LSHIFT])
-		{
-			keystate[SDLK_LSHIFT]=0;
-			inc_throttle(-1);
-		}
-		else if (keystate[SDLK_UP])
-		{
-			keystate[SDLK_UP]=0;
-			inc_dingoo_brightness();
-		}
-		else if (keystate[SDLK_DOWN])
-		{
-			keystate[SDLK_DOWN]=0;
-			dec_dingoo_brightness();
-		}
-		else if (keystate[SDLK_RIGHT])
-		{
-			keystate[SDLK_RIGHT]=0;
-			inc_dingoo_volumen();
-		}
-		else if (keystate[SDLK_LEFT])
-		{
-			keystate[SDLK_LEFT]=0;
-			dec_dingoo_volumen();
-		}
-	}
-	else
-#endif
-	if (emulated_mouse)
-	{
-		if (keystate[SDLK_LEFT])
-		{
-			lastmx -= emulated_mouse_speed;
-	    		newmousecounters = 1;
-		}
-		else
-		if (keystate[SDLK_RIGHT])
-		{
-			lastmx += emulated_mouse_speed;
-	    		newmousecounters = 1;
-		}
-		if (keystate[SDLK_UP])
-		{
-			lastmy -= emulated_mouse_speed;
-	    		newmousecounters = 1;
-		}
-		else
-		if (keystate[SDLK_DOWN])
-		{
-			lastmy += emulated_mouse_speed;
-	    		newmousecounters = 1;
-		}
-
-#ifndef DREAMCAST
-		for(i = 0; i < SDL_NumJoysticks(); i++)
-		{
-			SDL_Joystick *joy = i == 0 ? uae4all_joy0 : uae4all_joy1;
-			int joyx = SDL_JoystickGetAxis(joy, 0);	// left-right
-			int joyy = SDL_JoystickGetAxis(joy, 1);	// up-down
-			struct joy_range *dzone = i == 0 ? &dzone0 : &dzone1;
-
-			if(!mainMenu_usejoy)
-			{
-				break;
-			}
-
-			if(i > 1)
-			{
-				break;
-			}
-
-			if (joyx < dzone->minx)
-			{
-				lastmx -= emulated_mouse_speed;
-				newmousecounters = 1;
-			}
-			else
-			if (joyx > dzone->maxx)
-			{
-				lastmx += emulated_mouse_speed;
-				newmousecounters = 1;
-			}
-			if (joyy < dzone->miny)
-			{
-				lastmy -= emulated_mouse_speed;
-				newmousecounters = 1;
-			}
-			else
-			if (joyy > dzone->maxy)
-			{
-				lastmy += emulated_mouse_speed;
-				newmousecounters = 1;
-			}
-		}
-#endif
-	}
-	else
-	{
-		emulated_left=keystate[SDLK_LEFT];
-		emulated_right=keystate[SDLK_RIGHT];
-		emulated_top=keystate[SDLK_UP];
-		emulated_bot=keystate[SDLK_DOWN];
-	}
-	emulated_button1=keystate[SDLK_LCTRL];
-	emulated_button2=keystate[SDLK_LALT];
-	emulated_mouse_button1=keystate[SDLK_SPACE];
-	emulated_mouse_button2=keystate[SDLK_LSHIFT];
-#endif
-#ifndef EMULATED_JOYSTICK
-	if ( keystate[SDLK_PAGEUP] )
-		goSuperThrottle();
-	else
-		leftSuperThrottle();
-#endif
-#if !defined(DINGOO) && !defined(_3DS) && !defined(DREAMCAST)
-	if ( keystate[SDLK_F12] )
-		SDL_WM_ToggleFullScreen(prSDLScreen);
-	else
-#endif
-	if (( keystate[SDLK_F11] )
-#ifdef EMULATED_JOYSTICK
-#if defined(_3DS)
-			||(keystate[SDLK_ESCAPE])
-#else
-			||((keystate[SDLK_RETURN])&&(keystate[SDLK_ESCAPE]))
-#endif
-#endif
-	   )
-#else
-	if (SDL_JoystickGetButton(uae4all_joy0,3) || SDL_JoystickGetButton(uae4all_joy1,3) )
-#endif
-	{
-#ifdef EMULATED_JOYSTICK
-		keystate[SDLK_RETURN]=keystate[SDLK_ESCAPE]=keystate[SDLK_TAB]=keystate[SDLK_BACKSPACE]=0;
-#endif
-		if (!savestate_state && !in_goMenu)
-			in_goMenu=SDL_GetTicks();
-	} else {
-		if (in_goMenu) {
-			if (SDL_GetTicks()-in_goMenu>333) {
-#ifdef DREAMCAST
-				if (SDL_JoystickGetAxis (uae4all_joy0, 3) && !savestate_state)
-					savestate_state = STATE_DOSAVE;
-				else if (SDL_JoystickGetAxis (uae4all_joy0, 2) && !savestate_state)
-					savestate_state = STATE_DORESTORE;
+	int v,t = e->type;
+	if ((v=(t == SDL_KEYDOWN)) || t == SDL_KEYUP) {
+		switch (e->key.keysym.sym) {
+		case DS_A:
+			emulated_button1=v; break;
+		case DS_B:
+			emulated_button2=v; break;
+		case DS_Y:
+		case DS_L:
+			buttonstate[0] = v; break;
+		case DS_ZL:
+		case DS_X:
+			buttonstate[2] = v; break;
+		case DS_UP1:
+		case DS_UP2:
+		case DS_UP3:
+			emulated_top=v; break;
+		case DS_DOWN1:
+		case DS_DOWN2:
+		case DS_DOWN3:
+			emulated_bot=v; break;
+		case DS_LEFT1:
+		case DS_LEFT2:
+		case DS_LEFT3:
+			emulated_left=v; break;
+		case DS_RIGHT1:
+		case DS_RIGHT2:
+		case DS_RIGHT3:
+			emulated_right=v; break;
+		case DS_SELECT:
+			if (v) goMenu();
+			break;
+		case DS_START:
+			if (v) {
+				if (nowSuperThrottle)
+					leftSuperThrottle();
 				else
-#endif
-				goMenu();
-			} else {
-				goMenu();
+					goSuperThrottle();
 			}
-			in_goMenu=0;
+			break;
+		default:
+			break;
 		}
 	}
-#ifdef EMULATED_JOYSTICK
-	if (keystate[SDLK_RETURN])
-	{
-		if (goingSuperThrottle<3)
-			goingSuperThrottle++;
-		else
-		{
-			goingSuperThrottle=-333;
-			if (nowSuperThrottle)
-				leftSuperThrottle();
-			else
-				goSuperThrottle();
-		}
-	}
-	else
-		goingSuperThrottle=0;
-	if (keystate[SDLK_TAB])
-	{
-		if (keystate[SDLK_ESCAPE])
-		{
-			keystate[SDLK_ESCAPE]=keystate[SDLK_TAB]=0;
-			savestate_state = STATE_DOSAVE;
-		}
-		else
-		if (!vkbd_mode && !goingVkbd)
-		{
-			goingEmouse=1;
-		}
-	}
-	else if (goingEmouse)
-	{
-		goingEmouse=0;
-		if (emulated_mouse)
-   			notice_screen_contents_lost();
-		emulated_mouse=~emulated_mouse;
-	}
-	if (keystate[SDLK_BACKSPACE])
-	{
-		if (keystate[SDLK_ESCAPE])
-		{
-			extern char *savestate_filename;
-			FILE *f=fopen(savestate_filename,"rb");
-			keystate[SDLK_ESCAPE]=keystate[SDLK_BACKSPACE]=0;
-			if (f)
-			{
-				fclose(f);
-				savestate_state = STATE_DORESTORE;
-			}
-			else
-    				gui_set_message("Failed: Savestate not found", 100);
-		}
-		else
-		if (!emulated_mouse && !goingEmouse)
-		{
-			goingVkbd=1;
-		}
-		else
-		{
-			char str[40];
-			static Uint32 last=0;
-			Uint32 now=SDL_GetTicks();
-			if (now-last>100)
-			{
-				if (emulated_mouse_speed==15)
-					emulated_mouse_speed=1;
-				else
-					emulated_mouse_speed++;
-				sprintf((char *)&str[0],"  Mouse %i speed",emulated_mouse_speed);
-    				gui_set_message((char *)&str[0], 40);
-				last=now;
-			}
-		}
-	}
-	else if (goingVkbd)
-	{
-		goingVkbd=0;
-		if (vkbd_mode)
-		{
-			vkbd_mode=0;
-   			notice_screen_contents_lost();
-		}
-		else
-			vkbd_mode=1;
-	}
-#endif
-#ifdef DREAMCAST
-	if (SDL_JoystickGetAxis (uae4all_joy0, 2))
-	{
-		if (in_goMenu) {
-			if (SDL_GetTicks()-in_goMenu>333) {
-				if (!savestate_state) {
-					FILE *f=fopen(savestate_filename,"rb");
-					if (!f)  {
-						char *ad=(char *)calloc(strlen(savestate_filename)+16,1);
-						strcpy(ad,"/sd/uae4all/");
-						strcat(ad,savestate_filename);
-						f=fopen(ad,"rb");
-						free(ad);
-					}
-					if (f) {
-						savestate_state = STATE_DORESTORE;
-						fclose(f);
-					}
-					else {
-						SDL_Event evt;
-
-						SDL_Delay(555);
-    						gui_set_message("Failed: Savestate not found", 100);
-						while (SDL_PollEvent(&evt))
-							SDL_Delay(20);
-					}
-				}
-				in_goMenu=0;
-			}
-		} else
-		if (vkbd_mode)
-		{
-			vkbd_mode=0;
-			goingVkbd=0;
-   			notice_screen_contents_lost();
-		}
-		else
-			goingSuperThrottle=1;
-	}
-	else
-		if (!nowSuperThrottle)
-			goingSuperThrottle=0;
-		else
-			goingVkbd=0;
-	if (SDL_JoystickGetAxis (uae4all_joy0, 3))
-	{
-		if (in_goMenu) {
-			if (SDL_GetTicks()-in_goMenu>333) {
-				if (!savestate_state)
-					savestate_state = STATE_DOSAVE;
-				in_goMenu=0;
-			}
-		} else
-		if (goingSuperThrottle)
-			goSuperThrottle();
-		else
-			if (goingVkbd>4)
-				vkbd_mode=1;
-			else
-				goingVkbd++;
-	}
-	else
-		if (nowSuperThrottle)
-			leftSuperThrottle();
-		else
-			goingVkbd=0;
-#endif
-	if (vkbd_key)
-	{
-		if (vkbd_keysave==-1234567)
-		{
-			SDL_keysym ks;
-			ks.sym=vkbd_key;
-			vkbd_keysave=keycode2amiga(&ks);
-			if (vkbd_keysave >= 0)
-			{
-				if (!uae4all_keystate[vkbd_keysave])
-				{
-					uae4all_keystate[vkbd_keysave]=1;
-					record_key(vkbd_keysave<<1);
-				}
-			}
-		}
-	}
-	else
-		if (vkbd_keysave!=-1234567)
-		{
-			if (vkbd_keysave >= 0)
-			{
-				uae4all_keystate[vkbd_keysave]=0;
-				record_key((vkbd_keysave << 1) | 1);
-			}
-			vkbd_keysave=-1234567;
-		}
 }
 
 void gui_changesettings (void)

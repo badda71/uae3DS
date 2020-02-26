@@ -210,9 +210,7 @@ void init_text(int splash)
  	   	SDL_JoystickEventState(SDL_ENABLE);
     		SDL_JoystickOpen(0);
 	}
-#ifdef DREAMCAST
-        __sdl_dc_emulate_keyboard=1;
-#endif
+
 	if (!text_screen)
 	{
 		text_screen=SDL_CreateRGBSurface(prSDLScreen->flags,prSDLScreen->w,prSDLScreen->h,prSDLScreen->format->BitsPerPixel,prSDLScreen->format->Rmask,prSDLScreen->format->Gmask,prSDLScreen->format->Bmask,prSDLScreen->format->Amask);
@@ -249,71 +247,6 @@ void init_text(int splash)
 
 		obten_colores();
 		uae4all_init_sound();
-#if !defined(DEBUG_UAE4ALL) && !defined(PROFILER_UAE4ALL) && !defined(AUTO_RUN) && !defined(AUTO_FRAMERATE)
-		tmp=SDL_LoadBMP(MENU_FILE_SPLASH);
-		if (tmp==NULL)
-			exit(-6);
-		sur = SDL_DisplayFormat(tmp);
-		SDL_FreeSurface(tmp);
-		r.x=(text_screen->w - sur->w)/2;
-		r.y=(text_screen->h - sur->h)/2;
-		r.h=sur->w;
-		r.w=sur->h;
-		SDL_FillRect(text_screen,NULL,0xFFFFFFFF);
-		while(SDL_PollEvent(&ev));
-		for (i=128;(i>-8)&&(!toexit);i-=8)
-		{
-#ifdef DREAMCAST
-			vid_waitvbl();
-#else
-			SDL_Delay(50);
-#endif
-			SDL_FillRect(text_screen,NULL,0xFFFFFFFF);
-			SDL_BlitSurface(sur,NULL,text_screen,&r);
-			fade16(text_screen,i);
-			text_flip();
-			while(SDL_PollEvent(&ev)) toexit=1;
-		}
-		for(i=0;(i<23)&&(!toexit);i++)
-		{
-			while(SDL_PollEvent(&ev)) toexit=1;
-			SDL_Delay(100);
-		}
-		for(i=0;(i<128)&&(!toexit);i+=16)
-		{
-#ifdef DREAMCAST
-			vid_waitvbl();
-#else
-			SDL_Delay(50);
-#endif
-			SDL_FillRect(text_screen,NULL,0xFFFFFFFF);
-			SDL_BlitSurface(sur,NULL,text_screen,&r);
-			fade16(text_screen,i);
-			text_flip();
-			while(SDL_PollEvent(&ev)) toexit=1;
-		}
-		for(i=128;(i>-8)&&(!toexit);i-=8)
-		{
-#ifdef DREAMCAST
-			vid_waitvbl();
-#else
-			SDL_Delay(50);
-#endif
-			text_draw_background();
-			fade16(text_screen,i);
-			text_flip();
-			while(SDL_PollEvent(&ev)) toexit=1;
-		}
-		SDL_FreeSurface(sur);
-#else
-#ifndef DREAMCAST
-		chdir("example");
-#else
-#ifdef AUTO_RUN
-		fs_chdir("/cd");
-#endif
-#endif
-#endif
 		toexit = 0;
 
 		while(!toexit)
@@ -324,15 +257,8 @@ void init_text(int splash)
 #endif
 			if (!uae4all_init_rom(romfile))
 				break;
-#ifdef DREAMCAST
-			reinit_sdcard();
-			if (!uae4all_init_rom(romfile_sd))
-				break;
-#endif
-
 			text_draw_background();
 			text_draw_window(54,110,250,64,"--- ERROR ---");
-#ifdef _3DS
 #ifdef HOME_DIR
 			write_text(9,14,"kick.rom not found in:");
 
@@ -349,26 +275,16 @@ void init_text(int splash)
 			write_text(11,14,"kick.rom not found");
 			write_text(8,16,"Press any button to exit");
 #endif
-#else
-			write_text(11,14,"KICK.ROM not found");
-			write_text(8,16,"Press any button to exit");
-#endif
 			text_flip();
 			while(SDL_PollEvent(&ev))
 			{
-#ifndef DREAMCAST
+				if (uib_handle_event(&ev)) continue;
 				if (ev.type==SDL_QUIT)
 					toexit = 1;
 				else
-#endif
 				if (ev.type==SDL_KEYDOWN)
 				{
-					if(ev.key.keysym.sym==SDLK_LCTRL)
-						toexit = 1;
-					else if(ev.key.keysym.sym==SDLK_RETURN)
-						toexit = 1;
-					else if(ev.key.keysym.sym==SDLK_ESCAPE)
-						toexit = 1;
+					toexit = 1;
 				}
 				else if (ev.type==SDL_JOYBUTTONDOWN)
 				{

@@ -13,6 +13,8 @@
 #include "uae.h"
 #include "options.h"
 #include "sound.h"
+#include "uibottom.h"
+#include "keyboard.h"
 
 #ifdef HOME_DIR
 #include "homedir.h"
@@ -329,6 +331,7 @@ static int key_loadMenu(int *c)
 
 	while (SDL_PollEvent(&event) > 0)
 	{
+		if (uib_handle_event(&event)) continue;
 		if (event.type == SDL_QUIT)
 			end=-1;
 		else
@@ -337,39 +340,39 @@ static int key_loadMenu(int *c)
 			uae4all_play_click();
 			switch(event.key.keysym.sym)
 			{
-				case SDLK_d:
-				case SDLK_RIGHT: right=1; break;
-				case SDLK_a:
-				case SDLK_LEFT: left=1; break;
-				case SDLK_w:
-				case SDLK_UP: up=1; break;
-				case SDLK_s:
-				case SDLK_DOWN: down=1; break;
-				case SDLK_x:
-				case SDLK_SPACE:
-				case SDLK_c:
-				case SDLK_LSHIFT: hit2=1; break;
-				case SDLK_z:
-				case SDLK_RETURN:
-				case SDLK_e:
-				case SDLK_LCTRL: hit0=1; break;
-				case SDLK_q:
-				case SDLK_LALT: hit1=1; break;
-				case SDLK_1:
-#ifdef DREAMCAST
-				case SDLK_TAB:
-#else
-				case SDLK_BACKSPACE:
-#endif
+				case DS_RIGHT1:
+				case DS_RIGHT2:
+				case DS_RIGHT3:
+				case AK_RT: right = 1; break;
+				case DS_LEFT1:
+				case DS_LEFT2:
+				case DS_LEFT3:
+				case AK_LF: left = 1; break;
+				case DS_UP1:
+				case DS_UP2:
+				case DS_UP3:
+				case AK_UP: up = 1; break;
+				case DS_DOWN1:
+				case DS_DOWN2:
+				case DS_DOWN3:
+				case AK_DN: down = 1; break;
+				case AK_Y:
+				case DS_Y: 
+				case AK_X:
+				case DS_X: hit2=1; break;
+				case DS_A:
+				case DS_START:
+				case AK_RET:
+				case AK_SPC: hit0=1; break;
+				case AK_ESC:
+				case DS_B: hit1=1; break;
+				case DS_R:
+				case AK_R:
 						if (text_dir_num_files)
 							text_dir_num_files_index=text_dir_num_files-1;
 						break;
-				case SDLK_2:
-#ifdef DREAMCAST
-				case SDLK_BACKSPACE:
-#else
-				case SDLK_TAB:
-#endif
+				case AK_L:
+				case DS_L:
 						text_dir_num_files_index=0;
 						break;
 

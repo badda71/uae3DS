@@ -38,7 +38,6 @@ struct joy_range dzone0, dzone1;
 
 void read_joystick(int nr, unsigned int *dir, int *button)
 {
-#if !defined(MAX_AUTOEVENTS) && !defined(AUTOEVENTS)
     int x_axis, y_axis;
     int left = 0, right = 0, top = 0, bot = 0;
     int len, i, num;
@@ -53,7 +52,6 @@ void read_joystick(int nr, unsigned int *dir, int *button)
     nr = (~nr)&0x1;
 
     SDL_JoystickUpdate ();
-#ifndef DREAMCAST
     struct joy_range *r = nr == 0 ? &dzone0 : &dzone1;
 
     if (mainMenu_usejoy)
@@ -77,7 +75,6 @@ void read_joystick(int nr, unsigned int *dir, int *button)
 	for (i = 0; i < num; i++)
 	*button |= (SDL_JoystickGetButton (joy, i) & 1) << i;
      }
-#ifdef EMULATED_JOYSTICK
     extern int emulated_left, emulated_right, emulated_top, emulated_bot, emulated_button1, emulated_button2, emulated_mouse_button1, emulated_mouse_button2;
     if (nr)
     {
@@ -89,24 +86,6 @@ void read_joystick(int nr, unsigned int *dir, int *button)
 	if ((vkbd_button2==(SDLKey)0)&&(!vkbd_mode))
 		top|=emulated_button2;
     }
-#endif
-#else
-    if (mainMenu_usejoy)
-    {
-	int hat=/*15^*/(SDL_JoystickGetHat(joy,0));
-	if (hat & SDL_HAT_LEFT)
-	    left = 1;
-	else if (hat & SDL_HAT_RIGHT)
-	    right = 1;
-	if (hat & SDL_HAT_UP)
-	    top = 1;
-	else if (hat & SDL_HAT_DOWN)
-	    bot = 1;
-	if (vkbd_button2==(SDLKey)0)
-	top |= SDL_JoystickGetButton(joy,6) & 1;
-	*button = SDL_JoystickGetButton(joy,2) & 1;
-    }
-#endif
     
     if(vkbd_mode && nr)
     {
@@ -135,26 +114,12 @@ void read_joystick(int nr, unsigned int *dir, int *button)
 		vkbd_move=VKBD_BUTTON;
 		*button=0;
 	}
-#if defined(EMULATED_JOYSTICK) || defined(DREAMCAST)
-#ifndef DREAMCAST
 	else if (emulated_button2)
-#else
-	else if (SDL_JoystickGetButton(joy,6)&1)
-#endif
 		vkbd_move=VKBD_BUTTON2;
-#ifndef DREAMCAST
 	else if (emulated_mouse_button1)
-#else
- 	else if (SDL_JoystickGetButton(joy,5)&1)
-#endif
 		vkbd_move=VKBD_BUTTON3;
-#ifndef DREAMCAST
 	else if (emulated_mouse_button2)
-#else
-	else if (SDL_JoystickGetButton(joy,1)&1)
-#endif
 		vkbd_move=VKBD_BUTTON4;
-#endif
     }
     else
     {
@@ -162,7 +127,6 @@ void read_joystick(int nr, unsigned int *dir, int *button)
     	if (right) bot = !bot;
     	*dir = bot | (right << 1) | (top << 8) | (left << 9);
     }
-#endif
 }
 
 void init_joystick(void)

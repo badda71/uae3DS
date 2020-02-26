@@ -10,7 +10,8 @@
 #include "sound.h"
 #include "savestate.h"
 #include "disk.h"
-
+#include "uibottom.h"
+#include "keyboard.h"
 
 extern int emulating;
 
@@ -203,6 +204,7 @@ static enum DfMenuEntry key_dfMenu(enum DfMenuEntry *sel)
 
 	while (SDL_PollEvent(&event) > 0)
 	{
+		if (uib_handle_event(&event)) continue;
 		int left = 0, right = 0, up = 0, down = 0,
 		    activate = 0, cancel = 0, load_df0 = 0, load_df1 = 0;
 		if (event.type == SDL_QUIT)
@@ -212,36 +214,32 @@ static enum DfMenuEntry key_dfMenu(enum DfMenuEntry *sel)
 			uae4all_play_click();
 			switch(event.key.keysym.sym)
 			{
-				case SDLK_d:
-				case SDLK_RIGHT: right = 1; break;
-				case SDLK_a:
-				case SDLK_LEFT: left = 1; break;
-				case SDLK_w:
-				case SDLK_UP: up = 1; break;
-				case SDLK_s:
-				case SDLK_DOWN: down = 1; break;
-#ifdef DREAMCAST
-				case SDLK_c:
-				case SDLK_LSHIFT: load_df0 = 1; break;
-				case SDLK_x:
-				case SDLK_SPACE: load_df1 = 1; break;
-#elif defined(_3DS)
-				case SDLK_c:
-				case SDLK_SPACE: load_df1 = 1; break;
-				case SDLK_x:
-				case SDLK_LSHIFT: load_df0 = 1; break;
-#else
-				case SDLK_c:
-				case SDLK_LSHIFT: load_df1 = 1; break;
-				case SDLK_x:
-				case SDLK_SPACE: load_df0 = 1; break;
-#endif
-				case SDLK_z:
-				case SDLK_RETURN:
-				case SDLK_e:
-				case SDLK_LCTRL: activate = 1; break;
-				case SDLK_q:
-				case SDLK_LALT: cancel = 1; break;
+				case DS_RIGHT1:
+				case DS_RIGHT2:
+				case DS_RIGHT3:
+				case AK_RT: right = 1; break;
+				case DS_LEFT1:
+				case DS_LEFT2:
+				case DS_LEFT3:
+				case AK_LF: left = 1; break;
+				case DS_UP1:
+				case DS_UP2:
+				case DS_UP3:
+				case AK_UP: up = 1; break;
+				case DS_DOWN1:
+				case DS_DOWN2:
+				case DS_DOWN3:
+				case AK_DN: down = 1; break;
+				case AK_Y:
+				case DS_Y: load_df1 = 1; break;
+				case AK_X:
+				case DS_X: load_df0 = 1; break;
+				case AK_RET:
+				case AK_SPC:
+				case DS_START:
+				case DS_A: activate = 1; break;
+				case AK_ESC:
+				case DS_B: cancel = 1; break;
 			}
 			if (cancel)
 				return DF_MENU_ENTRY_BACK;

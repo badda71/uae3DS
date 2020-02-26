@@ -10,7 +10,8 @@
 #include "sound.h"
 #include "savestate.h"
 #include "gui.h"
-
+#include "uibottom.h"
+#include "keyboard.h"
 
 extern int emulating;
 
@@ -303,6 +304,8 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 
 	while (SDL_PollEvent(&event) > 0)
 	{
+		if (uib_handle_event(&event)) continue;
+
 		int left = 0, right = 0, up = 0, down = 0,
 		    activate = 0, cancel = 0, reset = 0, load = 0, toStates = 0;
 		if (event.type == SDL_QUIT)
@@ -312,42 +315,34 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 			uae4all_play_click();
 			switch(event.key.keysym.sym)
 			{
-				case SDLK_d:
-				case SDLK_RIGHT: right = 1; break;
-				case SDLK_a:
-				case SDLK_LEFT: left = 1; break;
-				case SDLK_w:
-				case SDLK_UP: up = 1; break;
-				case SDLK_s:
-				case SDLK_DOWN: down = 1; break;
-#ifdef DREAMCAST
-				case SDLK_c:
-				case SDLK_LSHIFT: load = 1; break;
-				case SDLK_x:
-				case SDLK_SPACE: toStates = 1; break;
-				case SDLK_2:
-				case SDLK_TAB: reset = 1; break;
-#elif defined(_3DS)
-				case SDLK_c:
-				case SDLK_SPACE: toStates = 1; break;
-				case SDLK_x:
-				case SDLK_LSHIFT: load = 1; break;
-				case SDLK_1:
-				case SDLK_BACKSPACE: reset = 1; break;
-#else
-				case SDLK_c:
-				case SDLK_LSHIFT: toStates = 1; break;
-				case SDLK_x:
-				case SDLK_SPACE: load = 1; break;
-				case SDLK_1:
-				case SDLK_BACKSPACE: reset = 1; break;
-#endif
-				case SDLK_z:
-				case SDLK_RETURN:
-				case SDLK_e:
-				case SDLK_LCTRL: activate = 1; break;
-				case SDLK_q:
-				case SDLK_LALT: cancel = 1; break;
+				case DS_RIGHT1:
+				case DS_RIGHT2:
+				case DS_RIGHT3:
+				case AK_RT: right = 1; break;
+				case DS_LEFT1:
+				case DS_LEFT2:
+				case DS_LEFT3:
+				case AK_LF: left = 1; break;
+				case DS_UP1:
+				case DS_UP2:
+				case DS_UP3:
+				case AK_UP: up = 1; break;
+				case DS_DOWN1:
+				case DS_DOWN2:
+				case DS_DOWN3:
+				case AK_DN: down = 1; break;
+				case AK_Y:
+				case DS_Y: toStates = 1; break;
+				case AK_X:
+				case DS_X: load = 1; break;
+				case DS_R:
+				case AK_R: reset = 1; break;
+				case AK_RET:
+				case AK_SPC:
+				case DS_START:
+				case DS_A: activate = 1; break;
+				case AK_ESC:
+				case DS_B: cancel = 1; break;
 			}
 			if (cancel && emulating)
 				return MAIN_MENU_ENTRY_RETURN_TO_EMULATION;
@@ -508,13 +503,8 @@ static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 				return 1; /* leave, returning to the emulation */
 			case MAIN_MENU_ENTRY_EXIT_UAE:
 				storeConfig();
-#ifdef DREAMCAST
-//malloc(16*1024*1024);
-				arch_reboot();
-#else
 				do_leave_program();
 				exit(0);
-#endif
 				break;
 		}
 	}

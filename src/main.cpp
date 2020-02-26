@@ -181,13 +181,6 @@ void do_leave_program (void)
     SDL_Quit ();
 #endif
     memory_cleanup ();
-
-#if defined(HOME_DIR)
-    if(config_dir)
-    {
-	free(config_dir);
-    }
-#endif
 }
 
 #if defined(DREAMCAST) && !defined(DEBUG_UAE4ALL)
@@ -259,6 +252,33 @@ typedef struct {
 
 // mappings like dingoo SDL
 static sdl_3dsbuttons buttons3ds[] = {
+	{KEY_A, DS_A, "A btn"},
+	{KEY_B, DS_B, "B btn"},
+	{KEY_X, DS_X, "X btn"},
+	{KEY_Y, DS_Y, "Y btn"},
+	{KEY_L, DS_L, "L btn"},
+	{KEY_R, DS_R, "R btn"},
+	{KEY_ZL, DS_ZL, "ZL btn"},
+	{KEY_ZR, DS_ZR, "ZR btn"},
+	{KEY_START, DS_START, "START btn"},
+	{KEY_SELECT, DS_SELECT, "SELECT btn"},
+	{KEY_UP, DS_UP1, "DPAD UP"},
+	{KEY_DOWN, DS_DOWN1, "DPAD DOWN"},
+	{KEY_LEFT, DS_LEFT1, "DPAD LEFT"},
+	{KEY_RIGHT, DS_RIGHT1, "DPAD RIGHT"},
+	{KEY_CSTICK_UP, DS_UP1, "CSTK UP"},
+	{KEY_CSTICK_DOWN, DS_DOWN1, "CSTK DOWN"},
+	{KEY_CSTICK_LEFT, DS_LEFT1, "CSTK LEFT"},
+	{KEY_CSTICK_RIGHT, DS_RIGHT1, "CSTK RIGHT"},
+	{KEY_TOUCH, DS_TOUCH, "TOUCH"},
+	//	{KEY_CPAD_UP, DS_UP1, "CPAD UP"},	// included in KEY_UP
+//	{KEY_CPAD_DOWN, DS_DOWN1, "CPAD DOWN"},
+//	{KEY_CPAD_LEFT, DS_LEFT1, "CPAD LEFT"},
+//	{KEY_CPAD_RIGHT, DS_RIGHT1, "CPAD RIGHT"},
+	{0,0,0}
+};
+/*
+static sdl_3dsbuttons buttons3ds[] = {
 	{KEY_A, SDLK_LCTRL, "A btn"},
 	{KEY_B, SDLK_LALT, "B btn"},
 	{KEY_X, SDLK_LSHIFT, "X btn"},
@@ -283,6 +303,7 @@ static sdl_3dsbuttons buttons3ds[] = {
 //	{KEY_CPAD_RIGHT, 221, "CPAD RIGHT"},
 	{0,0,0}
 };
+*/
 
 void real_main (int argc, char **argv)
 {

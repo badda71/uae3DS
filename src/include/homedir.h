@@ -1,4 +1,4 @@
 extern void get_config_dir(void);
 
-extern char *home_dir;
-extern char *config_dir;
+extern const char *home_dir;
+extern const char *config_dir;

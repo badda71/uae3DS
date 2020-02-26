@@ -11,7 +11,116 @@
 #include <3ds.h>
 #include <citro3d.h>
 #include <math.h>
+#include "keyboard.h"
 #include "uibottom.h"
+#include "uae3ds.h"
+
+uikbd_key uikbd_keypos[] = {
+	//  x,  y,   w,   h,         key,shft,stky, flgs, name
+	// toggle kb button
+	{   0,-15,  36,  15,         255,   0,   0,  0,  "ToggleKB"},
+	// 1st Row
+	{   0,  0,  32,  16,      AK_ESC,   0,   0,  0,  "ESC"},
+	{  32,  0,  16,  16,       AK_F1,   0,   0,  0,  "F1"},
+	{  48,  0,  16,  16,       AK_F2,   0,   0,  0,  "F2"},
+	{  64,  0,  16,  16,       AK_F3,   0,   0,  0,  "F3"},
+	{  80,  0,  16,  16,       AK_F4,   0,   0,  0,  "F4"},
+	{  96,  0,  16,  16,       AK_F5,   0,   0,  0,  "F5"},
+	{ 112,  0,  16,  16,       AK_F6,   0,   0,  0,  "F6"},
+	{ 128,  0,  16,  16,       AK_F7,   0,   0,  0,  "F7"},
+	{ 144,  0,  16,  16,       AK_F8,   0,   0,  0,  "F8"},
+	{ 160,  0,  16,  16,       AK_F9,   0,   0,  0,  "F9"},
+	{ 176,  0,  16,  16,      AK_F10,   0,   0,  0,  "F10"},
+	{ 192,  0,  32,  16,      AK_DEL,   0,   0,  0,  "DEL"},
+	{ 224,  0,  32,  16,     AK_HELP,   0,   0,  0,  "HELP"},
+	{ 256,  0,  16,  16, AK_NPLPAREN,   0,   0,  0,  "NP ("},
+	{ 272,  0,  16,  16, AK_NPRPAREN,   0,   0,  0,  "NP )"},
+	{ 288,  0,  16,  16,    AK_NPDIV,   0,   0,  0,  "NP /"},
+	{ 304,  0,  16,  16,    AK_NPMUL,   0,   0,  0,  "NP *"},
+	// 2nd Row
+	{   0, 16,  32,  16,AK_BACKQUOTE,   0,   0,  0,  "`"},
+	{  32, 16,  16,  16,        AK_1,   0,   0,  0,  "1"},
+	{  48, 16,  16,  16,        AK_2,   0,   0,  0,  "2"},
+	{  64, 16,  16,  16,        AK_3,   0,   0,  0,  "3"},
+	{  80, 16,  16,  16,        AK_4,   0,   0,  0,  "4"},
+	{  96, 16,  16,  16,        AK_5,   0,   0,  0,  "5"},
+	{ 112, 16,  16,  16,        AK_6,   0,   0,  0,  "6"},
+	{ 128, 16,  16,  16,        AK_7,   0,   0,  0,  "7"},
+	{ 144, 16,  16,  16,        AK_8,   0,   0,  0,  "8"},
+	{ 160, 16,  16,  16,        AK_9,   0,   0,  0,  "9"},
+	{ 176, 16,  16,  16,        AK_0,   0,   0,  0,  "0"},
+	{ 192, 16,  16,  16,    AK_MINUS,   0,   0,  0,  "-"},
+	{ 208, 16,  16,  16,    AK_EQUAL,   0,   0,  0,  "="},
+	{ 224, 16,  16,  16,AK_BACKSLASH,   0,   0,  0,  "\\"},
+	{ 240, 16,  16,  16,       AK_BS,   0,   0,  0,  "Backspace"},
+	{ 256, 16,  16,  16,      AK_NP7,   0,   0,  0,  "NP 7"},
+	{ 272, 16,  16,  16,      AK_NP8,   0,   0,  0,  "NP 8"},
+	{ 288, 16,  16,  16,      AK_NP9,   0,   0,  0,  "NP 9"},
+	{ 304, 16,  16,  16,    AK_NPSUB,   0,   0,  0,  "NP -"},
+	// 3rd Row
+	{   0, 32,  32,  16,      AK_TAB,   0,   0,  0,  "TAB"},
+	{  32, 32,  16,  16,        AK_Q,   0,   0,  0,  "Q"},
+	{  48, 32,  16,  16,        AK_W,   0,   0,  0,  "w"},
+	{  64, 32,  16,  16,        AK_E,   0,   0,  0,  "E"},
+	{  80, 32,  16,  16,        AK_R,   0,   0,  0,  "R"},
+	{  96, 32,  16,  16,        AK_T,   0,   0,  0,  "T"},
+	{ 112, 32,  16,  16,        AK_Y,   0,   0,  0,  "Y"},
+	{ 128, 32,  16,  16,        AK_U,   0,   0,  0,  "U"},
+	{ 144, 32,  16,  16,        AK_I,   0,   0,  0,  "I"},
+	{ 160, 32,  16,  16,        AK_O,   0,   0,  0,  "O"},
+	{ 176, 32,  16,  16,        AK_P,   0,   0,  0,  "P"},
+	{ 192, 32,  16,  16, AK_LBRACKET,   0,   0,  0,  "["},
+	{ 208, 32,  16,  16, AK_RBRACKET,   0,   0,  0,  "]"},
+	{ 224, 32,  32,  32,      AK_RET,   0,   0,  0,  "RETURN"},
+	{ 256, 32,  16,  16,      AK_NP4,   0,   0,  0,  "NP 4"},
+	{ 272, 32,  16,  16,      AK_NP5,   0,   0,  0,  "NP 5"},
+	{ 288, 32,  16,  16,      AK_NP6,   0,   0,  0,  "NP 6"},
+	{ 304, 32,  16,  16,    AK_NPADD,   0,   0,  0,  "NP +"},
+	// 4th Row
+	{   0, 48,  32,  16,     AK_CTRL,   0,   2,  0,  "CTRL"},
+	{  32, 48,  16,  16,        AK_A,   0,   0,  0,  "A"},
+	{  48, 48,  16,  16,        AK_S,   0,   0,  0,  "S"},
+	{  64, 48,  16,  16,        AK_D,   0,   0,  0,  "D"},
+	{  80, 48,  16,  16,        AK_F,   0,   0,  0,  "F"},
+	{  96, 48,  16,  16,        AK_G,   0,   0,  0,  "G"},
+	{ 112, 48,  16,  16,        AK_H,   0,   0,  0,  "H"},
+	{ 128, 48,  16,  16,        AK_J,   0,   0,  0,  "J"},
+	{ 144, 48,  16,  16,        AK_K,   0,   0,  0,  "K"},
+	{ 160, 48,  16,  16,        AK_L,   0,   0,  0,  "L"},
+	{ 176, 48,  16,  16,AK_SEMICOLON,   0,   0,  0,  ";"},
+	{ 192, 48,  16,  16,    AK_QUOTE,   0,   0,  0,  "'"},
+	{ 256, 48,  16,  16,      AK_NP1,   0,   0,  0,  "NP 1"},
+	{ 272, 48,  16,  16,      AK_NP2,   0,   0,  0,  "NP 2"},
+	{ 288, 48,  16,  16,      AK_NP3,   0,   0,  0,  "NP 3"},
+	{ 304, 48,  16,  48,      AK_ENT,   0,   0,  0,  "ENTER"},
+	// 5th Row
+	{   0, 64,  48,  16,      AK_LSH,   0,   1,  0,  "LSHIFT"},
+	{  48, 64,  16,  16,        AK_Z,   0,   0,  0,  "Z"},
+	{  64, 64,  16,  16,        AK_X,   0,   0,  0,  "X"},
+	{  80, 64,  16,  16,        AK_C,   0,   0,  0,  "C"},
+	{  96, 64,  16,  16,        AK_V,   0,   0,  0,  "V"},
+	{ 112, 64,  16,  16,        AK_B,   0,   0,  0,  "B"},
+	{ 128, 64,  16,  16,        AK_N,   0,   0,  0,  "N"},
+	{ 144, 64,  16,  16,        AK_M,   0,   0,  0,  "M"},
+	{ 160, 64,  16,  16,    AK_COMMA,   0,   0,  0,  ","},
+	{ 176, 64,  16,  16,   AK_PERIOD,   0,   0,  0,  "."},
+	{ 192, 64,  16,  16,    AK_SLASH,   0,   0,  0,  "/"},
+	{ 208, 64,  32,  16,      AK_LSH,   0,   1,  0,  "RSHIFT"},
+	{ 240, 64,  16,  16,       AK_UP,   0,   0,  0,  "C_UP"},
+	{ 256, 64,  32,  16,      AK_NP0,   0,   0,  0,  "NP 0"},
+	{ 288, 64,  16,  16,    AK_NPDEL,   0,   0,  0,  "NP ."},
+	// 6th row
+	{   0, 80,  32,  17,     AK_LALT,   0,   4,  0,  "LALT"},
+	{  32, 80,  16,  17,     AK_LAMI,   0,   8,  0,  "LAMI"},
+	{  48, 80, 144,  17,      AK_SPC,   0,   0,  0,  "SPACE"},
+	{ 192, 80,  16,  17,     AK_LAMI,   0,   8,  0,  "RAMI"},
+	{ 208, 80,  16,  17,     AK_LALT,   0,   4,  0,  "RALT"},
+	{ 224, 80,  16,  17,       AK_LF,   0,   0,  0,  "C_LEFT"},
+	{ 240, 80,  16,  17,       AK_DN,   0,   0,  0,  "C_DOWN"},
+	{ 256, 80,  16,  17,       AK_RT,   0,   0,  0,  "C_RIGHT"},
+	// Finish
+	{   0,  0,   0,   0,          -1,   0,   0,  0,  ""}
+};
 
 extern void log_citra(const char *format, ...);
 
@@ -27,12 +136,21 @@ volatile enum uib_action uib_must_redraw = UIB_NO;
 
 // static sprites
 static DS3_Image background_spr;
-//static DS3_Image spinner_spr;
+static DS3_Image kbd1_spr;
+static DS3_Image kbd2_spr;
+static DS3_Image twistyup_spr;
+static DS3_Image twistydn_spr;
+static DS3_Image keymask_spr;
 
 // static variables
 static Handle repaintRequired;
 static int uib_isinit=0;
 static u8 *gpusrc=NULL;
+static int kb_y_pos = 0;
+static volatile int set_kb_y_pos = -10000;
+static int kb_activekey=-1;
+static int sticky=0;
+static unsigned char keysPressed[256];
 
 // static functions
 // ================
@@ -123,7 +241,7 @@ static inline void  drawImage( DS3_Image *img, int x, int y, int w, int h, int d
 	C3D_ImmDrawEnd();
 }
 
-static void makeTexture(C3D_Tex *tex, u8 *mygpusrc, unsigned hw, unsigned hh) {
+static void makeTexture(C3D_Tex *tex, const u8 *mygpusrc, unsigned hw, unsigned hh) {
 	s32 i;
 	svcWaitSynchronization(privateSem1, U64_MAX);
 	// init texture
@@ -139,7 +257,7 @@ static void makeTexture(C3D_Tex *tex, u8 *mygpusrc, unsigned hw, unsigned hh) {
 }
 
 // this function is NOT thread safe - it uses static buffer gpusrc!!
-static void makeImage(DS3_Image *img, u8 *pixels, unsigned w, unsigned h, int noconv) {
+static void makeImage(DS3_Image *img, const u8 *pixels, unsigned w, unsigned h, int noconv) {
 
 	img->w=w;
 	img->h=h;
@@ -155,7 +273,7 @@ static void makeImage(DS3_Image *img, u8 *pixels, unsigned w, unsigned h, int no
 		// memset(gpusrc,0,hw*hh*4);
 
 		// copy to linear buffer, convert from RGBA to ABGR
-		u8* src=pixels; u8 *dst;
+		const u8* src=pixels; u8 *dst;
 		for(unsigned y = 0; y < h; y++) {
 			dst=gpusrc+y*hw*4;
 			for (unsigned x=0; x<w; x++) {
@@ -176,7 +294,7 @@ static void makeImage(DS3_Image *img, u8 *pixels, unsigned w, unsigned h, int no
 	return;
 }
 
-static int loadImage(DS3_Image *img, char *fname) {
+static int loadImage(DS3_Image *img, const char *fname) {
 	SDL_Surface *s=IMG_Load(fname);
 	if (!s) return -1;
 
@@ -193,11 +311,16 @@ static inline void requestRepaint() {
 
 static void uib_repaint(void *param, int topupdated) {
 	s32 c;
+	int i;
 	
 	if (svcWaitSynchronization(repaintRequired, 0)) return;
 	svcClearEvent(repaintRequired);
-
 	svcWaitSynchronization(privateSem1, U64_MAX);
+
+	if (set_kb_y_pos != -10000) {
+		kb_y_pos=set_kb_y_pos;
+		set_kb_y_pos=-10000;
+	}
 
 	// Render the scene
 	C3D_RenderTargetClear(VideoSurface2, C3D_CLEAR_ALL, CLEAR_COLOR, 0);
@@ -206,10 +329,19 @@ static void uib_repaint(void *param, int topupdated) {
 	// background
 	drawImage(&background_spr, 0, 0, 0, 0, 0);
 	
-	// spinner
-	//static int deg=0;
-	//drawImage(&spinner_spr, (320 - spinner_spr.w)/2, (240 - spinner_spr.h)/2, 0, 0, deg);
-	//deg = (deg+30) % 360;
+	// keyboard
+	DS3_Image *kb=(sticky & 1) == 1 ? &(kbd2_spr):&(kbd1_spr);
+	drawImage(kb, 0, kb_y_pos, 0, 0, 0);
+	// keyboard twisty
+	DS3_Image *tw = kb_y_pos > (240 - kb->h) ? &(twistyup_spr):&(twistydn_spr);
+	drawImage(tw, 0, kb_y_pos - tw->h, 0, 0, 0);
+	// keys pressed
+	uikbd_key *k;
+	for (i=0;uikbd_keypos[i].key!=-1; ++i) {
+		k=&(uikbd_keypos[i]);
+		if (k->flags==1 || keysPressed[i]==0) continue;
+		drawImage(&(keymask_spr),k->x,k->y+kb_y_pos,k->w,k->h,0);
+	}
 
 	svcReleaseSemaphore(&c, privateSem1, 1);
 }
@@ -228,7 +360,76 @@ static void uib_shutdown() {
 	uib_isinit = 0;
 }
 
-// init bottom
+static void keypress_recalc() {
+	const char *s;
+	int state,key;
+
+	memset(keysPressed,0,sizeof(keysPressed));
+	for (key = 0; uikbd_keypos[key].key!=-1; ++key) {
+		state=0;
+		if (key == kb_activekey) state=1;
+		else if (uikbd_keypos[key].sticky & sticky) state=1;
+		keysPressed[key]=state;
+	}
+}
+
+static void *alloc_copy(void *p, size_t s) {
+	void *d=malloc(s);
+	memcpy(d,p,s);
+	return d;
+}
+
+typedef struct animation {
+	int *var;
+	int from;
+	int to;
+} animation;
+
+typedef struct animation_set {
+	int steps;
+	int delay;
+	int nr;
+	void (*callback)(void *);
+	void *callback_data;
+	void (*callback2)(void *);
+	void *callback2_data;
+	animation anim[];
+} animation_set;
+
+static int animate(void *data){
+	animation_set *a=(animation_set*)data;
+	int steps = a->steps != 0 ? a->steps : 15 ;
+	int delay = a->delay != 0 ? a->delay : 16 ; // 1/60 sec, one 3ds frame
+	for (int s=0; s <= steps; s++) {
+		for (int i=0; i < a->nr; i++) {
+			*(a->anim[i].var)=
+				a->anim[i].from +
+				(((a->anim[i].to - a->anim[i].from) * s ) / steps);
+		}
+		if (a->callback) (a->callback)(a->callback_data);
+		if (s != steps) SDL_Delay(delay);
+	}
+	if (a->callback2) (a->callback2)(a->callback2_data);
+	free(data);
+	return 0;
+}
+
+static void anim_callback(void *param) {
+	requestRepaint();
+}
+
+static void toggle_keyboard() {
+	int y1=240-kbd1_spr.h;
+
+	start_worker(animate, alloc_copy(&((int[]){
+		0, 0, 1, // steps, delay, nr
+		(int)anim_callback, 0, // callback, callback_data
+		0,0, // callback2, callback2_data
+		(int)(&set_kb_y_pos), kb_y_pos < 240 ? y1 : 240, kb_y_pos < 240 ? 240 : y1
+	}), 10*sizeof(int)));
+}
+
+// exposed functions
 void uib_init() {
 	if (uib_isinit) return;
 	uib_isinit=1;
@@ -238,7 +439,14 @@ void uib_init() {
 
 	// pre-load sprites
 	loadImage(&background_spr, "romfs:/background.png");
-	//loadImage(&spinner_spr, "romfs:/spinner.png");
+	loadImage(&kbd1_spr, "romfs:/kbd1.png");
+	loadImage(&kbd2_spr, "romfs:/kbd2.png");
+	loadImage(&twistyup_spr, "romfs:/twistyup.png");
+	loadImage(&twistydn_spr, "romfs:/twistydn.png");
+	makeImage(&keymask_spr, (const u8[]){0x00, 0x00, 0x00, 0x80},1,1,0);
+
+
+	kb_y_pos = 240 - kbd1_spr.h;
 
 	svcCreateEvent(&repaintRequired, RESET_ONESHOT);
 	SDL_RequestCall(uib_repaint, NULL);
@@ -248,7 +456,6 @@ void uib_init() {
 	atexit(uib_shutdown);
 }
 
-// exposed functions
 void uib_update(void)
 {
 	enum uib_action uib_must_redraw_local;
@@ -260,11 +467,73 @@ void uib_update(void)
 		// needed for mutithreading
 		uib_must_redraw_local = uib_must_redraw;
 		uib_must_redraw = UIB_NO;
+		
+		if (uib_must_redraw_local & UIB_RECALC_KEYPRESS) {
+			keypress_recalc();
+		}
 		requestRepaint();
 	}
 //	requestRepaint();
 }
 
-void uib_handle_event(SDL_Event *e) {
+int uib_handle_event(SDL_Event *e) {
+	static SDL_Event sdl_e;
+	int i,x,y;
 
+	if (e->type == SDL_KEYDOWN) {
+		if (e->key.keysym.sym == 255) {
+			toggle_keyboard();
+			return 1;
+		}
+	}
+
+	switch (e->type) {
+		case SDL_MOUSEMOTION:
+			return 0;
+		case SDL_MOUSEBUTTONUP:
+			if (kb_activekey==-1) return 0; // did not get the button down, so ignore button up
+			i=kb_activekey;
+			kb_activekey=-1;
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			x = e->button.x;
+			y = e->button.y;
+			for (i = 0; uikbd_keypos[i].key != -1 ; ++i) {
+				// keyboard button
+				if (x >= uikbd_keypos[i].x &&
+					x <  uikbd_keypos[i].x + uikbd_keypos[i].w &&
+					y >= uikbd_keypos[i].y + kb_y_pos &&
+					y <  uikbd_keypos[i].y + uikbd_keypos[i].h + kb_y_pos) break;
+			}
+			if (uikbd_keypos[i].key == -1) {
+				return 0;
+			}
+			if (i==kb_activekey) return 1; // ignore button down on an already pressed key
+			kb_activekey=i;
+			break;
+		default:
+			return 0;
+	}
+
+	// sticky key press
+	if (uikbd_keypos[i].sticky>0) {
+		if (e->button.type == SDL_MOUSEBUTTONDOWN) {
+			sticky = sticky ^ uikbd_keypos[i].sticky;
+			sdl_e.type = sticky & uikbd_keypos[i].sticky ? SDL_KEYDOWN : SDL_KEYUP;
+			sdl_e.key.keysym.sym = uikbd_keypos[i].key;
+			sdl_e.key.keysym.unicode = 0;
+			SDL_PushEvent(&sdl_e);
+		}
+	} else {
+		// normal key press
+		sdl_e.type = e->button.type == SDL_MOUSEBUTTONDOWN ? SDL_KEYDOWN : SDL_KEYUP;
+		sdl_e.key.keysym.sym = uikbd_keypos[i].key;
+		if ((sticky & 1) && uikbd_keypos[i].shift)
+			sdl_e.key.keysym.unicode = uikbd_keypos[i].shift;
+		else
+			sdl_e.key.keysym.unicode = sdl_e.key.keysym.sym;
+		SDL_PushEvent(&sdl_e);
+	}
+	uib_must_redraw |= UIB_RECALC_KEYPRESS;
+	return 1;
 }

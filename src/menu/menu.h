@@ -3,7 +3,6 @@
 
 extern SDL_Surface *prSDLScreen;
 
-#define MENU_FILE_SPLASH DATA_PREFIX "splash.bmp"
 #define MENU_FILE_BACKGROUND DATA_PREFIX "background.bmp"
 #define MENU_FILE_WINDOW DATA_PREFIX "window.bmp"
 #define MENU_FILE_TEXT DATA_PREFIX "text.bmp"

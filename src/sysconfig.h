@@ -10,7 +10,6 @@
 #define __inline__ __inline__
 #define SHM_SUPPORT_LINKS 0
 #define OS_WITHOUT_MEMORY_MANAGEMENT
-#define VKBD_ALWAYS 
 #define EMULATED_JOYSTICK
 #define HOME_DIR
 //#define MENU_MUSIC

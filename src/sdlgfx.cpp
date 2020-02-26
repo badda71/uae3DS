@@ -40,7 +40,6 @@ void guarda(void);
 #include "debug.h"
 #include "savestate.h"
 #include "menu/menu.h"
-#include "vkbd/vkbd.h"
 #include "uibottom.h"
 
 #ifdef DREAMCAST
@@ -49,8 +48,6 @@ extern int __sdl_dc_emulate_mouse;
 #endif
 
 #include "debug_uae4all.h"
-
-#include "vkbd.h"
 
 extern int drawfinished;
 
@@ -165,10 +162,6 @@ void flush_screen (void)
 			_write_text_inv_n(prSDLScreen,0,29,30,show_message_str);
 		}
 	}
-	if (emulated_mouse)
-		vkbd_mouse();
-	if (vkbd_mode)
-		vkbd_key=vkbd_process();
 #if defined(DOUBLEBUFFER) || defined(DINGOO)
 	SDL_Flip(prSDLScreen);
 #endif

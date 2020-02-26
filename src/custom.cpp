@@ -3972,9 +3972,6 @@ void custom_prepare_savestate (void)
     }
 }
 
-extern SDLKey vkbd_button2;
-extern SDLKey vkbd_button3;
-extern SDLKey vkbd_button4;
 #define RB restore_u8 ()
 #define RW restore_u16 ()
 #define RL restore_u32 ()
@@ -4093,15 +4090,9 @@ uae_u8 *restore_custom (uae_u8 *src)
     RW;				/* 1DA ? */
     new_beamcon0 = RW;		/* 1DC BEAMCON0 */
     RW;				/* 1DE ? */
-#if 0
     RW;				/* 1E0 ? */
     RW;				/* 1E2 ? */
     RW;				/* 1E4 ? */
-#else
-    vkbd_button2 = (SDLKey) RW;
-    vkbd_button3 = (SDLKey) RW;
-    vkbd_button4 = (SDLKey) RW;
-#endif
     RW;				/* 1E6 ? */
     RW;				/* 1E8 ? */
     RW;				/* 1EA ? */
@@ -4239,15 +4230,9 @@ uae_u8 *save_custom (int *len)
     SW (0);			/* 1DA */
     SW (beamcon0);		/* 1DC BEAMCON0 */
     SW (0);			/* 1DE */
-#if 0
     SW (0);			/* 1E0 */
     SW (0);			/* 1E2 */
     SW (0);			/* 1E4 */
-#else
-    SW (vkbd_button2);
-    SW (vkbd_button3);
-    SW (vkbd_button4);
-#endif
     SW (0);			/* 1E6 */
     SW (0);			/* 1E8 */
     SW (0);			/* 1EA */

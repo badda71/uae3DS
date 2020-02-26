@@ -14,7 +14,6 @@
 #include "options.h"
 #include "gui.h"
 #include "menu.h"
-#include "vkbd.h"
 #include "debug_uae4all.h"
 #include "custom.h"
 #include "memory.h"
@@ -217,7 +216,6 @@ int gui_init (void)
 	emulating=0;
 	uae4all_image_file[0]=0;
 	uae4all_image_file2[0]=0;
-	vkbd_init();
 	init_text(1);
 	loadConfig();
 	run_mainMenu();
@@ -314,7 +312,6 @@ static void goMenu(void)
    uae4all_show_time();
 #endif
    emulating=1;
-//   vkbd_quit();
    init_text(0);
    pause_sound();
    menu_raise();
@@ -324,12 +321,10 @@ static void goMenu(void)
    if ((!(strcmp(prefs_df[0],uae4all_image_file))) || ((!(strcmp(prefs_df[1],uae4all_image_file2)))))
 	   menu_unraise();
    quit_text();
-//   vkbd_init();
 #ifdef DREAMCAST
    SDL_DC_EmulateKeyboard(SDL_FALSE);
 #endif
     getChanges();
-    vkbd_init_button2();
     if (exitmode==1 || exitmode==2)
     {
     	    extern char *savestate_filename;
@@ -383,7 +378,7 @@ static void goMenu(void)
 #endif
 }
 
-static int nowSuperThrottle=0, goingSuperThrottle=0, goingVkbd=0, goingEmouse;
+static int nowSuperThrottle=0, goingSuperThrottle=0;
 
 static void goSuperThrottle(void)
 {

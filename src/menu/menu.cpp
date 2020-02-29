@@ -16,6 +16,7 @@
 #include "msg.h"
 #include "fade.h"
 #include "uibottom.h"
+#include "keyboard.h"
 
 #ifdef HOME_DIR
 #include "homedir.h"
@@ -239,9 +240,6 @@ void init_text(int splash)
 	}
 	if (splash)
 	{
-		SDL_Surface *sur;
-		SDL_Rect r;
-		int i,j;
 		SDL_Event ev;
 		int toexit=0;
 
@@ -350,6 +348,8 @@ void write_text_pos(int x, int y, const char *str)
 	c = 65;
       else if (str[i] == ')')
 	c = 66;
+      else if (str[i] == '?')
+	c = 67;
       
       if (c >= 0)
 	{
@@ -424,6 +424,8 @@ void write_text(int x, int y, const char *str)
 	c = 65;
       else if (str[i] == ')')
 	c = 66;
+      else if (str[i] == '?')
+	c = 67;
       
       if (c >= 0)
 	{
@@ -626,44 +628,39 @@ void _write_num_inv(SDL_Surface *sf, int x, int y, int v)
 void text_draw_window(int x, int y, int w, int h, const char *title)
 {
 	int i,j;
-	int r8x = x / 8;
-	int r8y = y / 8;
-	int rx = r8x * 8;
-	int ry = r8y * 8;
-	int r32w =  w / 32;
-	int r24h =  h / 24;
-	int rw = r32w * 32;
-	int rh = r24h * 24;
-	int r8w = rw / 8;
-
 	SDL_Rect dest;
 
-	dest.x = rx + 6;
-	dest.y = ry - 4;
-	dest.w = rw + 6;
-	dest.h = rh + 18;
+	x=(x/8)*8;
+	y=(y/8)*8;
+	w=(w/8)*8;
+	h=(h/8)*8;
+
+	dest.x = x + 6;
+	dest.y = y - 4;
+	dest.w = w + 6;
+	dest.h = h + 18;
 	SDL_FillRect(text_screen, &dest, menu_win0_color);
 
-	dest.x = rx - 2;
-	dest.y = ry - 10; //12;
-	dest.w = rw + 4;
-	dest.h = rh + 14; //16;
+	dest.x = x - 2;
+	dest.y = y - 10; //12;
+	dest.w = w + 4;
+	dest.h = h + 14; //16;
 	SDL_FillRect(text_screen, &dest, menu_win1_color);
 
-	for(i=0;i<r32w;i++)
-		for(j=0;j<r24h;j++)
+	SDL_SetClipRect(text_screen, &(SDL_Rect){.x=x, .y=y, .w=w, .h=h});
+	for(i=0;i<w;i+=32)
+		for(j=0;j<h;j+=24)
 		{
-			dest.x=rx+i*32;
-			dest.y=ry+j*24;
+			dest.x=x+i;
+			dest.y=y+j;
 			dest.w=32;
 			dest.h=24;
 			SDL_BlitSurface(text_window_background,NULL,text_screen,&dest);
-
 		}
+	SDL_SetClipRect(text_screen, NULL);
 
-	write_text(r8x, r8y - 1, "OOO");
-	write_text(r8x + ((r8w-strlen(title)) / 2), r8y - 1, title);
-
+	write_text(x / 8, y / 8 - 1, "OOO");
+	write_text(x / 8 + ((w / 8 -strlen(title)) / 2), y / 8 - 1, title);
 }
 
 void _text_draw_window(SDL_Surface *sf, int x, int y, int w, int h, const char *title)
@@ -706,3 +703,117 @@ void _text_draw_window_bar(SDL_Surface *sf, int x, int y, int w, int h, int per,
 	text_screen=back;
 }
 
+#define FONT_H 8
+#define FONT_W 8
+#define MSGBOX_PADDING 8
+
+int text_messagebox(char *title, char *message, mb_mode mode) {
+	int height = 1;
+	int width = strlen(title) + 4,w;
+	char buf[200];
+	char *c;
+	extern SDL_Surface *text_screen;
+
+	for (c=message, w=0; *c!=0; c++)
+	{
+		if (*c == '\n')
+		{
+			++height;
+			if (width<w) width=w;
+			w=0;
+		}
+		else
+		{
+			++w;
+		}
+	}
+	if (width<w) width=w;
+	height += mode==MB_NONE ? 0 : 2;
+
+	int maxwidth = (text_screen->w - MSGBOX_PADDING * 2) / FONT_W - 2;
+	if (mode == MB_OK && width<4) width=4;
+	if (mode == MB_YESNO && width<9) width=9;
+	if (width > maxwidth) width = maxwidth;
+
+	int maxheight = text_screen->h / FONT_H - 3 - MSGBOX_PADDING * 2 / FONT_H;;
+	if (height > maxwidth) height = maxheight;
+
+	int x= (text_screen->w / FONT_W - width) / 2;
+	int y= (text_screen->h / FONT_H - height) / 2;
+	
+	int selected=0;
+	int frame = 0;
+	do {
+		int yo=0;
+		SDL_Event e;
+		text_draw_background();
+		text_draw_window(x * FONT_W - MSGBOX_PADDING, y * FONT_H - MSGBOX_PADDING, width*FONT_W + MSGBOX_PADDING*2, height*FONT_H + MSGBOX_PADDING*2, title);
+		
+		for (c=message; c!=1; c=strchr(c, '\n')+1)
+		{
+			char *n;
+			if ((n=strchr(c,'\n'))!=NULL)
+				*n=0;
+			snprintf(buf, width+1, "%s", c);
+			if (n) *n='\n';
+			write_text(x, y+yo, buf);
+			++yo;
+		}
+
+		int flash = frame / 3;
+
+		if (SDL_PollEvent(&e) &&
+			!uib_handle_event(&e) &&
+			e.type==SDL_KEYDOWN)
+		{
+			switch (e.key.keysym.sym) {
+			case DS_RIGHT1:
+			case DS_RIGHT2:
+			case DS_RIGHT3:
+			case AK_RT:
+			case DS_DOWN1:
+			case DS_DOWN2:
+			case DS_DOWN3:
+			case AK_DN:
+			case DS_LEFT1:
+			case DS_LEFT2:
+			case DS_LEFT3:
+			case AK_LF:
+			case DS_UP1:
+			case DS_UP2:
+			case DS_UP3:
+			case AK_UP: if (mode == MB_YESNO) selected = (selected+1) % 2; break;
+			case DS_A:
+			case DS_START:
+			case AK_RET:
+			case AK_SPC: return selected; break;
+			case AK_ESC:
+			case DS_B: return -1; break;
+			}
+		}
+		switch (mode) {
+			case MB_OK:
+				write_text(x+width/2-2, y+yo+1, "    ");
+				if (flash)
+					write_text_inv(x+width/2-1, y+yo+1, "OK");
+				else
+					write_text(x+width/2-1, y+yo+1, "OK");
+				break;
+			case MB_YESNO:
+				write_text(x+width/2-5, y+yo+1, "         ");
+				if (flash && selected==0)
+					write_text_inv(x+width/2-4, y+yo+1, "YES");
+				else
+					write_text(x+width/2-4, y+yo+1, "YES");
+				if (flash && selected==1)
+					write_text_inv(x+width/2+1, y+yo+1, "NO");
+				else
+					write_text(x+width/2+1, y+yo+1, "NO");
+				break;
+		}
+		text_flip();
+		SDL_Delay(10);
+		frame = (frame + 1) % 6;
+	} while (mode != MB_NONE);
+	return 0;
+}

@@ -351,7 +351,7 @@ int run_menuSave()
 
 	if (!emulating)
 	{
-		show_error("No running");
+		show_error("Not running");
 		return 0;
 	}
 
@@ -405,7 +405,7 @@ int run_menuSave()
 				}
 				else
 				{
-					show_error("No exists");
+					show_error("Not Found");
 					saveMenu_case=-1;
 				}
 				}

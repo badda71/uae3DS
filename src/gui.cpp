@@ -73,7 +73,7 @@ char uae4all_image_file2[128];
 
 int drawfinished=0;
 
-extern int mainMenu_throttle, mainMenu_frameskip, mainMenu_sound, mainMenu_case, mainMenu_autosave, mainMenu_vpos, mainMenu_usejoy;
+extern int mainMenu_throttle, mainMenu_frameskip, mainMenu_sound, mainMenu_case, mainMenu_autosave, mainMenu_vpos;
 
 int emulated_left=0;
 int emulated_right=0;
@@ -129,8 +129,6 @@ void loadConfig()
 			sscanf(arg, "%d", &mainMenu_sound);
 		else if(!strcmp(line, "SAVE_DISKS"))
 			sscanf(arg, "%d", &mainMenu_autosave);
-		else if(!strcmp(line, "USE_JOY"))
-			sscanf(arg, "%d", &mainMenu_usejoy);
 		else if(!strcmp(line, "LAST_DIR"))
 		{
 			int len = strlen(arg);
@@ -175,7 +173,7 @@ void storeConfig()
 		return;
 	}
 
-	fprintf(f, "THROTTLE %d\nFRAMESKIP %d\nSCREEN_POS %d\nSOUND %d\nSAVE_DISKS %d\nUSE_JOY %d\n", mainMenu_throttle, mainMenu_frameskip, mainMenu_vpos, mainMenu_sound, mainMenu_autosave, mainMenu_usejoy);
+	fprintf(f, "THROTTLE %d\nFRAMESKIP %d\nSCREEN_POS %d\nSOUND %d\nSAVE_DISKS %d\n", mainMenu_throttle, mainMenu_frameskip, mainMenu_vpos, mainMenu_sound, mainMenu_autosave);
 
 	if(last_directory[0])
 	{

@@ -25,6 +25,12 @@ enum DiskOrder
 	DF_1,
 };
 
+typedef enum {
+	MB_NONE,
+	MB_OK,
+	MB_YESNO
+} mb_mode;
+
 void text_draw_background();
 void init_text(int splash);
 void quit_text(void);
@@ -45,6 +51,7 @@ void _write_num(SDL_Surface *sf, int x, int y, int v);
 void _write_num_inv(SDL_Surface *sf, int x, int y, int v);
 void _text_draw_window(SDL_Surface *sf, int x, int y, int w, int h, const char *title);
 void _text_draw_window_bar(SDL_Surface *sf, int x, int y, int w, int h, int per, int max, const char *title);
+int text_messagebox(char *title, char *text, mb_mode mode);
 // void text_draw_menu_msg();
 void text_flip(void);
 

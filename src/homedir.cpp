@@ -9,13 +9,13 @@
 #define MKDIRMOD 0644
 #define PATH_SEP_CHAR '/'
 
-const char *home_dir="/3ds/uae3DS";
-const char *config_dir=home_dir;
+char home_dir[]="/3ds/uae3DS";
+char *config_dir=home_dir;
 
-int mkpath(const char* file_path, int complete) {
+int mkpath(char* file_path, int complete) {
 	char* p;
 
-	for (p=strchr(file_path+1, PATH_SEP_CHAR); p; p=strchr(p+1, PATH_SEP_CHAR)) {
+	for (p=strchr(file_path+1, PATH_SEP_CHAR); p != NULL; p=strchr(p+1, PATH_SEP_CHAR)) {
 		*p='\0';
 		if (mkdir(file_path, MKDIRMOD)==-1) {
 			if (errno!=EEXIST) { *p=PATH_SEP_CHAR; goto mkpath_err; }

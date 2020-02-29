@@ -36,6 +36,8 @@
 #include "homedir.h"
 #include "3ds_cia.h"
 #include "http.h"
+#include "uibottom.h"
+#include "keyboard.h"
 
 extern int __system_argc;
 extern char** __system_argv;
@@ -75,6 +77,18 @@ static char *prog_title=NULL;
 static char *prog_text=NULL;
 static int progress_callback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
 {
+	// check events
+	SDL_Event e;
+	if (SDL_PollEvent(&e) && 
+		!uib_handle_event(&e) &&
+		e.type==SDL_KEYDOWN && (
+		e.key.keysym.sym == AK_ESC ||
+		e.key.keysym.sym == DS_B))
+	{
+		return -1;
+	}
+	
+	// draw update message box
 	char *bar="##############################";
 	char buf[512];
 	sprintf(buf, "%s\n\n%-30s\n%s / ",
@@ -84,7 +98,6 @@ static int progress_callback(void *clientp, curl_off_t dltotal, curl_off_t dlnow
 	strcat(buf,humanSize(dltotal));
 	text_messagebox(
 		prog_title?prog_title:"Download", buf, MB_NONE);
-	SDL_Delay(100);
 	return 0;
 }
 
@@ -181,7 +194,7 @@ int check_update()
 		}
 	}
 	if (update_fname[0] == 0) {
-		sprintf(update_fname,"%s%s", SAVE_PREFIX, strrchr(update_url,'/'));
+		sprintf(update_fname,"%s%s", SAVE_PREFIX, strrchr(update_url,'/')+1);
 	}
 	mkpath(update_fname, 0);
 

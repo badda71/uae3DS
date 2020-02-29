@@ -749,13 +749,11 @@ int text_messagebox(char *title, char *message, mb_mode mode) {
 		text_draw_background();
 		text_draw_window(x * FONT_W - MSGBOX_PADDING, y * FONT_H - MSGBOX_PADDING, width*FONT_W + MSGBOX_PADDING*2, height*FONT_H + MSGBOX_PADDING*2, title);
 		
-		for (c=message; c!=1; c=strchr(c, '\n')+1)
+		char *n=NULL;
+		for (c=message; c!=1; c=n+1)
 		{
-			char *n;
-			if ((n=strchr(c,'\n'))!=NULL)
-				*n=0;
-			snprintf(buf, width+1, "%s", c);
-			if (n) *n='\n';
+			n=strchr(c,'\n');
+			snprintf(buf, MIN(n?n-c:strlen(c), width)+1, "%s", c);
 			write_text(x, y+yo, buf);
 			++yo;
 		}
@@ -811,9 +809,13 @@ int text_messagebox(char *title, char *message, mb_mode mode) {
 					write_text(x+width/2+1, y+yo+1, "NO");
 				break;
 		}
-		text_flip();
-		SDL_Delay(10);
+		// text_flip() but without the SDL_Delay
+		 SDL_BlitSurface(text_screen,NULL,prSDLScreen,NULL);
+		 uib_update();
+		 SDL_Flip(prSDLScreen);
+		if (mode == MB_NONE) break;
+		SDL_Delay(20);
 		frame = (frame + 1) % 6;
-	} while (mode != MB_NONE);
+	} while (1);
 	return 0;
 }

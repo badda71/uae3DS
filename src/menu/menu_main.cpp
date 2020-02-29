@@ -463,6 +463,7 @@ static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 		while (action == MAIN_MENU_ENTRY_NONE)
 		{
 			draw_mainMenu(c);
+			SDL_Delay(10);
 			action = key_mainMenu(&c);
 		}
 		unraise_mainMenu();

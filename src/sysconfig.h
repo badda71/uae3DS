@@ -460,23 +460,4 @@
 
 /* Define if you have the <windows.h> header file.  */
 /* #undef HAVE_WINDOWS_H */
-
-#ifdef WIN32
-#define random() (rand())
-#endif
-
-#ifdef DREAMCAST
-#include<kos.h>
-#include<sys/stat.h>
-#include<utime.h>
-#define dup(a) (int)fs_dup((file_t)a)
-#define access(a,b) 0
-#define mkdir(a,b) fs_mkdir(a)
-#define rmdir(a) fs_rmdir(a)
-#define chmod(a,b) 0
-#define utime(a,b) 0
-#define random() (rand())
-#define creat(x,y) open("T:creat",O_CREAT|O_WRONLY|O_TRUNC)
-#define tmpnam(a) "/ram/tmp"
-#endif
-
+#define MIN(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a < _b ? _a : _b; })

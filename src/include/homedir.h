@@ -1,5 +1,5 @@
-extern int mkpath(const char* file_path, int complete);
+extern int mkpath(char* file_path, int complete);
 extern void get_config_dir(void);
 
-extern const char *home_dir;
-extern const char *config_dir;
+extern char home_dir[];
+extern char *config_dir;

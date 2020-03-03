@@ -125,34 +125,11 @@ extern int emulated_mouse, emulated_mouse_button1, emulated_mouse_button2;
 int uae4all_keystate[256];
 
 
-#ifdef USE_RASTER_DRAW
-void flush_block (int ystart, int ystop)
-#else
 void flush_screen (void)
-#endif
 {
-    uae4all_prof_start(13);
-#ifdef DEBUG_GFX
-    dbgf("Function: flush_block %d %d\n", ystart, ystop);
-#endif
-#if !defined(DREAMCAST) && !defined(DINGOO)
-    if (SDL_MUSTLOCK(prSDLScreen))
-    	SDL_UnlockSurface (prSDLScreen);
-#endif
-#ifndef DINGOO
-#ifndef DOUBLEBUFFER
-#ifdef USE_RASTER_DRAW
-    SDL_UpdateRect(prSDLScreen, 0, ystart, current_width, ystop-ystart+1);
-#else
-    SDL_UpdateRect(prSDLScreen, 0, 0, 320, 240);
-#endif
-#endif
-#endif
-#ifdef USE_RASTER_DRAW
-    if (drawfinished)
-    {
-	drawfinished=0;
-#endif
+	uae4all_prof_start(13);
+	if (SDL_MUSTLOCK(prSDLScreen))
+		SDL_UnlockSurface (prSDLScreen);
 	if (show_message)
 	{
 		show_message--;
@@ -162,22 +139,15 @@ void flush_screen (void)
 			_write_text_inv_n(prSDLScreen,0,29,30,show_message_str);
 		}
 	}
-#if defined(DOUBLEBUFFER) || defined(DINGOO)
 	SDL_Flip(prSDLScreen);
-#endif
-#if !defined(DREAMCAST) && !defined(DINGOO)
-    if (SDL_MUSTLOCK(prSDLScreen))
-    	SDL_LockSurface (prSDLScreen);
-#endif
-#if defined(DOUBLEBUFFER) || defined(DINGOO)
+
+	if (SDL_MUSTLOCK(prSDLScreen))
+		SDL_LockSurface (prSDLScreen);
+
 	gfx_mem = (char*) prSDLScreen->pixels;
 	prSDLScreenPixels = (uae_u16*) prSDLScreen->pixels;
 	reset_screen_pointers();
-#endif
-#ifdef USE_RASTER_DRAW
-    }
-#endif
-    uae4all_prof_end(13);
+	uae4all_prof_end(13);
 }
 
 void black_screen_now(void)

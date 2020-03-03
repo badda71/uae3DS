@@ -11,9 +11,13 @@
 #include <3ds.h>
 #include <citro3d.h>
 #include <math.h>
+#include "sysconfig.h"
+#include "sysdeps.h"
+#include "config.h"
 #include "keyboard.h"
 #include "uibottom.h"
 #include "uae3ds.h"
+#include "gui.h"
 
 uikbd_key uikbd_keypos[] = {
 	//  x,  y,   w,   h,         key,shft,stky, flgs, name
@@ -142,10 +146,14 @@ static DS3_Image twistyup_spr;
 static DS3_Image twistydn_spr;
 static DS3_Image keymask_spr;
 
+// dynamic sprites
+static DS3_Image statusbar_spr;
+
 // static variables
 static Handle repaintRequired;
 static int uib_isinit=0;
 static u8 *gpusrc=NULL;
+static u8 *status_gpusrc=NULL;
 static int kb_y_pos = 0;
 static volatile int set_kb_y_pos = -10000;
 static int kb_activekey=-1;
@@ -328,7 +336,10 @@ static void uib_repaint(void *param, int topupdated) {
 
 	// background
 	drawImage(&background_spr, 0, 0, 0, 0, 0);
-	
+
+	// statusbar
+	drawImage(&statusbar_spr, 0, 0, 0, 0, 0);
+
 	// keyboard
 	DS3_Image *kb=(sticky & 1) == 1 ? &(kbd2_spr):&(kbd1_spr);
 	drawImage(kb, 0, kb_y_pos, 0, 0, 0);
@@ -355,13 +366,14 @@ static void uib_shutdown() {
 	svcCloseHandle(repaintRequired);
 
 	if (gpusrc) linearFree(gpusrc);
-	gpusrc=NULL;
+	gpusrc = NULL;
+	if (status_gpusrc) linearFree(status_gpusrc);
+	status_gpusrc = NULL;
 
 	uib_isinit = 0;
 }
 
 static void keypress_recalc() {
-	const char *s;
 	int state,key;
 
 	memset(keysPressed,0,sizeof(keysPressed));
@@ -445,7 +457,17 @@ void uib_init() {
 	loadImage(&twistydn_spr, "romfs:/twistydn.png");
 	makeImage(&keymask_spr, (const u8[]){0x00, 0x00, 0x00, 0x80},1,1,0);
 
+	
+	// set up status sprite / framebuf
+	status_gpusrc = (u8*)linearAlloc(512*16*4);
+	memset(status_gpusrc, 0, 512*16*4);
+	statusbar_spr.w=320;
+	statusbar_spr.h=16;
+	statusbar_spr.fw=(float)(statusbar_spr.w)/512.0f;
+	statusbar_spr.fh=(float)(statusbar_spr.h)/16.0f;
+	makeTexture(&(statusbar_spr.tex), status_gpusrc, 512, 16);
 
+	// other stuff
 	kb_y_pos = 240 - kbd1_spr.h;
 
 	svcCreateEvent(&repaintRequired, RESET_ONESHOT);
@@ -456,12 +478,114 @@ void uib_init() {
 	atexit(uib_shutdown);
 }
 
+// status line stuff
+
+#define TD_PADX 9
+#define TD_PADY 2
+#define TD_WIDTH 32
+#define TD_LED_WIDTH 24
+#define TD_LED_HEIGHT 4
+
+#define ON_RGB_D 0x00ff00ff
+#define OFF_RGB_D 0x0044000ff
+#define ON_RGB_P 0xff0000ff
+#define OFF_RGB_P 0x4400000ff
+
+#define TD_RIGHT 1
+#define TD_BOTTOM 2
+
+#define TD_NUM_WIDTH 7
+#define TD_NUM_HEIGHT 7
+
+#define TD_TOTAL_HEIGHT (TD_PADY * 2 + TD_NUM_HEIGHT)
+
+static const char *numbers = {
+"------ ------ ------ ------ ------ ------ ------ ------ ------ ------ "
+"-xxxxx ---xx- -xxxxx -xxxxx -x---x -xxxxx -xxxxx -xxxxx -xxxxx -xxxxx "
+"-x---x ----x- -----x -----x -x---x -x---- -x---- -----x -x---x -x---x "
+"-x---x ----x- -xxxxx -xxxxx -xxxxx -xxxxx -xxxxx ----x- -xxxxx -xxxxx "
+"-x---x ----x- -x---- -----x -----x -----x -x---x ---x-- -x---x -----x "
+"-xxxxx ----x- -xxxxx -xxxxx -----x -xxxxx -xxxxx ---x-- -xxxxx -xxxxx "
+"------ ------ ------ ------ ------ ------ ------ ------ ------ ------ "
+};
+
+static void uib_paint_led(int x, u32 col, int num)
+{
+	int y,j;
+	
+	for (y = 0; y < TD_TOTAL_HEIGHT; ++y) {
+		for (j = 0 ; j < TD_LED_WIDTH; ++j) {
+			*((u32*)(status_gpusrc + ((x + j + y * 512)<<2))) = col;
+		}
+	}
+
+	if (num >= 0) {
+		x += TD_PADX;
+		u8 *nump1 = (u8 *)(numbers + (num/10) * TD_NUM_WIDTH);
+		u8 *nump2 = (u8 *)(numbers + (num%10) * TD_NUM_WIDTH);
+		for (y = 0; y < TD_NUM_HEIGHT; ++y) {
+			for (j = 0 ; j < TD_NUM_WIDTH; ++j) {
+				*((u32*)(status_gpusrc + ((x + j + (y + TD_PADY) * 512)<<2))) = 
+					nump1[j + y * 10 * TD_NUM_WIDTH] == 'x'? 0xffffffff : 0x000000ff;
+				*((u32*)(status_gpusrc + ((TD_NUM_WIDTH + x + j + (y + TD_PADY) * 512)<<2))) = 
+					nump2[j + y * 10 * TD_NUM_WIDTH] == 'x'? 0xffffffff : 0x000000ff;
+			}
+		}
+	}
+}
+
+static void uib_statusbar_recalc()
+{
+	static uae_u8 dt0 = -1;
+	static uae_u8 dt1 = -1;
+	static uae_u8 dm0 = -1;
+	static uae_u8 dm1 = -1;
+	static uae_u8 pow = -1;
+	static int fps = -1;
+	int upd=0;
+	extern int fps_counter;
+
+
+	if (dt0 != gui_data.drive_track[0] || 
+		dm0 != gui_data.drive_motor[0])
+	{
+		dt0 = gui_data.drive_track[0];
+		dm0 = gui_data.drive_motor[0];
+		uib_paint_led(250, dm0 ? ON_RGB_D : OFF_RGB_D, dt0);
+		upd=1;
+	}
+	if (dt1 != gui_data.drive_track[1] || 
+		dm1 != gui_data.drive_motor[1])
+	{
+		dt1 = gui_data.drive_track[1];
+		dm1 = gui_data.drive_motor[1];
+		uib_paint_led(282, dm1 ? ON_RGB_D : OFF_RGB_D, dt1);
+		upd=1;
+	}
+	
+	if (pow != gui_data.powerled ||
+		fps != fps_counter)	
+	{
+		pow = gui_data.powerled;
+		fps = fps_counter;
+		uib_paint_led(218, pow ? ON_RGB_P : OFF_RGB_P, fps_counter);
+		upd=1;
+	}
+
+	if (upd) {
+		makeTexture(&(statusbar_spr.tex), status_gpusrc, 512, 16);
+		uib_must_redraw |= UIB_REPAINT;
+	}
+}
+
 void uib_update(void)
 {
 	enum uib_action uib_must_redraw_local;
 
 	// init if needed
 	if (!uib_isinit) uib_init();
+
+	uib_statusbar_recalc();
 
 	if (uib_must_redraw) {
 		// needed for mutithreading

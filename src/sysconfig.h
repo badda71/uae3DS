@@ -1,5 +1,13 @@
 /* src/sysconfig.h.  Generated automatically by configure.  */
 /* src/sysconfig.h.in.  Generated automatically from configure.in by autoheader.  */
+//#define EXACT_AUDIO
+//#define USE_BLIT_MASKTABLE
+//#define USE_SPECIAL_MEM
+//#define USE_LINESTATE
+//#define USE_RASTER_DRAW
+
+//#define AUTO_FRAMERATE 1400
+//#define MAX_AUTO_FRAMERATE 4400
 
 #define USE_SDL
 #define GCCCONSTFUNC "__attribute__((const))"
@@ -62,8 +70,6 @@
 //#define DEBUG_EVENTS
 //#define DEBUG_GFX -DDEBUG_BLITTER
 //#define DEBUG_FRAMERATE
-//#define AUTO_FRAMERATE 1400
-//#define MAX_AUTO_FRAMERATE 4400
 //#define AUTO_FRAMERATE_SOUND
 //#define START_DEBUG 999999
 //#define MAX_AUTOEVENTS 999990

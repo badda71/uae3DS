@@ -14,7 +14,8 @@
 enum uib_action {
 	UIB_NO = 0,
 	UIB_REPAINT = 1,
-	UIB_RECALC_KEYPRESS = 2
+	UIB_RECALC_KEYPRESS = 2,
+	UIB_RECALC_STATUSBAR = 4
 };
 
 #define DS_A 0x101

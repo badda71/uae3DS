@@ -50,10 +50,11 @@
 #include "savestate.h"
 #include "sound.h"
 #include "debug_uae4all.h"
+#include "uibottom.h"
 
 #include <sys/time.h>
 #include <time.h>
-static int fps_counter = 0, fps_counter_changed = 0;
+int fps_counter = 0;
 
 #ifdef USE_DRAWING_EXTRA_INLINE
 #define _INLINE_ __inline__
@@ -1916,7 +1917,7 @@ static _INLINE_ void init_drawing_frame (void)
 /*
  * Some code to put status information on the screen.
  */
-
+/*
 #define TD_PADX 10
 #define TD_PADY 2
 #define TD_WIDTH 32
@@ -1933,7 +1934,7 @@ static int td_pos = (TD_RIGHT|TD_BOTTOM);
 
 #define TD_TOTAL_HEIGHT (TD_PADY * 2 + TD_NUM_HEIGHT)
 
-static const char *numbers = { /* ugly */
+static const char *numbers = { //ugly
 "------ ------ ------ ------ ------ ------ ------ ------ ------ ------ "
 "-xxxxx ---xx- -xxxxx -xxxxx -x---x -xxxxx -xxxxx -xxxxx -xxxxx -xxxxx "
 "-x---x ----x- -----x -----x -x---x -x---- -x---- -----x -x---x -x---x "
@@ -2012,7 +2013,7 @@ static _INLINE_ void draw_status_line (int line)
 	x += TD_WIDTH;
     }
 }
-
+*/
 void check_all_prefs(void)
 {
 
@@ -2038,11 +2039,6 @@ static void fps_counter_upd(void)
 		thissec = tv.tv_sec;
 		fps_counter = fcount;
 		fcount = 0;
-		fps_counter_changed = 1;
-	}
-	else
-	{
-		fps_counter_changed = 0;
 	}
 	fcount++;
 }
@@ -2054,57 +2050,32 @@ static _INLINE_ void finish_drawing_frame (void)
 	fps_counter_upd();
 
     for (i = 0; i < max_ypos_thisframe; i++) {
-	int where,i1;
-	int line = i + thisframe_y_adjust_real;
+		int where,i1;
+		int line = i + thisframe_y_adjust_real;
 
 #ifdef USE_LINESTATE
-	if (linestate[line] == LINE_UNDECIDED)
-	    break;
+		if (linestate[line] == LINE_UNDECIDED)
+		    break;
 #endif
 
-	i1 = i + min_ypos_for_screen;
-	where = amiga2aspect_line_map[i1];
+		i1 = i + min_ypos_for_screen;
+		where = amiga2aspect_line_map[i1];
 #if defined(USE_ALL_LINES) || !defined(USE_LINESTATE)
-	if (where >= GFXVIDINFO_HEIGHT - TD_TOTAL_HEIGHT)
-	    break;
+		if (where >= GFXVIDINFO_HEIGHT)
+		    break;
 #endif
-	if (where == -1)
-	    continue;
-	pfield_draw_line (line, where, amiga2aspect_line_map[i1 + 1]);
+		if (where == -1)
+		    continue;
+		pfield_draw_line (line, where, amiga2aspect_line_map[i1 + 1]);
     }
-#ifdef USE_RASTER_DRAW
-    if (   (frame_redraw_necessary) ||
-#else
-    if (
-#endif
-#if !defined(DOUBLEBUFFER) && !defined(STATUS_ALWAYS)
-	   (back_drive_track0!=gui_data.drive_track[0])
-	|| (back_drive_motor0!=gui_data.drive_motor[0])
-#if NUM_DRIVES > 1
-	|| (back_drive_track1!=gui_data.drive_track[1])
-	|| (back_drive_motor1!=gui_data.drive_motor[1])
-#endif
-	|| (back_powerled!=gui_data.powerled)
-#else
-	1
-#endif
-	)
-    {
-#if !defined(DOUBLEBUFFER) && !defined(STATUS_ALWAYS)
-	back_drive_track0=gui_data.drive_track[0];
-	back_drive_motor0=gui_data.drive_motor[0];
-#if NUM_DRIVES > 1
-	back_drive_track1=gui_data.drive_track[1];
-	back_drive_motor1=gui_data.drive_motor[1];
-#endif
-	back_powerled=gui_data.powerled;
-#endif
- 	for (i = 0; i < TD_TOTAL_HEIGHT; i++) {
+
+/*
+for (i = 0; i < TD_TOTAL_HEIGHT; i++) {
 		int line = GFXVIDINFO_HEIGHT - TD_TOTAL_HEIGHT + i;
 		draw_status_line (line);
 		do_flush_line (line);
-    	}
     }
+*/
 #ifdef USE_RASTER_DRAW
     drawfinished=1;
     do_flush_screen (first_drawn_line, last_drawn_line);
@@ -2187,7 +2158,7 @@ void hsync_record_line_state (int lineno, int changed)
 #endif
 #endif
 #ifndef USE_ALL_LINES
-    if (amiga2aspect_line_map[lineno - thisframe_y_adjust_real + min_ypos_for_screen] >= GFXVIDINFO_HEIGHT - TD_TOTAL_HEIGHT) {
+    if (amiga2aspect_line_map[lineno - thisframe_y_adjust_real + min_ypos_for_screen] >= GFXVIDINFO_HEIGHT) {
 #ifdef USE_LINESTATE
 	    *state = LINE_UNDECIDED;
 #endif

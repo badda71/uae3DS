@@ -54,7 +54,7 @@ static __inline__ int coord_window_to_diw_x (int x)
 }
 
 extern int framecnt;
-
+extern int fps_counter;
 
 /* color values in two formats: 12 (OCS/ECS) or 24 (AJA) bit Amiga RGB (color_uae_regs),
  * and the native color value; both for each Amiga hardware color register. 

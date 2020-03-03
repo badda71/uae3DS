@@ -51,6 +51,10 @@
 #include "sound.h"
 #include "debug_uae4all.h"
 
+#include <sys/time.h>
+#include <time.h>
+static int fps_counter = 0, fps_counter_changed = 0;
+
 #ifdef USE_DRAWING_EXTRA_INLINE
 #define _INLINE_ __inline__
 #else
@@ -1658,7 +1662,7 @@ static _INLINE_ void init_row_map (void)
 static _INLINE_ void init_aspect_maps (void)
 {
     int i, maxl;
-    double native_lines_per_amiga_line;
+    //double native_lines_per_amiga_line;
 
     if (native2amiga_line_map)
 	free (native2amiga_line_map);
@@ -1669,13 +1673,14 @@ static _INLINE_ void init_aspect_maps (void)
     amiga2aspect_line_map = (int *)xmalloc (sizeof (int) * (MAXVPOS + 1)*2 + 1);
     native2amiga_line_map = (int *)xmalloc (sizeof (int) * GFXVIDINFO_HEIGHT);
 
-	native_lines_per_amiga_line = 1;
+	//native_lines_per_amiga_line = 1;
 
     maxl = (MAXVPOS + 1);
     min_ypos_for_screen = minfirstline;
     max_drawn_amiga_line = -1;
     for (i = 0; i < maxl; i++) {
-	int v = (int) ((i - min_ypos_for_screen) * native_lines_per_amiga_line);
+	//int v = (int) ((i - min_ypos_for_screen) * native_lines_per_amiga_line);
+	int v = (int) (i - min_ypos_for_screen);
 	if (v >= GFXVIDINFO_HEIGHT && max_drawn_amiga_line == -1)
 	    max_drawn_amiga_line = i - min_ypos_for_screen;
 	if (i < min_ypos_for_screen || v >= GFXVIDINFO_HEIGHT)
@@ -1683,20 +1688,20 @@ static _INLINE_ void init_aspect_maps (void)
 	amiga2aspect_line_map[i] = v;
     }
 
-    for (i = 0; i < GFXVIDINFO_HEIGHT; i++)
+    for (i = GFXVIDINFO_HEIGHT; i--;)
 	native2amiga_line_map[i] = -1;
-
+/*
     if (native_lines_per_amiga_line < 1) {
-	/* Must omit drawing some lines. */
+	// Must omit drawing some lines.
 	for (i = maxl - 1; i > min_ypos_for_screen; i--) {
 	    if (amiga2aspect_line_map[i] == amiga2aspect_line_map[i-1]) {
 		    amiga2aspect_line_map[i] = -1;
 	    }
 	}
     }
-
+*/
     for (i = maxl-1; i >= min_ypos_for_screen; i--) {
-	int j;
+	register int j;
 	if (amiga2aspect_line_map[i] == -1)
 	    continue;
 	for (j = amiga2aspect_line_map[i]; j < GFXVIDINFO_HEIGHT && native2amiga_line_map[j] == -1; j++)
@@ -1987,7 +1992,7 @@ static _INLINE_ void draw_status_line (int line)
 	    on_rgb = 0x0f0;
 	    off_rgb = 0x040;
 	} else {
-	    track = -1;
+	    track = fps_counter;
 	    on = gui_data.powerled;
 	    on_rgb = 0xf00;
 	    off_rgb = 0x400;
@@ -2022,9 +2027,31 @@ void check_all_prefs(void)
 	}
 }
 
+static void fps_counter_upd(void)
+{
+	struct timeval tv;
+	static int thissec, fcount;
+
+	gettimeofday(&tv, 0);
+	if (tv.tv_sec != thissec)
+	{
+		thissec = tv.tv_sec;
+		fps_counter = fcount;
+		fcount = 0;
+		fps_counter_changed = 1;
+	}
+	else
+	{
+		fps_counter_changed = 0;
+	}
+	fcount++;
+}
+
 static _INLINE_ void finish_drawing_frame (void)
 {
     int i;
+
+	fps_counter_upd();
 
     for (i = 0; i < max_ypos_thisframe; i++) {
 	int where,i1;

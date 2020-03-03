@@ -488,6 +488,7 @@ int run_menuLoad(enum DiskOrder new_df_num)
 	while(!end)
 	{
 		draw_loadMenu(c);
+		SDL_Delay(10);
 		end=key_loadMenu(&c);
 	}
 	unraise_loadMenu();

@@ -362,6 +362,7 @@ int run_menuSave()
 		while(!end)
 		{
 			draw_saveMenu(c);
+			SDL_Delay(10);
 			end=key_saveMenu(&c);
 		}
 		unraise_saveMenu();

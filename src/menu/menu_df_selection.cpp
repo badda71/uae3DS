@@ -330,6 +330,7 @@ int run_menuDfSel()
 		while (action == DF_MENU_ENTRY_NONE)
 		{
 			draw_dfMenu(c);
+			SDL_Delay(10);
 			action = key_dfMenu(&c);
 		}
 		unraise_dfMenu();

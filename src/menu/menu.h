@@ -5,7 +5,7 @@ extern SDL_Surface *prSDLScreen;
 
 #define MENU_FILE_BACKGROUND DATA_PREFIX "background.bmp"
 #define MENU_FILE_WINDOW DATA_PREFIX "window.bmp"
-#define MENU_FILE_TEXT DATA_PREFIX "text.bmp"
+#define MENU_FILE_TEXT DATA_PREFIX "8x8font.bmp"
 #ifdef DREAMCAST
 #ifdef AUTO_RUN
 #define MENU_DIR_DEFAULT "/cd/"
@@ -31,6 +31,16 @@ typedef enum {
 	MB_YESNO
 } mb_mode;
 
+enum str_alignment {
+	ALIGN_LEFT,
+	ALIGN_RIGHT,
+	ALIGN_CENTER
+};
+
+enum font_size {
+	FONT_NORMAL
+};
+
 void text_draw_background();
 void init_text(int splash);
 void quit_text(void);
@@ -51,6 +61,7 @@ void _write_num(SDL_Surface *sf, int x, int y, int v);
 void _write_num_inv(SDL_Surface *sf, int x, int y, int v);
 void _text_draw_window(SDL_Surface *sf, int x, int y, int w, int h, const char *title);
 void _text_draw_window_bar(SDL_Surface *sf, int x, int y, int w, int h, int per, int max, const char *title);
+void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, SDL_Color col);
 int text_messagebox(char *title, char *text, mb_mode mode);
 // void text_draw_menu_msg();
 void text_flip(void);

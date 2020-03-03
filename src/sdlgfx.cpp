@@ -130,15 +130,6 @@ void flush_screen (void)
 	uae4all_prof_start(13);
 	if (SDL_MUSTLOCK(prSDLScreen))
 		SDL_UnlockSurface (prSDLScreen);
-	if (show_message)
-	{
-		show_message--;
-		if (!show_message) {
-			notice_screen_contents_lost();
-		} else {
-			_write_text_inv_n(prSDLScreen,0,29,30,show_message_str);
-		}
-	}
 	SDL_Flip(prSDLScreen);
 
 	if (SDL_MUSTLOCK(prSDLScreen))
@@ -520,8 +511,6 @@ void handle_events (void)
 					if (!uae4all_keystate[iAmigaKeyCode])
 					{
 					uae4all_keystate[iAmigaKeyCode] = 1;
-log_citra("record key down: %d",iAmigaKeyCode);
-
 					record_key(iAmigaKeyCode << 1);
 					}
 				}
@@ -533,7 +522,6 @@ log_citra("record key down: %d",iAmigaKeyCode);
 				iAmigaKeyCode = rEvent.key.keysym.sym;
 				if (iAmigaKeyCode >= 0)
 				{
-log_citra("record key up: %d",iAmigaKeyCode);
 					uae4all_keystate[iAmigaKeyCode] = 0;
 					record_key((iAmigaKeyCode << 1) | 1);
 				}

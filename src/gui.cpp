@@ -389,7 +389,7 @@ static void goSuperThrottle(void)
 		check_prefs_changed_cpu();
 		check_prefs_changed_audio();
 		check_prefs_changed_custom();
-		gui_set_message("SuperThrottle On",5);
+		gui_set_message("SuperThrottle On",50);
 	}
 }
 

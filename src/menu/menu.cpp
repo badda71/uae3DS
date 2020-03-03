@@ -215,14 +215,12 @@ void init_text(int splash)
 	if (!text_screen)
 	{
 		text_screen=SDL_CreateRGBSurface(prSDLScreen->flags,prSDLScreen->w,prSDLScreen->h,prSDLScreen->format->BitsPerPixel,prSDLScreen->format->Rmask,prSDLScreen->format->Gmask,prSDLScreen->format->Bmask,prSDLScreen->format->Amask);
-		tmp=SDL_LoadBMP(MENU_FILE_TEXT);
-		if (text_screen==NULL || tmp==NULL)
+		text_image=SDL_LoadBMP(MENU_FILE_TEXT);
+		if (text_screen==NULL)
 			exit(-1);
-		text_image=SDL_DisplayFormat(tmp);
-		SDL_FreeSurface(tmp);
 		if (text_image==NULL)
 			exit(-2);
-		SDL_SetColorKey(text_image,(SDL_SRCCOLORKEY | SDL_RLEACCEL),SDL_MapRGB(text_image -> format, 0, 0, 0));
+		SDL_SetColorKey(text_image, SDL_SRCCOLORKEY, 0x00000000);
 		tmp=SDL_LoadBMP(MENU_FILE_BACKGROUND);
 		if (tmp==NULL)
 			exit(-3);
@@ -319,193 +317,72 @@ void quit_text(void)
 */
 }
 
-void write_text_pos(int x, int y, const char *str)
-{
-  int i, c;
-  SDL_Rect src, dest;
-  
-  for (i = 0; str[i] != '\0'; i++)
-    {
-      c = -1;
-      
-      if (str[i] >= '0' && str[i] <= '9')
-	c = str[i] - '0';
-      else if (str[i] >= 'A' && str[i] <= 'Z')
-	c = str[i] - 'A' + 10;
-      else if (str[i] >= 'a' && str[i] <= 'z')
-	c = str[i] - 'a' + 36;
-      else if (str[i] == '#')
-	c = 62;
-      else if (str[i] == '=')
-	c = 63;
-      else if (str[i] == '.')
-	c = 64;
-      else if (str[i] == '_')
-	c = -2;
-      else if (str[i] == '-')
-	c = -3;
-      else if (str[i] == '(')
-	c = 65;
-      else if (str[i] == ')')
-	c = 66;
-      else if (str[i] == '?')
-	c = 67;
-      
-      if (c >= 0)
-	{
-	  src.x = c * 8;
-	  src.y = 0;
-	  src.w = 8;
-	  src.h = 8;
-	  
-	  dest.x = x + (i * 8);
-	  dest.y = y;
-	  dest.w = 8;
-	  dest.h = 8;
-	  
-	  SDL_BlitSurface(text_image, &src,
-			  text_screen, &dest);
+typedef struct {
+	SDL_Surface *img;
+	int w;
+	int h;
+} font_info;
+
+void get_font_info(font_info *f, enum font_size size) {
+	switch (size) {
+		default:
+			f->img = text_image;
+			f->w = f->h = 8;
 	}
-      else if (c == -2 || c == -3)
-	{
-	  dest.x = x + (i * 8);
-	  
-	  if (c == -2)
-	    dest.y = y  + 7;
-	  else if (c == -3)
-	    dest.y = y  + 3;
-	  
-	  dest.w = 8;
-	  dest.h = 1;
-	  
-	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
+}
+
+void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, SDL_Color col) {
+	int xof, w;
+	if (str==NULL || str[0]==0) return;
+	font_info f;
+	w=strlen(str);
+	if (maxchars > 0 && w > maxchars) w=maxchars;
+	get_font_info(&f,size);
+
+	switch (align) {
+		case ALIGN_CENTER:
+			xof=x-(w*f.w/2);
+			break;
+		case ALIGN_RIGHT:
+			xof=x-w*f.w;
+			break;
+		default:
+			xof=x;
 	}
-    }
+
+	int c;
+	SDL_SetPalette(f.img, SDL_LOGPAL, &col, 1, 1);
+	for (int i=0; i < w; i++) {
+		c=(str[i] & 0x7f)-32;
+		if (c<0) c=0;
+		SDL_BlitSurface(
+			f.img,
+			&(SDL_Rect){.x=(c&0x0f)*f.w, .y=(c>>4)*f.h, .w=f.w, .h=f.h},
+			s,
+			&(SDL_Rect){.x = xof+i*f.w, .y = y});
+	}
+	SDL_SetPalette(f.img, SDL_LOGPAL, &(SDL_Color){0xff,0xff,0xff,0}, 1, 1);
 }
 
 void _write_text_pos(SDL_Surface *sf, int x, int y, const char *str)
 {
-	SDL_Surface *back=text_screen;
-	text_screen=sf;
-	write_text_pos(x,y,str);
-	text_screen=back;
+	write_text_full (sf, str, x, y, 0, ALIGN_LEFT, FONT_NORMAL, (SDL_Color){0x30,0x30,0x30,0});
 }
 
-void write_text(int x, int y, const char *str)
+void write_text_pos(int x, int y, const char *str)
 {
-  int i, c;
-  SDL_Rect src, dest;
-  
-  for (i = 0; str[i] != '\0'; i++)
-    {
-      c = -1;
-      
-      if (str[i] >= '0' && str[i] <= '9')
-	c = str[i] - '0';
-      else if (str[i] >= 'A' && str[i] <= 'Z')
-	c = str[i] - 'A' + 10;
-      else if (str[i] >= 'a' && str[i] <= 'z')
-	c = str[i] - 'a' + 36;
-      else if (str[i] == '#')
-	c = 62;
-      else if (str[i] == '=')
-	c = 63;
-      else if (str[i] == '.')
-	c = 64;
-      else if (str[i] == '_')
-	c = -2;
-      else if (str[i] == '-')
-	c = -3;
-      else if (str[i] == '/')
-	c = -4;
-      else if (str[i] == ':')
-	c = -5;
-      else if (str[i] == '(')
-	c = 65;
-      else if (str[i] == ')')
-	c = 66;
-      else if (str[i] == '?')
-	c = 67;
-      
-      if (c >= 0)
-	{
-	  src.x = c * 8;
-	  src.y = 0;
-	  src.w = 8;
-	  src.h = 8;
-	  
-	  dest.x = (x + i) * 8;
-	  dest.y = y * 8; //10;
-	  dest.w = 8;
-	  dest.h = 8;
-	  
-	  SDL_BlitSurface(text_image, &src,
-			  text_screen, &dest);
-	}
-      else if (c == -2 || c == -3)
-	{
-	  dest.x = (x + i) * 8;
-	  
-	  if (c == -2)
-	    dest.y = y * 8 /*10*/ + 7;
-	  else if (c == -3)
-	    dest.y = y * 8 /*10*/ + 3;
-	  
-	  dest.w = 8;
-	  dest.h = 1;
-	  
-	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
-	}
-      else if (c == -4)
-	{
-	  /* upper segment of '/' */
-	  dest.x = (x + i) * 8 + 4;
-	  dest.y = y * 8 /*10*/;
-	  dest.w = 1;
-	  dest.h = 2;
-	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
-
-	  /* middle segment of '/' */
-	  dest.x = (x + i) * 8 + 3;
-	  dest.y = y * 8 /*10*/ + 2;
-	  dest.w = 1;
-	  dest.h = 3;
-	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
-
-	  /* lower segment of '/' */
-	  dest.x = (x + i) * 8 + 2;
-	  dest.y = y * 8 /*10*/ + 5;
-	  dest.w = 1;
-	  dest.h = 2;
-	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
-	}
-      else if (c == -5)
-	{
-	  /* upper point of ':' */
-	  dest.x = (x + i) * 8 + 2;
-	  dest.y = y * 8 /*10*/ + 2;
-	  dest.w = 1;
-	  dest.h = 1;
-	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
-
-	  /* lower point of ':' */
-	  dest.x = (x + i) * 8 + 2;
-	  dest.y = y * 8 /*10*/ + 6;
-	  dest.w = 1;
-	  dest.h = 1;
-	  SDL_FillRect(text_screen, &dest, menu_barra0_color);
-	}
-    }
+	_write_text_pos(text_screen, x, y, str);
 }
 
 void _write_text(SDL_Surface *sf, int x, int y, const char *str)
 {
-	SDL_Surface *back=text_screen;
-	text_screen=sf;
-	write_text(x,y,str);
-	text_screen=back;
+	_write_text_pos(sf, x*8, y*8, str);
 }
 
+void write_text(int x, int y, const char *str)
+{
+	_write_text(text_screen, x, y, str);
+}
 
 /* Write text, inverted: */
 

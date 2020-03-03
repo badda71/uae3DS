@@ -18,6 +18,7 @@
 #include "uibottom.h"
 #include "uae3ds.h"
 #include "gui.h"
+#include "menu.h"
 
 uikbd_key uikbd_keypos[] = {
 	//  x,  y,   w,   h,         key,shft,stky, flgs, name
@@ -148,6 +149,9 @@ static DS3_Image keymask_spr;
 
 // dynamic sprites
 static DS3_Image statusbar_spr;
+
+// SDL Surfaces
+SDL_Surface *statusbar_img=NULL;
 
 // static variables
 static Handle repaintRequired;
@@ -367,6 +371,8 @@ static void uib_shutdown() {
 
 	if (gpusrc) linearFree(gpusrc);
 	gpusrc = NULL;
+	
+	SDL_FreeSurface(statusbar_img);
 	if (status_gpusrc) linearFree(status_gpusrc);
 	status_gpusrc = NULL;
 
@@ -461,6 +467,11 @@ void uib_init() {
 	// set up status sprite / framebuf
 	status_gpusrc = (u8*)linearAlloc(512*16*4);
 	memset(status_gpusrc, 0, 512*16*4);
+	statusbar_img = SDL_CreateRGBSurfaceFrom((void *)status_gpusrc,
+                        512, 16, 32, 512*4,
+                        0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+	SDL_SetAlpha(statusbar_img, 0, 255);
+
 	statusbar_spr.w=320;
 	statusbar_spr.h=16;
 	statusbar_spr.fw=(float)(statusbar_spr.w)/512.0f;
@@ -484,20 +495,17 @@ void uib_init() {
 #define TD_PADY 2
 #define TD_WIDTH 32
 #define TD_LED_WIDTH 24
-#define TD_LED_HEIGHT 4
 
 #define ON_RGB_D 0x00ff00ff
 #define OFF_RGB_D 0x0044000ff
 #define ON_RGB_P 0xff0000ff
 #define OFF_RGB_P 0x4400000ff
 
-#define TD_RIGHT 1
-#define TD_BOTTOM 2
-
 #define TD_NUM_WIDTH 7
 #define TD_NUM_HEIGHT 7
 
 #define TD_TOTAL_HEIGHT (TD_PADY * 2 + TD_NUM_HEIGHT)
+#define TD_STARTX 218
 
 static const char *numbers = {
 "------ ------ ------ ------ ------ ------ ------ ------ ------ ------ "
@@ -544,6 +552,7 @@ static void uib_statusbar_recalc()
 	static int fps = -1;
 	int upd=0;
 	extern int fps_counter;
+	static char buf[100]={0};
 
 
 	if (dt0 != gui_data.drive_track[0] || 
@@ -551,7 +560,7 @@ static void uib_statusbar_recalc()
 	{
 		dt0 = gui_data.drive_track[0];
 		dm0 = gui_data.drive_motor[0];
-		uib_paint_led(250, dm0 ? ON_RGB_D : OFF_RGB_D, dt0);
+		uib_paint_led(TD_STARTX + TD_WIDTH, dm0 ? ON_RGB_D : OFF_RGB_D, dt0);
 		upd=1;
 	}
 	if (dt1 != gui_data.drive_track[1] || 
@@ -559,7 +568,7 @@ static void uib_statusbar_recalc()
 	{
 		dt1 = gui_data.drive_track[1];
 		dm1 = gui_data.drive_motor[1];
-		uib_paint_led(282, dm1 ? ON_RGB_D : OFF_RGB_D, dt1);
+		uib_paint_led(TD_STARTX + 2*TD_WIDTH, dm1 ? ON_RGB_D : OFF_RGB_D, dt1);
 		upd=1;
 	}
 	
@@ -568,12 +577,30 @@ static void uib_statusbar_recalc()
 	{
 		pow = gui_data.powerled;
 		fps = fps_counter;
-		uib_paint_led(218, pow ? ON_RGB_P : OFF_RGB_P, fps_counter);
+		uib_paint_led(TD_STARTX, pow ? ON_RGB_P : OFF_RGB_P, fps_counter);
 		upd=1;
 	}
 
+	if (show_message)
+	{
+		show_message--;
+		if (!show_message) {
+			SDL_FillRect(statusbar_img,
+				&(SDL_Rect){.x=0, .y=0, .w=TD_STARTX-TD_WIDTH+TD_LED_WIDTH, .h=TD_TOTAL_HEIGHT}, 0x00000000);
+			*buf=0;
+			upd=1;
+		} else {
+			if (strcmp(buf, show_message_str)) {
+				strncpy(buf, show_message_str, 99);
+				SDL_FillRect(statusbar_img,
+					&(SDL_Rect){.x=0, .y=0, .w=TD_STARTX-TD_WIDTH+TD_LED_WIDTH, .h=TD_TOTAL_HEIGHT}, 0x70708aff);			
+				write_text_full (statusbar_img, buf, 2, 2, TD_STARTX/8-1, ALIGN_LEFT, FONT_NORMAL, (SDL_Color){0x30,0x30,0x30,0});
+				upd=1;
+			}
+		}
+	}
 	if (upd) {
-		makeTexture(&(statusbar_spr.tex), status_gpusrc, 512, 16);
+		makeTexture(&(statusbar_spr.tex), statusbar_img->pixels, 512, 16);
 		uib_must_redraw |= UIB_REPAINT;
 	}
 }

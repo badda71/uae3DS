@@ -376,7 +376,7 @@ static void goMenu(void)
 #endif
 }
 
-static int nowSuperThrottle=0, goingSuperThrottle=0;
+int nowSuperThrottle=0;
 
 static void goSuperThrottle(void)
 {

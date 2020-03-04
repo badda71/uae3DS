@@ -129,6 +129,27 @@ uikbd_key uikbd_keypos[] = {
 
 extern void log_citra(const char *format, ...);
 
+// status line stuff
+
+#define TD_PADX 9
+#define TD_PADY 2
+#define TD_WIDTH 32
+#define TD_LED_WIDTH 24
+#define TD_PAD (TD_WIDTH - TD_LED_WIDTH)
+
+#define ON_RGB_D 0x00ff00ff
+#define OFF_RGB_D 0x0044000ff
+#define ON_RGB_P 0xff0000ff
+#define OFF_RGB_P 0x4400000ff
+
+#define TD_NUM_WIDTH 7
+#define TD_NUM_HEIGHT 7
+
+#define TD_TOTAL_HEIGHT (TD_PADY * 2 + TD_NUM_HEIGHT)
+#define TD_STARTX 218
+int td_text_length = 0;
+
+// data definitions
 typedef struct {
 	unsigned w;
 	unsigned h;
@@ -146,6 +167,7 @@ static DS3_Image kbd2_spr;
 static DS3_Image twistyup_spr;
 static DS3_Image twistydn_spr;
 static DS3_Image keymask_spr;
+static DS3_Image turbo_icon_spr;
 
 // dynamic sprites
 static DS3_Image statusbar_spr;
@@ -342,6 +364,9 @@ static void uib_repaint(void *param, int topupdated) {
 	drawImage(&background_spr, 0, 0, 0, 0, 0);
 
 	// statusbar
+	extern int nowSuperThrottle;
+	if (nowSuperThrottle)
+		drawImage(&turbo_icon_spr, TD_STARTX - TD_PAD - turbo_icon_spr.w, 0, 0, 0, 0);
 	drawImage(&statusbar_spr, 0, 0, 0, 0, 0);
 
 	// keyboard
@@ -456,11 +481,12 @@ void uib_init() {
 	gpusrc = (u8*)linearAlloc(512*256*4);
 
 	// pre-load sprites
-	loadImage(&background_spr, "romfs:/background.png");
-	loadImage(&kbd1_spr, "romfs:/kbd1.png");
-	loadImage(&kbd2_spr, "romfs:/kbd2.png");
-	loadImage(&twistyup_spr, "romfs:/twistyup.png");
-	loadImage(&twistydn_spr, "romfs:/twistydn.png");
+	loadImage(&background_spr,	"romfs:/background.png");
+	loadImage(&kbd1_spr,		"romfs:/kbd1.png");
+	loadImage(&kbd2_spr,		"romfs:/kbd2.png");
+	loadImage(&twistyup_spr,	"romfs:/twistyup.png");
+	loadImage(&twistydn_spr,	"romfs:/twistydn.png");
+	loadImage(&turbo_icon_spr,	"romfs:/turbo.png");
 	makeImage(&keymask_spr, (const u8[]){0x00, 0x00, 0x00, 0x80},1,1,0);
 
 	
@@ -477,6 +503,7 @@ void uib_init() {
 	statusbar_spr.fw=(float)(statusbar_spr.w)/512.0f;
 	statusbar_spr.fh=(float)(statusbar_spr.h)/16.0f;
 	makeTexture(&(statusbar_spr.tex), status_gpusrc, 512, 16);
+	td_text_length = TD_STARTX - turbo_icon_spr.w - 2 * TD_PAD;
 
 	// other stuff
 	kb_y_pos = 240 - kbd1_spr.h;
@@ -489,23 +516,7 @@ void uib_init() {
 	atexit(uib_shutdown);
 }
 
-// status line stuff
-
-#define TD_PADX 9
-#define TD_PADY 2
-#define TD_WIDTH 32
-#define TD_LED_WIDTH 24
-
-#define ON_RGB_D 0x00ff00ff
-#define OFF_RGB_D 0x0044000ff
-#define ON_RGB_P 0xff0000ff
-#define OFF_RGB_P 0x4400000ff
-
-#define TD_NUM_WIDTH 7
-#define TD_NUM_HEIGHT 7
-
-#define TD_TOTAL_HEIGHT (TD_PADY * 2 + TD_NUM_HEIGHT)
-#define TD_STARTX 218
+// status line funtions
 
 static const char *numbers = {
 "------ ------ ------ ------ ------ ------ ------ ------ ------ ------ "
@@ -586,15 +597,15 @@ static void uib_statusbar_recalc()
 		show_message--;
 		if (!show_message) {
 			SDL_FillRect(statusbar_img,
-				&(SDL_Rect){.x=0, .y=0, .w=TD_STARTX-TD_WIDTH+TD_LED_WIDTH, .h=TD_TOTAL_HEIGHT}, 0x00000000);
+				&(SDL_Rect){.x=0, .y=0, .w=td_text_length, .h=TD_TOTAL_HEIGHT}, 0x00000000);
 			*buf=0;
 			upd=1;
 		} else {
 			if (strcmp(buf, show_message_str)) {
 				strncpy(buf, show_message_str, 99);
 				SDL_FillRect(statusbar_img,
-					&(SDL_Rect){.x=0, .y=0, .w=TD_STARTX-TD_WIDTH+TD_LED_WIDTH, .h=TD_TOTAL_HEIGHT}, 0x70708aff);			
-				write_text_full (statusbar_img, buf, 2, 2, TD_STARTX/8-1, ALIGN_LEFT, FONT_NORMAL, (SDL_Color){0x30,0x30,0x30,0});
+					&(SDL_Rect){.x=0, .y=0, .w=td_text_length, .h=TD_TOTAL_HEIGHT}, 0x70708aff);			
+				write_text_full (statusbar_img, buf, 2, 2, (td_text_length-4)/8, ALIGN_LEFT, FONT_NORMAL, (SDL_Color){0x30,0x30,0x30,0});
 				upd=1;
 			}
 		}

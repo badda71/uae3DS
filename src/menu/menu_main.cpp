@@ -65,7 +65,7 @@ enum MainMenuEntry {
 	MAIN_MENU_ENTRY_COUNT, /* the number of entries to be shown */
 };
 
-int mainMenu_vpos=1;
+int mainMenu_vpos=0;
 int mainMenu_throttle=0;
 int mainMenu_frameskip=-1;
 int mainMenu_sound=-1;

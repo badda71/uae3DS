@@ -47,6 +47,7 @@ KOS_INIT_ROMDISK(romdisk);
 #include "bsdsocket.h"
 #include "drawing.h"
 #include "uibottom.h"
+#include "autofire.h"
 
 #ifdef USE_SDL
 #include "SDL.h"
@@ -351,7 +352,11 @@ void real_main (int argc, char **argv)
 	produce_sound = 0;
     }
 
+	// init my 3DS secific stuff
 	uib_init();
+log_citra("1");
+	autofire_init();
+log_citra("2");
 
     /* Install resident module to get 8MB chipmem, if requested */
     rtarea_setup ();

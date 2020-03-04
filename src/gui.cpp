@@ -26,6 +26,7 @@
 #include "savestate.h"
 #include "joystick.h"
 #include "uibottom.h"
+#include "autofire.h"
 
 #ifdef HOME_DIR
 #include "homedir.h"
@@ -475,6 +476,9 @@ void gui_handle_events (SDL_Event *e)
 					goSuperThrottle();
 			}
 			break;
+		case DS_R:
+			if (v) autofire_start();
+			else autofire_stop();
 		default:
 			break;
 		}

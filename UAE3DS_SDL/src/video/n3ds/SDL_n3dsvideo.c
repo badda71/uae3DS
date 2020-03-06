@@ -134,6 +134,8 @@ static int N3DS_FlipHWSurface (_THIS, SDL_Surface *surface);
 int N3DS_ToggleFullScreen(_THIS, int on);
 
 
+static SDL_VideoDevice* this_device;
+
 //Copied from sf2dlib that grabbed it from: http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
 unsigned int next_pow2(unsigned int v)
 {
@@ -164,7 +166,7 @@ static SDL_VideoDevice *N3DS_CreateDevice(int devindex)
 	SDL_VideoDevice *device;
 
 	/* Initialize all variables that we clean on shutdown */
-	device = (SDL_VideoDevice *)SDL_malloc(sizeof(SDL_VideoDevice));
+	this_device = device = (SDL_VideoDevice *)SDL_malloc(sizeof(SDL_VideoDevice));
 	if ( device ) {
 		SDL_memset(device, 0, (sizeof *device));
 		device->hidden = (struct SDL_PrivateVideoData *)
@@ -212,6 +214,9 @@ static SDL_VideoDevice *N3DS_CreateDevice(int devindex)
 
 	device->free = N3DS_DeleteDevice;
 
+	device->hidden->scalex2 = 1.0f;
+	device->hidden->scaley2 = 1.0f;
+
 	return device;
 }
 
@@ -244,6 +249,32 @@ SDL_Rect **N3DS_ListModes(_THIS, SDL_PixelFormat *format, Uint32 flags)
    	 return (SDL_Rect **) -1;
 }
 
+static void vlog_citrac(const char *format, va_list arg ) {
+	char buf[2000];
+    vsnprintf(buf, 2000, format, arg);
+	svcOutputDebugString(buf, strlen(buf));
+}
+
+void log_citrac(const char *format, ...)
+{
+    va_list argptr;
+    va_start(argptr, format);
+	vlog_citrac(format, argptr);
+    va_end(argptr);
+}
+
+void N3DS_SetScalingDirect(float x, float y, int permanent) {
+	this_device->hidden->scalex = x;
+	this_device->hidden->scaley = y;
+	if (permanent) {
+		this_device->hidden->scalex2 = x;
+		this_device->hidden->scaley2 = y;
+	}
+	C3D_TexSetFilter(&spritesheet_tex,
+		(x!=1.0f || y!=1.0f) ? GPU_LINEAR : GPU_NEAREST,
+		GPU_NEAREST);
+}
+
 void N3DS_SetScaling(_THIS)
 {
 	if(this->hidden->flags & SDL_FULLSCREEN) 
@@ -252,18 +283,16 @@ void N3DS_SetScaling(_THIS)
 	else
 		this->hidden->fitscreen = this->hidden->flags & (SDL_FITWIDTH | SDL_FITHEIGHT);
 
+	float fx=400.0/(float)this->hidden->w1;
+	float fy=240.0/(float)this->hidden->h1;	
 	if((this->hidden->fitscreen & SDL_FITWIDTH)&&(this->hidden->fitscreen & SDL_FITHEIGHT)) {
-		this->hidden->scalex= 400.0/(float)this->hidden->w1;
-		this->hidden->scaley= 240.0/(float)this->hidden->h1;
+		N3DS_SetScalingDirect(fx,fy, 0);
 	} else if(this->hidden->fitscreen & SDL_FITWIDTH) {
-		this->hidden->scalex= 400.0/(float)this->hidden->w1;
-		this->hidden->scaley= this->hidden->scalex;//1.0f;
+		N3DS_SetScalingDirect(fx,fx, 0);
 	} else 	if(this->hidden->fitscreen & SDL_FITHEIGHT) {
-		this->hidden->scaley= 240.0/(float)this->hidden->h1;
-		this->hidden->scalex= this->hidden->scaley;//1.0f;
+		N3DS_SetScalingDirect(fy,fy, 0);
 	} else {
-		this->hidden->scalex= 1.0f;
-		this->hidden->scaley= 1.0f;
+		N3DS_SetScalingDirect(this->hidden->scalex2,this->hidden->scaley2, 0);
 	}
 }
 
@@ -443,6 +472,14 @@ int hh= next_pow2(height);
 
 //Set scaling
 
+// NOTE: the following is a dirty hack to make work mode 2. Passing a RGB565 buffer to a RGB656 texture and rendering it to a RGB656 display results in some colors being transparent.
+// To fix this we are transfering a RGB656 buffer to a RGB5A1 texure and then rendering it to a RGB656 display. We lose 1 bit of Green color depth, but at least it works
+	int mode = this->hidden->mode;
+	if (mode==2) mode = 3; 
+
+	// Setup the textures
+	C3D_TexInit(&spritesheet_tex, hw, hh, this->hidden->mode);
+
 	N3DS_SetScaling(this);
 	
 	this->info.current_w = current->w = width;
@@ -454,18 +491,6 @@ int hh= next_pow2(height);
 		current->pixels = this->hidden->palettedbuffer;
 		current->pitch = width;
 	}
-
-// NOTE: the following is a dirty hack to make work mode 2. Passing a RGB565 buffer to a RGB656 texture and rendering it to a RGB656 display results in some colors being transparent.
-// To fix this we are transfering a RGB656 buffer to a RGB5A1 texure and then rendering it to a RGB656 display. We lose 1 bit of Green color depth, but at least it works
-	int mode = this->hidden->mode;
-	if (mode==2) mode = 3; 
-
-	// Setup the textures
-	C3D_TexInit(&spritesheet_tex, hw, hh, this->hidden->mode);
-	C3D_TexSetFilter(&spritesheet_tex,
-		this->hidden->fitscreen ? GPU_LINEAR : GPU_NEAREST,
-		GPU_NEAREST);
-//	C3D_TexBind(0, &spritesheet_tex);
 	
 	runThread = true;
 	svcCreateSemaphore(&privateSem1, 1, 255);
@@ -507,22 +532,16 @@ void SDL_RequestCall(void(*callback)(void*, int), void *param) {
 	addDrawParam=param;
 }
 
-SDL_VideoDevice *vdev;
-struct SDL_PrivateVideoData *vdev_hidden;
-
 void drawMainSpritesheetAt(int x, int y, int w, int h) {
 	s32 i;
 	svcWaitSynchronization(privateSem1, U64_MAX);
 	C3D_TexBind(0, &spritesheet_tex);
-	drawTexture(x, y, w, h, vdev->hidden->l1, vdev->hidden->r1, vdev->hidden->t1, vdev->hidden->b1);  
+	drawTexture(x, y, w, h, this_device->hidden->l1, this_device->hidden->r1, this_device->hidden->t1, this_device->hidden->b1);  
 	svcReleaseSemaphore(&i, privateSem1, 1);
 }
 
 static void videoThread(void* data)
 {
-    vdev = (SDL_VideoDevice *) data;
-	vdev_hidden=vdev->hidden;
-
 	while(runThread) {
 		if(!app_pause && !app_exiting) {
 			if (svcWaitSynchronization(repaintRequired, 0)) {
@@ -538,7 +557,11 @@ static void videoThread(void* data)
 					C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uLoc_projection, &projection2);
 					C3D_RenderTargetClear(VideoSurface1, C3D_CLEAR_ALL, RenderClearColor, 0);
 					C3D_FrameDrawOn(VideoSurface1);
-					drawMainSpritesheetAt((400-vdev->hidden->w1*vdev->hidden->scalex)/2,(240-vdev->hidden->h1*vdev->hidden->scaley)/2, vdev->hidden->w1*vdev->hidden->scalex, vdev->hidden->h1*vdev->hidden->scaley); 
+					drawMainSpritesheetAt(
+						(400-this_device->hidden->w1*this_device->hidden->scalex)/2,
+						(240-this_device->hidden->h1*this_device->hidden->scaley)/2,
+						this_device->hidden->w1*this_device->hidden->scalex,
+						this_device->hidden->h1*this_device->hidden->scaley); 
 
 					if (addDrawCallback) addDrawCallback(addDrawParam,1);
 				

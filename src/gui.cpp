@@ -433,9 +433,13 @@ static void inc_throttle(int sgn)
 }
 
 static int in_goMenu=0;
+extern "C" void N3DS_SetScalingDirect(float x, float y, int permanent);
 
 void gui_handle_events (SDL_Event *e)
 {
+	static int scale = 100;
+	char buf[50];
+	
 	int v,t = e->type;
 	if ((v=(t == SDL_KEYDOWN)) || t == SDL_KEYUP) {
 		switch (e->key.keysym.sym) {
@@ -451,20 +455,42 @@ void gui_handle_events (SDL_Event *e)
 			buttonstate[2] = v; break;
 		case DS_UP1:
 		case DS_UP2:
-		case DS_UP3:
 			emulated_top=v; break;
 		case DS_DOWN1:
 		case DS_DOWN2:
-		case DS_DOWN3:
 			emulated_bot=v; break;
 		case DS_LEFT1:
 		case DS_LEFT2:
-		case DS_LEFT3:
 			emulated_left=v; break;
 		case DS_RIGHT1:
 		case DS_RIGHT2:
-		case DS_RIGHT3:
 			emulated_right=v; break;
+		case DS_UP3:
+			if (v) mainMenu_vpos += 2;
+		case DS_DOWN3:
+			if (v) {
+				mainMenu_vpos -= 1;
+				if (mainMenu_vpos > 6) mainMenu_vpos=6;
+				if (mainMenu_vpos < -4) mainMenu_vpos=-4;
+				snprintf(buf,50,"VPOS %d",mainMenu_vpos*8);
+				gui_set_message(buf,50);
+				getChanges();
+				check_all_prefs();
+			    notice_screen_contents_lost();
+			}
+			break;
+		case DS_LEFT3:
+			if (v) scale += 10;
+		case DS_RIGHT3:
+			if (v) {
+				scale -= 5;
+				if (scale < 50) scale=50;
+				if (scale > 200) scale=200;
+				N3DS_SetScalingDirect((float)scale/100.0f, (float)scale/100.0f, 0);
+				snprintf(buf,50,"Scale %d%%",scale);
+				gui_set_message(buf,50);
+			}
+			break;
 		case DS_SELECT:
 			if (v) goMenu();
 			break;

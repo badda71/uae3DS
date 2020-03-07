@@ -75,35 +75,37 @@ static void draw_mainMenu(enum MainMenuEntry c)
 {
 	static int frame = 0;
 	int flash = frame / 3;
-	int row = 4, column = 0;
+	int row = 4, col = 10;
+		
+	int column = 0;
 
 	text_draw_background();
-	text_draw_window(40,28,260,192,text_str_title);
+	text_draw_window(72,28,260,192,text_str_title);
 
 	if (c == MAIN_MENU_ENTRY_LOAD && flash)
-		write_text_inv(6, row++, text_str_load);
+		write_text_inv(col, row++, text_str_load);
 	else
-		write_text(6, row++, text_str_load);
+		write_text(col, row++, text_str_load);
 
-	write_text(6, row++, text_str_separator);
+	write_text(col, row++, text_str_separator);
 
 	if(emulating)
 	{
 		if (c == MAIN_MENU_ENTRY_SAVED_STATES && flash)
-			write_text_inv(6, row++, text_str_save);
+			write_text_inv(col, row++, text_str_save);
 		else
-			write_text(6, row++, text_str_save);
+			write_text(col, row++, text_str_save);
 	}
 	else
 	{
 		row++;
 	}
 
-	write_text(6, row, text_str_separator);
+	write_text(col, row, text_str_separator);
 	row++;
 
-	write_text(6, row, text_str_throttle);
-	column = 17;
+	write_text(col, row, text_str_throttle);
+	column = col + 11;
 
 	if ((mainMenu_throttle == 0) && (c != MAIN_MENU_ENTRY_THROTTLE || flash))
 		write_text_inv(column, row, text_str_0);
@@ -137,8 +139,8 @@ static void draw_mainMenu(enum MainMenuEntry c)
 
 	row += 2;
 
-	write_text(6, row, text_str_frameskip);
-	column = 17;
+	write_text(col, row, text_str_frameskip);
+	column = col + 11;
 
 	if ((mainMenu_frameskip == 0) && (c != MAIN_MENU_ENTRY_FRAMESKIP || flash))
 		write_text_inv(column, row, text_str_0);
@@ -177,8 +179,8 @@ static void draw_mainMenu(enum MainMenuEntry c)
 
 	row += 2;
 
-	write_text(6, row, text_str_vpos);
-	column = 17;
+	write_text(col, row, text_str_vpos);
+	column = col+11;
 
 	if ((mainMenu_vpos == 0) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
 		write_text_inv(column, row, text_str_0);
@@ -212,8 +214,8 @@ static void draw_mainMenu(enum MainMenuEntry c)
 
 	row += 2;
 
-	write_text(6, row, text_str_sound);
-	column = 17;
+	write_text(col, row, text_str_sound);
+	column = col+11;
 
 	if (!mainMenu_sound && (c != MAIN_MENU_ENTRY_SOUND || flash))
 		write_text_inv(column, row, text_str_off);
@@ -227,8 +229,8 @@ static void draw_mainMenu(enum MainMenuEntry c)
 
 	row += 2;
 
-	write_text(6, row, text_str_autosave);
-	column = 17;
+	write_text(col, row, text_str_autosave);
+	column = col+11;
 	
 	if (!mainMenu_autosave && (c != MAIN_MENU_ENTRY_SAVE_DISKS || flash))
 		write_text_inv(column, row, text_str_off);
@@ -241,44 +243,44 @@ static void draw_mainMenu(enum MainMenuEntry c)
 		write_text(column, row, text_str_on);
 
 	row++;
-	write_text(6, row++, text_str_separator);
+	write_text(col, row++, text_str_separator);
 
 	if (c == MAIN_MENU_ENTRY_RESET_EMULATION && flash)
 		if(emulating)
-			write_text_inv(6, row, text_str_reset);
+			write_text_inv(col, row, text_str_reset);
 		else
-			write_text_inv(6, row, text_str_start);
+			write_text_inv(col, row, text_str_start);
 	else
 		if(emulating)
-			write_text(6, row, text_str_reset);
+			write_text(col, row, text_str_reset);
 		else
-			write_text(6, row, text_str_start);
+			write_text(col, row, text_str_start);
 
 	row += 2;
 
 	if(emulating)
 	{
 		if (c == MAIN_MENU_ENTRY_RETURN_TO_EMULATION && flash)
-			write_text_inv(6, row++, text_str_return);
+			write_text_inv(col, row++, text_str_return);
 		else
-			write_text(6, row++, text_str_return);
+			write_text(col, row++, text_str_return);
 	}
 	else
 	{
 		row++;
 	}
 
-	write_text(6, row++, text_str_separator);
+	write_text(col, row++, text_str_separator);
 	if (c == MAIN_MENU_ENTRY_UPDATE && flash)
-		write_text_inv(6, row++, text_str_update);
+		write_text_inv(col, row++, text_str_update);
 	else
-		write_text(6, row++, text_str_update);
+		write_text(col, row++, text_str_update);
 	row++;
 
 	if (c == MAIN_MENU_ENTRY_EXIT_UAE && flash)
-		write_text_inv(6, row++, text_str_exit);
+		write_text_inv(col, row++, text_str_exit);
 	else
-		write_text(6, row++, text_str_exit);
+		write_text(col, row++, text_str_exit);
 
 	text_flip();
 	frame = (frame + 1) % 6;
@@ -428,7 +430,7 @@ static void raise_mainMenu()
 	for(i=0;i<10;i+=2)
 	{
 		text_draw_background();
-		text_draw_window(40,(10-i)*24,260,200,text_str_title);
+		text_draw_window(72,(10-i)*24,260,200,text_str_title);
 		text_flip();
 	}
 	clear_events();
@@ -441,7 +443,7 @@ static void unraise_mainMenu()
 	for(i=9;i>=0;i-=2)
 	{
 		text_draw_background();
-		text_draw_window(40,(10-i)*24,260,200,text_str_title);
+		text_draw_window(72,(10-i)*24,260,200,text_str_title);
 		text_flip();
 	}
 	text_draw_background();

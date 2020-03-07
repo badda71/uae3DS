@@ -51,7 +51,8 @@ static void draw_dfMenu(enum DfMenuEntry c)
 {
 	static int frame = 0;
 	int flash = frame / 3;
-	int row = 4, column = 0;
+	int row = 4, col = 10;
+	int column = 0;
 	char image_text[27];
 	static int b = 0;
 	int update_scroll = !(b%5);
@@ -59,9 +60,9 @@ static void draw_dfMenu(enum DfMenuEntry c)
 
 	text_draw_background();
 
-	text_draw_window(40,28,260,192,text_str_title_df_menu);
+	text_draw_window(72,28,260,192,text_str_title_df_menu);
 
-	write_text(6, row, text_str_df0);
+	write_text(col, row, text_str_df0);
 	if(uae4all_image_file[0])
 	{
 		int len = strlen(uae4all_image_file);
@@ -102,13 +103,13 @@ static void draw_dfMenu(enum DfMenuEntry c)
 
 		strncpy(image_text, &uae4all_image_file[scroll], visible_len);
 		image_text[26] = '\0';
-		write_text(10, row++, image_text);
+		write_text(col+4, row++, image_text);
 	}
 	else
-		write_text(10, row++, text_str_empty);
+		write_text(col+4, row++, text_str_empty);
 	row++;
 
-	write_text(6, row, text_str_df1);
+	write_text(col, row, text_str_df1);
 	if(uae4all_image_file2[0])
 	{
 		int len = strlen(uae4all_image_file2);
@@ -144,45 +145,45 @@ static void draw_dfMenu(enum DfMenuEntry c)
 
 		strncpy(image_text, &uae4all_image_file2[scroll2], visible_len);
 		image_text[26] = '\0';
-		write_text(10, row++, image_text);
+		write_text(col+4, row++, image_text);
 	}
 	else
-		write_text(10, row++, text_str_empty);
+		write_text(col+4, row++, text_str_empty);
 
 	row += 2;
 
 	if (c == DF_MENU_ENTRY_LOAD_DF0 && flash)
-		write_text_inv(6, row++, text_str_load_df0);
+		write_text_inv(col, row++, text_str_load_df0);
 	else
-		write_text(6, row++, text_str_load_df0);
+		write_text(col, row++, text_str_load_df0);
 
 	row++;
 
 	if (c == DF_MENU_ENTRY_LOAD_DF1 && flash)
-		write_text_inv(6, row++, text_str_load_df1);
+		write_text_inv(col, row++, text_str_load_df1);
 	else
-		write_text(6, row++, text_str_load_df1);
+		write_text(col, row++, text_str_load_df1);
 
-	write_text(6, row++, text_str_separator);
+	write_text(col, row++, text_str_separator);
 
 	if (c == DF_MENU_ENTRY_EJECT_DF0 && flash)
-		write_text_inv(6, row++, text_str_eject_df0);
+		write_text_inv(col, row++, text_str_eject_df0);
 	else
-		write_text(6, row++, text_str_eject_df0);
+		write_text(col, row++, text_str_eject_df0);
 
 	row++;
 
 	if (c == DF_MENU_ENTRY_EJECT_DF1 && flash)
-		write_text_inv(6, row++, text_str_eject_df1);
+		write_text_inv(col, row++, text_str_eject_df1);
 	else
-		write_text(6, row++, text_str_eject_df1);
+		write_text(col, row++, text_str_eject_df1);
 
-	write_text(6, row++, text_str_separator);
+	write_text(col, row++, text_str_separator);
 
 	if (c == DF_MENU_ENTRY_BACK && flash)
-		write_text_inv(6, row++, text_str_back);
+		write_text_inv(col, row++, text_str_back);
 	else
-		write_text(6, row++, text_str_back);
+		write_text(col, row++, text_str_back);
 
 	text_flip();
 	frame = (frame + 1) % 6;
@@ -289,7 +290,7 @@ static void raise_dfMenu()
 	for(i=0;i<10;i+=2)
 	{
 		text_draw_background();
-		text_draw_window(40,(10-i)*24,260,200,text_str_title_df_menu);
+		text_draw_window(72,(10-i)*24,260,200,text_str_title_df_menu);
 		text_flip();
 	}
 	clear_events();
@@ -302,7 +303,7 @@ static void unraise_dfMenu()
 	for(i=9;i>=0;i-=2)
 	{
 		text_draw_background();
-		text_draw_window(40,(10-i)*24,260,200,text_str_title_df_menu);
+		text_draw_window(72,(10-i)*24,260,200,text_str_title_df_menu);
 		text_flip();
 	}
 	text_draw_background();

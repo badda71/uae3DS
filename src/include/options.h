@@ -29,7 +29,7 @@ extern unsigned prefs_chipmem_size;
 extern int prefs_gfx_framerate, changed_gfx_framerate;
 extern int m68k_speed;
 
-#define PREFS_GFX_WIDTH 320
+#define PREFS_GFX_WIDTH 400
 #define PREFS_GFX_HEIGHT 240
 
 extern void check_prefs_changed_custom (void);

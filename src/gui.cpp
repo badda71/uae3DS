@@ -206,7 +206,7 @@ int gui_init (void)
 {
 //Se ejecuta justo despues del MAIN
     if (prSDLScreen==NULL)
-	prSDLScreen=SDL_SetVideoMode(320,240,16,VIDEO_FLAGS);
+	prSDLScreen=SDL_SetVideoMode(400,240,16,VIDEO_FLAGS);
     SDL_ShowCursor(SDL_DISABLE);
     SDL_JoystickEventState(SDL_IGNORE);
     SDL_JoystickOpen(0);
@@ -224,6 +224,7 @@ int gui_init (void)
 	getChanges();
 	check_all_prefs();
 	reset_frameskip();
+    black_screen_now();
 #ifdef DEBUG_FRAMERATE
 	uae4all_update_time();
 #endif
@@ -368,6 +369,7 @@ static void goMenu(void)
     }
     check_all_prefs();
     gui_purge_events();
+    black_screen_now();
     notice_screen_contents_lost();
 #ifdef DEBUG_FRAMERATE
     uae4all_update_time();
@@ -535,7 +537,7 @@ void gui_show_window_bar(int per, int max, int case_title)
 		title="  Restore State";
 	else
 		title="  Save State";
-	_text_draw_window_bar(prSDLScreen,80,64,172,48,per,max,title);
+	_text_draw_window_bar(prSDLScreen,120,64,172,48,per,max,title);
 #if defined(DOUBLEBUFFER) || defined(DINGOO)
 	SDL_Flip(prSDLScreen);
 #endif

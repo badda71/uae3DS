@@ -230,10 +230,11 @@ static void draw_loadMenu(int c)
 	int visibleLen;
 	SDL_Rect r;
 	extern SDL_Surface *text_screen;
-	r.x=80-64; r.y=0; r.h=240;
+	r.x=80-24; r.y=0; r.h=240;
+	int col = 8;
 
 	text_draw_background();
-	text_draw_window(80-64,12,160+64+64,220,text_str_load_title);
+	text_draw_window(80-24,12,160+64+64,220,text_str_load_title);
 
 	if (text_dir_num_files_index<min_in_dir)
 	{
@@ -252,7 +253,7 @@ static void draw_loadMenu(int c)
 
 	for (i=min_in_dir,j=1;i<max_in_dir;i++,j+=2)
 	{
-		write_text(3,j,text_str_load_separator);
+		write_text(col,j,text_str_load_separator);
 
 		if (text_dir_files[i].d_type==4)
 		{
@@ -290,7 +291,7 @@ static void draw_loadMenu(int c)
 					scroll = 0;
 			}
 
-			padding = 4 - scroll;
+			padding = col + 1 - scroll;
 			r.x += 16;
 			r.w -= 16;
 		}
@@ -303,8 +304,8 @@ static void draw_loadMenu(int c)
 				pauseScrollTimer = 15;
 			}
 
-			padding = 4;
-			r.x=16;
+			padding = col + 1;
+			r.x=56;
 		}
 
 		SDL_SetClipRect(text_screen,&r);
@@ -316,9 +317,9 @@ static void draw_loadMenu(int c)
 		SDL_SetClipRect(text_screen,NULL);
 
 		if (text_dir_files[i].d_type==4)
-			write_text(32,j+1,text_str_load_dir);
+			write_text(col+29,j+1,text_str_load_dir);
 	}
-	write_text(3,j,text_str_load_separator);
+	write_text(col,j,text_str_load_separator);
 	text_flip();
 	b++;
 }
@@ -435,7 +436,7 @@ static void raise_loadMenu()
 	for(i=0;i<10;i++)
 	{
 		text_draw_background();
-		text_draw_window(80-64,(10-i)*24,160+64+64,220,text_str_load_title);
+		text_draw_window(80-24,(10-i)*24,160+64+64,220,text_str_load_title);
 		text_flip();
 	}
 }
@@ -447,7 +448,7 @@ static void unraise_loadMenu()
 	for(i=9;i>=0;i--)
 	{
 		text_draw_background();
-		text_draw_window(80-64,(10-i)*24,160+64+64,220,text_str_load_title);
+		text_draw_window(80-24,(10-i)*24,160+64+64,220,text_str_load_title);
 		text_flip();
 	}
 	text_draw_background();

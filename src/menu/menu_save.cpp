@@ -45,71 +45,72 @@ static inline void draw_saveMenu(int c)
 {
 	static int b=0;
 	int bb=(b%6)/3;
+	int col = 13;
 
 	text_draw_background();
-	text_draw_window(64,40,208,172,text_str_title);
-	write_text(9,6,text_str_separator);
+	text_draw_window(96,40,208,172,text_str_title);
+	write_text(col,6,text_str_separator);
 	
-	write_text(9,7,text_str_savestate);
+	write_text(col,7,text_str_savestate);
 	if ((saveMenu_n_savestate==0)&&((c!=0)||(bb)))
-		write_text_inv(22,7,text_str_0);
+		write_text_inv(col+13,7,text_str_0);
 	else
-		write_text(22,7,text_str_0);
+		write_text(col+13,7,text_str_0);
 	if ((saveMenu_n_savestate==1)&&((c!=0)||(bb)))
-		write_text_inv(24,7,text_str_1);
+		write_text_inv(col+15,7,text_str_1);
 	else
-		write_text(24,7,text_str_1);
+		write_text(col+15,7,text_str_1);
 	if ((saveMenu_n_savestate==2)&&((c!=0)||(bb)))
-		write_text_inv(26,7,text_str_2);
+		write_text_inv(col+17,7,text_str_2);
 	else
-		write_text(26,7,text_str_2);
+		write_text(col+17,7,text_str_2);
 	if ((saveMenu_n_savestate==3)&&((c!=0)||(bb)))
-		write_text_inv(28,7,text_str_3);
+		write_text_inv(col+19,7,text_str_3);
 	else
-		write_text(28,7,text_str_3);
-	write_text(9,8,text_str_separator);
+		write_text(col+19,7,text_str_3);
+	write_text(col,8,text_str_separator);
 
-	write_text(9,10,text_str_separator);
+	write_text(col,10,text_str_separator);
 
 	if ((c==1)&&(bb))
-		write_text_inv(9,11,text_str_loadmem);
+		write_text_inv(col,11,text_str_loadmem);
 	else
-		write_text(9,11,text_str_loadmem);
+		write_text(col,11,text_str_loadmem);
 
-	write_text(9,12,text_str_separator);
+	write_text(col,12,text_str_separator);
 
 	if ((c==2)&&(bb))
-		write_text_inv(9,13,text_str_savemem);
+		write_text_inv(col,13,text_str_savemem);
 	else
-		write_text(9,13,text_str_savemem);
+		write_text(col,13,text_str_savemem);
 
-	write_text(9,14,text_str_separator);
+	write_text(col,14,text_str_separator);
 
 #ifdef DREAMCAST_SAVE_VMU
-	write_text(9,16,text_str_separator);
+	write_text(col,16,text_str_separator);
 
 	if ((c==3)&&(bb))
-		write_text_inv(9,17,text_str_loadvmu);
+		write_text_inv(col,17,text_str_loadvmu);
 	else
-		write_text(9,17,text_str_loadvmu);
+		write_text(col,17,text_str_loadvmu);
 
-	write_text(9,18,text_str_separator);
+	write_text(col,18,text_str_separator);
 
 	if ((c==4)&&(bb))
-		write_text_inv(9,19,text_str_savevmu);
+		write_text_inv(col,19,text_str_savevmu);
 	else
-		write_text(9,19,text_str_savevmu);
+		write_text(col,19,text_str_savevmu);
 #endif
 
-	write_text(9,20,text_str_separator);
+	write_text(col,20,text_str_separator);
 
-	write_text(9,22,text_str_separator);
+	write_text(col,22,text_str_separator);
 
 	if ((c==5)&&(bb))
-		write_text_inv(9,23,text_str_exit);
+		write_text_inv(col,23,text_str_exit);
 	else
-		write_text(9,23,text_str_exit);
-	write_text(9,24,text_str_separator);
+		write_text(col,23,text_str_exit);
+	write_text(col,24,text_str_separator);
 
 	text_flip();
 	b++;
@@ -288,15 +289,13 @@ static inline void raise_saveMenu()
 {
 	int i;
 
-//	uae4all_play_save();
 	text_draw_background();
 	text_flip();
-	for(i=0;i<8;i++)
+	for(i=0;i<10;i++)
 	{
 		text_draw_background();
-		text_draw_window(128-(8*i),(8-i)*24,144+(8*i),172,"");
+		text_draw_window(96,(10-i)*24,208,172,text_str_title);
 		text_flip();
-		SDL_Delay(15);
 	}
 }
 
@@ -304,12 +303,11 @@ static inline void unraise_saveMenu()
 {
 	int i;
 
-	for(i=7;i>=0;i--)
+	for(i=9;i>=0;i--)
 	{
 		text_draw_background();
-		text_draw_window(128-(8*i),(8-i)*24,144+(8*i),160,"");
+		text_draw_window(96,(10-i)*24,208,172,text_str_title);
 		text_flip();
-		SDL_Delay(15);
 	}
 	text_draw_background();
 	text_flip();
@@ -324,8 +322,8 @@ static void show_error(const char *str)
 	{
 //		menu_moving=0;
 		text_draw_background();
-		text_draw_window(64,64,160,40,"ERROR !");
-		write_text(9,9,str);
+		text_draw_window(120,64,160,40,"ERROR !");
+		write_text(16,9,str);
 		text_flip();
 	}
 	SDL_Delay(2500);
@@ -336,9 +334,8 @@ static void show_please_wait(const char *title)
 {
 //	menu_moving=0;
 	text_draw_background();
-	text_draw_window(64,64,172,32,title);
-//	uae4all_play_wait();
-	write_text(12,9,"Please wait");
+	text_draw_window(120,64,160,40,title);
+	write_text(16,9,"Please wait");
 	text_flip();
 	SDL_Delay(1000);
 }

@@ -206,7 +206,7 @@ void init_text(int splash)
 	if (prSDLScreen==NULL)
 	{
 		SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK);
-		prSDLScreen=SDL_SetVideoMode(320,240,16,VIDEO_FLAGS);
+		prSDLScreen=SDL_SetVideoMode(400,240,16,VIDEO_FLAGS);
     		SDL_ShowCursor(SDL_DISABLE);
  	   	SDL_JoystickEventState(SDL_ENABLE);
     		SDL_JoystickOpen(0);

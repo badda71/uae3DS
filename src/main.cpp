@@ -354,9 +354,7 @@ void real_main (int argc, char **argv)
 
 	// init my 3DS secific stuff
 	uib_init();
-log_citra("1");
 	autofire_init();
-log_citra("2");
 
     /* Install resident module to get 8MB chipmem, if requested */
     rtarea_setup ();

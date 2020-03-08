@@ -22,15 +22,8 @@ static const char *text_str_0="0";
 static const char *text_str_1="1";
 static const char *text_str_2="2";
 static const char *text_str_3="3";
-#ifdef DREAMCAST_SAVE_VMU
-static const char *text_str_loadmem="Load from memory (Y)";
-static const char *text_str_savemem="Save to memory (X)";
-static const char *text_str_loadvmu="Load from VMU (L)";
-static const char *text_str_savevmu="Save to VMU (R)";
-#else
 static const char *text_str_loadmem="Load state (Y)";
 static const char *text_str_savemem="Save state (X)";
-#endif
 static const char *text_str_separator="----------------------";
 static const char *text_str_exit="Main menu (B)";
 
@@ -85,22 +78,6 @@ static inline void draw_saveMenu(int c)
 		write_text(col,13,text_str_savemem);
 
 	write_text(col,14,text_str_separator);
-
-#ifdef DREAMCAST_SAVE_VMU
-	write_text(col,16,text_str_separator);
-
-	if ((c==3)&&(bb))
-		write_text_inv(col,17,text_str_loadvmu);
-	else
-		write_text(col,17,text_str_loadvmu);
-
-	write_text(col,18,text_str_separator);
-
-	if ((c==4)&&(bb))
-		write_text_inv(col,19,text_str_savevmu);
-	else
-		write_text(col,19,text_str_savevmu);
-#endif
 
 	write_text(col,20,text_str_separator);
 
@@ -248,22 +225,6 @@ static inline int key_saveMenu(int *cp)
 						end=1;
 					}
 					break;
-#ifdef DREAMCAST_SAVE_VMU
-				case 3:
-					if (hit0)
-					{
-						saveMenu_case=SAVE_MENU_CASE_LOAD_VMU;
-						end=1;
-					}
-					break;
-				case 4:
-					if (hit0)
-					{
-						saveMenu_case=SAVE_MENU_CASE_SAVE_VMU;
-						end=1;
-					}
-					break;
-#endif
 				case 5:
 					if (hit0)
 					{
@@ -315,29 +276,7 @@ static inline void unraise_saveMenu()
 
 static void show_error(const char *str)
 {
-	int i;
-	
-//	uae4all_play_error();
-	for(i=0;i<40;i++)
-	{
-//		menu_moving=0;
-		text_draw_background();
-		text_draw_window(120,64,160,40,"ERROR !");
-		write_text(16,9,str);
-		text_flip();
-	}
-	SDL_Delay(2500);
-}
-
-
-static void show_please_wait(const char *title)
-{
-//	menu_moving=0;
-	text_draw_background();
-	text_draw_window(120,64,160,40,title);
-	write_text(16,9,"Please wait");
-	text_flip();
-	SDL_Delay(1000);
+	text_messagebox("ERROR", str, MB_OK);
 }
 
 int run_menuSave()
@@ -366,7 +305,6 @@ int run_menuSave()
 		switch(saveMenu_case)
 		{
 			case SAVE_MENU_CASE_LOAD_MEM:
-//				show_please_wait("Loading");
 				{
 				extern char uae4all_image_file[];
 				strcpy(savestate_filename,uae4all_image_file);
@@ -381,20 +319,7 @@ int run_menuSave()
 					default: 
 						strcat(savestate_filename,".asf");
 				}
-#ifdef DREAMCAST
-				extern void reinit_sdcard(void);
-				reinit_sdcard();
-#endif
 				FILE *f=fopen(savestate_filename,"rb");
-#ifdef DREAMCAST
-				if (!f) {
-					char *ad=(char *)calloc(strlen(savestate_filename)+16,1);
-					strcpy(ad,"/sd/uae4all/");
-					strcat(ad,savestate_filename);
-					f=fopen(ad,"rb");
-					free(ad);
-				}
-#endif
 				if (f)
 				{
 					fclose(f);
@@ -409,32 +334,9 @@ int run_menuSave()
 				}
 				break;
 			case SAVE_MENU_CASE_SAVE_MEM:
-//				show_please_wait("Saving");
 				savestate_state = STATE_DOSAVE;
 				saveMenu_case=1;
 				break;
-#ifdef DREAMCAST_SAVE_VMU
-			case SAVE_MENU_CASE_LOAD_VMU:
-				show_please_wait("VMU Load");
-				if (loadstate_vmu(saveMenu_n_savestate))
-				{
-					show_error("No VMU Saved");
-					saveMenu_case=-1;
-				}
-				else
-					saveMenu_case=1;
-				break;
-			case SAVE_MENU_CASE_SAVE_VMU:
-				show_please_wait("VMU Save");
-				if (savestate_vmu(saveMenu_n_savestate))
-				{
-					show_error("VMU Overflow");
-					saveMenu_case=-1;
-				}
-				else
-					saveMenu_case=1;
-				break;
-#endif
 			case SAVE_MENU_CASE_EXIT:	
 			case SAVE_MENU_CASE_CANCEL:	
 				saveMenu_case=1;

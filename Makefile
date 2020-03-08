@@ -70,7 +70,13 @@ LOGO			:=	$(TOPDIR)/$(META)/logo.lz11
 #---------------------------------------------------------------------------------
 ARCH		:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-COMMON_CFLAGS := -fpermissive -Wno-write-strings -fdata-sections -Wno-sign-compare -fno-exceptions -g -Wall -Wno-format -Wno-switch -O0 -mword-relocations -fomit-frame-pointer -ffunction-sections -ffast-math $(ARCH) $(INCLUDE) -DARM11 -D_3DS -DVERSION3DS=\"$(VERSION)\"
+ifeq ($(MAKECMDGOALS),release)
+	MORECFLAGS := -O3
+else
+	MORECFLAGS := -O0 -ggdb
+endif
+
+COMMON_CFLAGS := -fpermissive -Wno-write-strings -fdata-sections -Wno-sign-compare -fno-exceptions -Wall -Wno-format -Wno-switch -mword-relocations -fomit-frame-pointer -ffunction-sections -ffast-math $(ARCH) $(MORECFLAGS) $(INCLUDE) -DARM11 -D_3DS -DVERSION3DS=\"$(VERSION)\"
 
 CFLAGS		:= $(COMMON_CFLAGS) -std=gnu11 -Wno-discarded-qualifiers
 CXXFLAGS	:= $(COMMON_CFLAGS) -fno-rtti -std=gnu++11
@@ -218,14 +224,17 @@ endif
 
 SUBLIBS_CLEAN := $(SUBLIBS:%=clean-%)
 
-.PHONY: all clean
+.PHONY: all clean dev release
 .PHONY: $(SUBLIBS)
 .PHONY: $(SUBLIBS_CLEAN)
 
 #---------------------------------------------------------------------------------
+dev: all
+release: all
+
 all: $(BUILD) $(GFXBUILD) $(DEPSDIR) $(ROMFS_T3XFILES) $(T3XHFILES)
 	@echo building $(APP_TITLE)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $(MAKECMDGOALS)
 
 $(BUILD):
 	@mkdir -p $@
@@ -262,6 +271,9 @@ else
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
+dev: all
+release: all
+
 all	:	$(OUTPUT).3dsx $(OUTPUT).cia $(OUTPUT).3ds
 
 $(SUBLIBS):

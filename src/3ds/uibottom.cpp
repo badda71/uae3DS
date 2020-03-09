@@ -641,6 +641,7 @@ void uib_update(void)
 #define DOUBLECLICK_TIME 500
 
 int uib_handle_event(SDL_Event *e) {
+	extern SDL_Surface *prSDLScreen;
 	static SDL_Event sdl_e;
 	int i,x,y;
 	static Uint32 gesture1_time=0;
@@ -669,7 +670,7 @@ int uib_handle_event(SDL_Event *e) {
 			kb_activekey=-1;
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			x = e->button.x;
+			x = (int)(((((double)e->button.x)*320.0f)/((double)prSDLScreen->w))+0.5f);
 			y = e->button.y;
 			for (i = 0; uikbd_keypos[i].key != -1 ; ++i) {
 				// keyboard button

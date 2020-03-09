@@ -77,7 +77,8 @@ extern uae_u16 INTREQR (void);
 
 /* maximums for statically allocated tables */
 
-#define MAXHPOS 227
+//#define MAXHPOS 227
+#define MAXHPOS 247
 #define MAXVPOS 312
 //#define MAXVPOS 280
 

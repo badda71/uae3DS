@@ -12,13 +12,13 @@
 #error UAE4ALL_ALIGN NO DEFINIDO
 #endif
 
-#if defined(NO_THREADS) && defined(DREAMCAST)
+#if defined(NO_THREADS) && defined(_3DS)
 #define PRE_SNDBUFFER_LEN (960)
 #else
 #define PRE_SNDBUFFER_LEN (1024)
 #endif
 
-#if !defined(DREAMCAST) && !defined(DINGOO)
+#if !defined(_3DS) && !defined(DINGOO)
 #define SNDBUFFER_LEN (PRE_SNDBUFFER_LEN*2)
 #else
 #define SNDBUFFER_LEN PRE_SNDBUFFER_LEN

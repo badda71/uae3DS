@@ -183,7 +183,7 @@ static int frame_redraw_necessary;
 #define frame_redraw_necessary 1
 #endif
 
-#if defined(NO_THREADS) && defined(DREAMCAST)
+#if defined(NO_THREADS) && defined(_3DS)
 // SOLO PARA DREAMCAST PORQUE TIENE UN SOUNDBUFFER DE 960
 #define UMBRAL 21
 #else
@@ -323,8 +323,8 @@ static __inline__ void count_frame (void)
 	{
 		if ((ahora+PARTIDA)<proximo_frameskip)
 		{
-#ifdef DREAMCAST
-//			SDL_Delay(proximo_frameskip-ahora-PARTIDA+1);
+#ifdef _3DS
+			SDL_Delay(proximo_frameskip-ahora-PARTIDA+1);
 #else
 			SDL_Delay(proximo_frameskip-ahora);
 #endif

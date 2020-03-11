@@ -339,10 +339,10 @@ int run_menuDfSel()
 		{
 			case DF_MENU_ENTRY_LOAD_DF0:
 				run_menuLoad(DF_0);
-				return 1;
+				break;
 			case DF_MENU_ENTRY_LOAD_DF1:
 				run_menuLoad(DF_1);
-				return 1;
+				break;
 			case DF_MENU_ENTRY_EJECT_DF0:
 				uae4all_image_file[0]=0;
 				disk_eject(0);

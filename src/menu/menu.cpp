@@ -6,6 +6,7 @@
 #include "menu.h"
 
 #include <SDL/SDL_mixer.h>
+#include <SDL/SDL_image.h>
 
 #include "sysdeps.h"
 #include "uae.h"
@@ -160,35 +161,7 @@ static void update_window_color(void)
 
 void text_draw_background()
 {
-	static int pos_x=12345678;
-	static int pos_y=12345678;
-	SDL_Rect r;
-	int i,j;
-	int w=text_screen->w+text_background->w-1;
-	int h=text_screen->h+text_background->h-1;
-
-	if (menu_moving)
-	{
-		if (pos_x>=0) pos_x=-text_screen->w;
-		else pos_x++;
-		if (pos_y>=0) pos_y=-text_screen->h;
-		else pos_y++;
-	}
-
-	for(i=pos_x;i<w;i+=text_background->w)
-		for(j=pos_y;j<h;j+=text_background->h)
-		{
-			r.x=i;
-			r.y=j;
-			r.w=text_background->w;
-			r.h=text_background->h;
-			SDL_BlitSurface(text_background,NULL,text_screen,&r);
-		}
-	if (menu_moving)
-	{
-		text_draw_menu_msg();
-		update_window_color();
-	}
+	SDL_BlitSurface(text_background,NULL,text_screen,NULL);
 }
 
 void text_flip(void)
@@ -221,7 +194,7 @@ void init_text(int splash)
 		if (text_image==NULL)
 			exit(-2);
 		SDL_SetColorKey(text_image, SDL_SRCCOLORKEY, 0x00000000);
-		tmp=SDL_LoadBMP(MENU_FILE_BACKGROUND);
+		tmp=IMG_Load(MENU_FILE_BACKGROUND);
 		if (tmp==NULL)
 			exit(-3);
 		text_background=SDL_DisplayFormat(tmp);
@@ -248,47 +221,14 @@ void init_text(int splash)
 		while(!toexit)
 		{
 			SDL_Event ev;
-#ifdef HOME_DIR
 			int config_dir_len = strlen(config_dir);
-#endif
 			if (!uae4all_init_rom(romfile))
 				break;
-			text_draw_background();
-			text_draw_window(54,110,250,64,"--- ERROR ---");
-#ifdef HOME_DIR
-			write_text(9,14,"kick.rom not found in:");
 
-			if(config_dir_len < 26) /* Center the text */
-			{
-				write_text(7 + 13 - config_dir_len/2, 16, config_dir);
-			}
-			else
-			{
-				write_text(7,16,config_dir);
-			}
-
-#else
-			write_text(11,14,"kick.rom not found");
-			write_text(8,16,"Press any button to exit");
-#endif
-			text_flip();
-			while(SDL_PollEvent(&ev))
-			{
-				if (uib_handle_event(&ev)) continue;
-				if (ev.type==SDL_QUIT)
-					toexit = 1;
-				else
-				if (ev.type==SDL_KEYDOWN)
-				{
-					toexit = 1;
-				}
-				else if (ev.type==SDL_JOYBUTTONDOWN)
-				{
-					toexit = 1;
-				}
-			}	
-
-			text_flip();
+			char buf[128];
+			snprintf(buf,128,"kick.rom not found in\n%s",config_dir);
+			text_messagebox("--- ERROR ---", buf, MB_OK);
+			toexit=1;
 		}
 
 		if(toexit)

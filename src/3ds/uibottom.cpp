@@ -481,7 +481,7 @@ void uib_init() {
 	gpusrc = (u8*)linearAlloc(512*256*4);
 
 	// pre-load sprites
-	loadImage(&background_spr,	"romfs:/background.png");
+	loadImage(&background_spr,	"romfs:/bg_bot.png");
 	loadImage(&kbd1_spr,		"romfs:/kbd1.png");
 	loadImage(&kbd2_spr,		"romfs:/kbd2.png");
 	loadImage(&twistyup_spr,	"romfs:/twistyup.png");

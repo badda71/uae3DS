@@ -16,7 +16,7 @@
 
 extern int emulating;
 
-static const char *text_str_title="   -- UAE3DS v" VERSION3DS " ------";
+static const char *text_str_title="- UAE3DS v" VERSION3DS " by badda71";
 static const char *text_str_load="Load disk image (X)";
 static const char *text_str_save="Saved states (Y)";
 static const char *text_str_throttle="Throttle";

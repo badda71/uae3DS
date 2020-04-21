@@ -67,8 +67,10 @@ int text_messagebox(char *title, char *text, mb_mode mode);
 void text_flip(void);
 
 void drawPleaseWait(void);
-void menu_raise(void);
-void menu_unraise(void);
+//void menu_raise(void);
+//void menu_unraise(void);
+#define menu_raise(x)
+#define menu_unraise(x)
 
 int run_mainMenu();
 int run_menuDfSel();

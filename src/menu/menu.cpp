@@ -15,7 +15,6 @@
 #include "sound.h"
 
 #include "msg.h"
-#include "fade.h"
 #include "uibottom.h"
 #include "keyboard.h"
 
@@ -83,6 +82,7 @@ static void obten_colores(void)
 	menu_win1_color_base=menu_win1_color;
 }
 
+/*
 void menu_raise(void)
 {
 	int i;
@@ -112,6 +112,7 @@ void menu_unraise(void)
 		SDL_Delay(10);
 	}
 }
+*/
 
 static void text_draw_menu_msg()
 {
@@ -239,8 +240,8 @@ void init_text(int splash)
 	}
 	else
 	{
-		SDL_FillRect(text_screen,NULL,0xFFFFFFFF);
-		text_flip();
+	//	SDL_FillRect(text_screen,NULL,0xFFFFFFFF);
+	//	text_flip();
 		uae4all_resume_music();
 	}
 	menu_msg_time=SDL_GetTicks();

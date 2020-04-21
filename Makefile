@@ -65,6 +65,14 @@ BANNER_AUDIO	:=	$(TOPDIR)/$(META)/audio.wav
 BANNER_IMAGE	:=	$(TOPDIR)/$(META)/banner.png
 LOGO			:=	$(TOPDIR)/$(META)/logo.lz11
 
+ifeq (, $(shell which gm))
+	MKICOPNG := cp -f
+else
+	MKICOPNG := gm convert -fill white -font "Picopixel-Standard"\
+		-draw "font-size 8;text 1,47 'v$(VERSION)';"
+endif
+
+
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
@@ -211,7 +219,8 @@ ifeq ($(strip $(ICON)),)
 		endif
 	endif
 else
-	export APP_ICON := $(TOPDIR)/$(META)/$(ICON)
+	export RAW_ICON := $(TOPDIR)/$(META)/$(ICON)
+	export APP_ICON := $(CURDIR)/$(BUILD)/$(ICON)
 endif
 
 ifeq ($(strip $(NO_SMDH)),)
@@ -292,6 +301,11 @@ $(OUTPUT).elf	:	$(OFILES) $(SUBLIBS)
 #---------------------------------------------------------------------------------
 # cia/3ds generation targets
 #---------------------------------------------------------------------------------
+$(APP_ICON): $(RAW_ICON) $(TOPDIR)/Makefile
+	@echo -n generating $@ ...
+	@$(MKICOPNG) $< $@
+	@echo OK
+
 icon.icn: $(APP_ICON)
 	@echo -n generating $(notdir $@) ...
 	@bannertool makesmdh -s "$(APP_TITLE)" -l "$(APP_TITLE) - $(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i $(APP_ICON) -o $@

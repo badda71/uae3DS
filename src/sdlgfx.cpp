@@ -479,10 +479,9 @@ int keycode2amiga(SDL_keysym *prKeySym)
 
 static int refresh_necessary = 0;
 
-#define MSENSITIVITY 2
-
 void handle_events (void)
 {
+	extern int mainMenu_msens;
     SDL_Event rEvent;
     int iAmigaKeyCode;
     int i, j;
@@ -537,8 +536,8 @@ void handle_events (void)
 */
 		case SDL_MOUSEMOTION:
 			if (rEvent.motion.state) {
-				lastmx += rEvent.motion.xrel * MSENSITIVITY;
-				lastmy += rEvent.motion.yrel * MSENSITIVITY;
+				lastmx += rEvent.motion.xrel * mainMenu_msens;
+				lastmy += rEvent.motion.yrel * mainMenu_msens;
 				newmousecounters = 1;
 			}
 			break;

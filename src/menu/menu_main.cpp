@@ -23,6 +23,7 @@ static const char *text_str_throttle="Throttle";
 static const char *text_str_frameskip="Frameskip";
 static const char *text_str_autosave="Save disks";
 static const char *text_str_vpos="Screen pos";
+static const char *text_str_msens="Mouse sens";
 static const char *text_str_8="8";
 static const char *text_str_16="16";
 static const char *text_str_20="20";
@@ -58,6 +59,7 @@ enum MainMenuEntry {
 	MAIN_MENU_ENTRY_SCREEN_POSITION,
 	MAIN_MENU_ENTRY_SOUND,
 	MAIN_MENU_ENTRY_SAVE_DISKS,
+	MAIN_MENU_ENTRY_MOUSE_SENSITIVITY,
 	MAIN_MENU_ENTRY_RESET_EMULATION,
 	MAIN_MENU_ENTRY_RETURN_TO_EMULATION,
 	MAIN_MENU_ENTRY_UPDATE,
@@ -70,17 +72,18 @@ int mainMenu_throttle=0;
 int mainMenu_frameskip=-1;
 int mainMenu_sound=-1;
 int mainMenu_autosave=-1;
+int mainMenu_msens=2;
 
 static void draw_mainMenu(enum MainMenuEntry c)
 {
 	static int frame = 0;
 	int flash = frame / 3;
-	int row = 4, col = 10;
+	int row = 3, col = 10;
 		
 	int column = 0;
 
 	text_draw_background();
-	text_draw_window(72,28,260,192,text_str_title);
+	text_draw_window(72,20,260,200,text_str_title);
 
 	if (c == MAIN_MENU_ENTRY_LOAD && flash)
 		write_text_inv(col, row++, text_str_load);
@@ -242,6 +245,29 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	else
 		write_text(column, row, text_str_on);
 
+	row += 2;
+	write_text(col, row, text_str_msens);
+	column = col+11;
+	if ((mainMenu_msens== 1) && (c != MAIN_MENU_ENTRY_MOUSE_SENSITIVITY || flash))
+		write_text_inv(column, row, text_str_1);
+	else
+		write_text(column, row, text_str_1);
+	column += strlen(text_str_1) + 1;
+	if ((mainMenu_msens== 2) && (c != MAIN_MENU_ENTRY_MOUSE_SENSITIVITY || flash))
+		write_text_inv(column, row, text_str_2);
+	else
+		write_text(column, row, text_str_2);
+	column += strlen(text_str_2) + 1;
+	if ((mainMenu_msens== 3) && (c != MAIN_MENU_ENTRY_MOUSE_SENSITIVITY || flash))
+		write_text_inv(column, row, text_str_3);
+	else
+		write_text(column, row, text_str_3);
+	column += strlen(text_str_3) + 1;
+	if ((mainMenu_msens== 4) && (c != MAIN_MENU_ENTRY_MOUSE_SENSITIVITY || flash))
+		write_text_inv(column, row, text_str_4);
+	else
+		write_text(column, row, text_str_4);
+
 	row++;
 	write_text(col, row++, text_str_separator);
 
@@ -397,6 +423,13 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 					case MAIN_MENU_ENTRY_SAVE_DISKS:
 						if (left || right)
 							mainMenu_autosave = ~mainMenu_autosave;
+						break;
+					case MAIN_MENU_ENTRY_MOUSE_SENSITIVITY:
+						if (left)
+							--mainMenu_msens;
+						else if (right)
+							++mainMenu_msens;
+						mainMenu_msens = ((mainMenu_msens + 3) % 4) + 1; 
 						break;
 					case MAIN_MENU_ENTRY_LOAD:
 					case MAIN_MENU_ENTRY_SAVED_STATES:

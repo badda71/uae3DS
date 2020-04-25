@@ -14,7 +14,6 @@
 #include "zfile.h"
 #include "sound.h"
 
-#include "msg.h"
 #include "uibottom.h"
 #include "keyboard.h"
 
@@ -114,52 +113,6 @@ void menu_unraise(void)
 }
 */
 
-static void text_draw_menu_msg()
-{
-	write_text_pos(menu_msg_pos,0,menu_msg);
-	if (menu_msg_pos<MAX_SCROLL_MSG)
-		menu_msg_pos=330;
-	else
-		menu_msg_pos--;
-}
-
-
-static void update_window_color(void)
-{
-	static int cambio=0;
-	static int spin=0;
-
-	Uint8 r,g,b;
-	int cambio2=cambio>>3;
-	SDL_GetRGB(menu_win0_color_base,text_screen->format,&r,&g,&b);
-	if (((int)r)-cambio2>0) r-=cambio2;
-	else r=0;
-	if (((int)g)-cambio2>0) g-=cambio2;
-	else g=0;
-	if (((int)b)-cambio2>0) b-=cambio2;
-	else b=0;
-	menu_win0_color=SDL_MapRGB(text_screen->format,r,g,b);
-	SDL_GetRGB(menu_win1_color_base,text_screen->format,&r,&g,&b);
-	if (((int)r)-cambio>0) r-=cambio;
-	else r=0;
-	if (((int)g)-cambio>0) g-=cambio;
-	else g=0;
-	if (((int)b)-cambio>0) b-=cambio;
-	else b=0;
-	menu_win1_color=SDL_MapRGB(text_screen->format,r,g,b);
-	if (spin)
-	{
-		if (cambio<=0) spin=0;
-		else cambio-=2;
-
-	}
-	else
-	{
-		if (cambio>=24) spin=1;
-		else cambio+=2;
-	}
-}
-
 void text_draw_background()
 {
 	SDL_BlitSurface(text_background,NULL,text_screen,NULL);
@@ -212,7 +165,6 @@ void init_text(int splash)
 	}
 	if (splash)
 	{
-		SDL_Event ev;
 		int toexit=0;
 
 		obten_colores();
@@ -221,8 +173,6 @@ void init_text(int splash)
 
 		while(!toexit)
 		{
-			SDL_Event ev;
-			int config_dir_len = strlen(config_dir);
 			if (!uae4all_init_rom(romfile))
 				break;
 
@@ -326,20 +276,23 @@ void write_text(int x, int y, const char *str)
 }
 
 /* Write text, inverted: */
-
-void write_text_inv(int x, int y, const char *str)
+void write_text_inv_pos(int x, int y, const char *str)
 {
   SDL_Rect dest;
   
-  
-  dest.x = (x * 8) -2 ;
-  dest.y = (y * 8) /*10*/ - 2;
+  dest.x = x - 2;
+  dest.y = y - 2;
   dest.w = (strlen(str) * 8) + 4;
   dest.h = 12;
 
   SDL_FillRect(text_screen, &dest, menu_inv_color);
 
-  write_text(x, y, str);
+  write_text_pos(x, y, str);
+}
+
+void write_text_inv(int x, int y, const char *str)
+{
+  write_text_inv_pos(x*8, y*8, str);
 }
 
 void _write_text_inv(SDL_Surface *sf, int x, int y, const char *str)
@@ -349,37 +302,6 @@ void _write_text_inv(SDL_Surface *sf, int x, int y, const char *str)
 	write_text_inv(x,y,str);
 	text_screen=back;
 }
-
-void write_text_inv_n(int x, int y, int n, const char *str)
-{
-  SDL_Rect dest;
-  
-  
-  dest.x = (x * 8) ;
-  dest.y = (y * 8) /*10*/ - 3;
-  dest.w = (n*8)+2;
-  dest.h = 11;
-
-  SDL_FillRect(text_screen, &dest, menu_inv_color);
-
-  dest.x = (x * 8) +1;
-  dest.y = (y * 8) /*10*/ -2;
-  dest.w = (n*8);
-  dest.h = 9;
-
-  SDL_FillRect(text_screen, &dest, menu_inv_color2);
-
-  write_text(x+1, y, str);
-}
-
-void _write_text_inv_n(SDL_Surface *sf, int x, int y, int n, const char *str)
-{
-	SDL_Surface *back=text_screen;
-	text_screen=sf;
-	write_text_inv_n(x,y,n,str);
-	text_screen=back;
-}
-
 
 /* Write text, horizontally centered... */
 
@@ -578,7 +500,8 @@ int text_messagebox(char *title, char *message, mb_mode mode) {
 
 		int flash = frame / 3;
 
-		if (SDL_PollEvent(&e) &&
+		if (mode != MB_NONE &&
+			SDL_PollEvent(&e) &&
 			!uib_handle_event(&e) &&
 			e.type==SDL_KEYDOWN)
 		{

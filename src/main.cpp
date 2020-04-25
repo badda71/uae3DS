@@ -48,6 +48,7 @@ KOS_INIT_ROMDISK(romdisk);
 #include "drawing.h"
 #include "uibottom.h"
 #include "autofire.h"
+#include "uae3ds.h"
 
 #ifdef USE_SDL
 #include "SDL.h"
@@ -98,6 +99,22 @@ void dingoo_set_clock(unsigned int mhz);
 
 void discard_prefs ()
 {
+}
+
+void loadconfig() {
+	char *cfgfile1 = ROM_PATH_PREFIX CFG_FILE_NAME;
+	char *cfgfile2 = DATA_PREFIX CFG_FILE_NAME;
+	char buf[4096] = {0};
+
+	// read resources
+	FILE *f;
+	if ((f = fopen(cfgfile1,"r")) != NULL ||
+		(f = fopen(cfgfile2,"r")) != NULL)
+	{
+		fscanf(f," keymappings = %s ",buf);
+		uae3ds_mapping_loadbuf(buf);
+		fclose(f);
+	}
 }
 
 void default_prefs ()
@@ -246,13 +263,8 @@ void leave_program (void)
     do_leave_program ();
 }
 
-typedef struct {
-	unsigned int sdlkey, key;
-	const char *name;
-} sdl_3dsbuttons;
-
 // mappings like dingoo SDL
-static sdl_3dsbuttons buttons3ds[] = {
+sdl_3dsbuttons buttons3ds[] = {
 	{KEY_A, DS_A, "A btn"},
 	{KEY_B, DS_B, "B btn"},
 	{KEY_X, DS_X, "X btn"},
@@ -271,8 +283,8 @@ static sdl_3dsbuttons buttons3ds[] = {
 	{KEY_CSTICK_DOWN, DS_DOWN3, "CSTK DOWN"},
 	{KEY_CSTICK_LEFT, DS_LEFT3, "CSTK LEFT"},
 	{KEY_CSTICK_RIGHT, DS_RIGHT3, "CSTK RIGHT"},
-	{KEY_TOUCH, DS_TOUCH, "TOUCH"},
-	//	{KEY_CPAD_UP, DS_UP1, "CPAD UP"},	// included in KEY_UP
+//	{KEY_TOUCH, DS_TOUCH, "TOUCH"},
+//	{KEY_CPAD_UP, DS_UP1, "CPAD UP"},	// included in KEY_UP
 //	{KEY_CPAD_DOWN, DS_DOWN1, "CPAD DOWN"},
 //	{KEY_CPAD_LEFT, DS_LEFT1, "CPAD LEFT"},
 //	{KEY_CPAD_RIGHT, DS_RIGHT1, "CPAD RIGHT"},
@@ -330,6 +342,7 @@ void real_main (int argc, char **argv)
     if (! graphics_setup ()) {
 	exit (1);
     }
+	loadconfig();
 
     rtarea_init ();
 

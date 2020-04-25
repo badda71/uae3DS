@@ -23,6 +23,7 @@ void guarda(void);
 #include <unistd.h>
 #include <signal.h>
 
+#include <3ds.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_endian.h>
 
@@ -41,6 +42,7 @@ void guarda(void);
 #include "savestate.h"
 #include "menu/menu.h"
 #include "uibottom.h"
+#include "uae3ds.h"
 
 #ifdef DREAMCAST
 #include <SDL/SDL_dreamcast.h>
@@ -493,6 +495,8 @@ void handle_events (void)
     while (SDL_PollEvent(&rEvent))
     {
 		if (uib_handle_event(&rEvent)) continue;
+
+		uae3ds_mapping_apply(&rEvent);
 		
 	    gui_handle_events (&rEvent);
 

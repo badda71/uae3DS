@@ -43,7 +43,7 @@ enum uib_action {
 #define DS_TOUCH 0x117
 
 typedef struct {
-	int x,y,w,h,key,shift,sticky,flags;
+	int x,y,w,h,key,sticky,flags;
 	const char *name;
 } uikbd_key;
 
@@ -53,5 +53,6 @@ extern int uib_handle_event(SDL_Event *);
 extern void uib_init();
 
 // exposed variables
+extern uikbd_key uikbd_keypos[];
 extern volatile enum uib_action uib_must_redraw;
 #endif

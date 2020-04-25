@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<3ds.h>
 
 #include "menu.h"
 #include "sysdeps.h"
@@ -13,6 +14,7 @@
 #include "uibottom.h"
 #include "keyboard.h"
 #include "update.h"
+#include "uae3ds.h"
 
 extern int emulating;
 
@@ -24,6 +26,11 @@ static const char *text_str_frameskip="Frameskip";
 static const char *text_str_autosave="Save disks";
 static const char *text_str_vpos="Screen pos";
 static const char *text_str_msens="Mouse sens";
+static const char *text_str_keymap="Key mappings";
+static const char *text_str_keymap1="Add";
+static const char *text_str_keymap2="Delete";
+static const char *text_str_keymap3="List";
+static const char *text_str_keymap4="Save";
 static const char *text_str_8="8";
 static const char *text_str_16="16";
 static const char *text_str_20="20";
@@ -60,6 +67,7 @@ enum MainMenuEntry {
 	MAIN_MENU_ENTRY_SOUND,
 	MAIN_MENU_ENTRY_SAVE_DISKS,
 	MAIN_MENU_ENTRY_MOUSE_SENSITIVITY,
+	MAIN_MENU_ENTRY_KEYMAP,
 	MAIN_MENU_ENTRY_RESET_EMULATION,
 	MAIN_MENU_ENTRY_RETURN_TO_EMULATION,
 	MAIN_MENU_ENTRY_UPDATE,
@@ -73,12 +81,13 @@ int mainMenu_frameskip=-1;
 int mainMenu_sound=-1;
 int mainMenu_autosave=-1;
 int mainMenu_msens=2;
+int mainMenu_mappos=0;
 
 static void draw_mainMenu(enum MainMenuEntry c)
 {
 	static int frame = 0;
 	int flash = frame / 3;
-	int row = 3, col = 10;
+	int row = 3*8, col = 10*8;
 		
 	int column = 0;
 
@@ -86,227 +95,246 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	text_draw_window(72,20,260,200,text_str_title);
 
 	if (c == MAIN_MENU_ENTRY_LOAD && flash)
-		write_text_inv(col, row++, text_str_load);
+		write_text_inv_pos(col, row, text_str_load);
 	else
-		write_text(col, row++, text_str_load);
+		write_text_pos(col, row, text_str_load);
 
-	write_text(col, row++, text_str_separator);
-
+	row+=8;
+	write_text_pos(col, row, text_str_separator);
+	row+=8;
 	if(emulating)
 	{
 		if (c == MAIN_MENU_ENTRY_SAVED_STATES && flash)
-			write_text_inv(col, row++, text_str_save);
+			write_text_inv_pos(col, row, text_str_save);
 		else
-			write_text(col, row++, text_str_save);
+			write_text_pos(col, row, text_str_save);
 	}
-	else
-	{
-		row++;
-	}
+	row+=8;
+	write_text_pos(col, row, text_str_separator);
+	row+=8;
 
-	write_text(col, row, text_str_separator);
-	row++;
-
-	write_text(col, row, text_str_throttle);
-	column = col + 11;
+	write_text_pos(col, row, text_str_throttle);
+	column = col + 11 * 8;
 
 	if ((mainMenu_throttle == 0) && (c != MAIN_MENU_ENTRY_THROTTLE || flash))
-		write_text_inv(column, row, text_str_0);
+		write_text_inv_pos(column, row, text_str_0);
 	else
-		write_text(column, row, text_str_0);
-	column += strlen(text_str_0) + 1;
+		write_text_pos(column, row, text_str_0);
+	column += 8*(strlen(text_str_0) + 1);
 	if ((mainMenu_throttle == 1) && (c != MAIN_MENU_ENTRY_THROTTLE || flash))
-		write_text_inv(column, row, text_str_20);
+		write_text_inv_pos(column, row, text_str_20);
 	else
-		write_text(column, row, text_str_20);
-	column += strlen(text_str_20) + 1;
+		write_text_pos(column, row, text_str_20);
+	column += 8*(strlen(text_str_20) + 1);
 	if ((mainMenu_throttle == 2) && (c != MAIN_MENU_ENTRY_THROTTLE || flash))
-		write_text_inv(column, row, text_str_40);
+		write_text_inv_pos(column, row, text_str_40);
 	else
-		write_text(column, row, text_str_40);
-	column += strlen(text_str_40) + 1;
+		write_text_pos(column, row, text_str_40);
+	column += 8*(strlen(text_str_40) + 1);
 	if ((mainMenu_throttle == 3) && (c != MAIN_MENU_ENTRY_THROTTLE || flash))
-		write_text_inv(column, row, text_str_60);
+		write_text_inv_pos(column, row, text_str_60);
 	else
-		write_text(column, row, text_str_60);
-	column += strlen(text_str_60) + 1;
+		write_text_pos(column, row, text_str_60);
+	column += 8*(strlen(text_str_60) + 1);
 	if ((mainMenu_throttle == 4) && (c != MAIN_MENU_ENTRY_THROTTLE || flash))
-		write_text_inv(column, row, text_str_80);
+		write_text_inv_pos(column, row, text_str_80);
 	else
-		write_text(column, row, text_str_80);
-	column += strlen(text_str_80) + 1;
+		write_text_pos(column, row, text_str_80);
+	column += 8*(strlen(text_str_80) + 1);
 	if ((mainMenu_throttle == 5) && (c != MAIN_MENU_ENTRY_THROTTLE || flash))
-		write_text_inv(column, row, text_str_100);
+		write_text_inv_pos(column, row, text_str_100);
 	else
-		write_text(column, row, text_str_100);
+		write_text_pos(column, row, text_str_100);
 
-	row += 2;
+	row += 12;
 
-	write_text(col, row, text_str_frameskip);
-	column = col + 11;
+	write_text_pos(col, row, text_str_frameskip);
+	column = col + 11*8;
 
 	if ((mainMenu_frameskip == 0) && (c != MAIN_MENU_ENTRY_FRAMESKIP || flash))
-		write_text_inv(column, row, text_str_0);
+		write_text_inv_pos(column, row, text_str_0);
 	else
-		write_text(column, row, text_str_0);
-	column += strlen(text_str_0) + 1;
+		write_text_pos(column, row, text_str_0);
+	column += 8*(strlen(text_str_0) + 1);
 	if ((mainMenu_frameskip == 1) && (c != MAIN_MENU_ENTRY_FRAMESKIP || flash))
-		write_text_inv(column, row, text_str_1);
+		write_text_inv_pos(column, row, text_str_1);
 	else
-		write_text(column, row, text_str_1);
-	column += strlen(text_str_1) + 1;
+		write_text_pos(column, row, text_str_1);
+	column += 8*(strlen(text_str_1) + 1);
 	if ((mainMenu_frameskip == 2) && (c != MAIN_MENU_ENTRY_FRAMESKIP || flash))
-		write_text_inv(column, row, text_str_2);
+		write_text_inv_pos(column, row, text_str_2);
 	else
-		write_text(column, row, text_str_2);
-	column += strlen(text_str_2) + 1;
+		write_text_pos(column, row, text_str_2);
+	column += 8*(strlen(text_str_2) + 1);
 	if ((mainMenu_frameskip == 3) && (c != MAIN_MENU_ENTRY_FRAMESKIP || flash))
-		write_text_inv(column, row, text_str_3);
+		write_text_inv_pos(column, row, text_str_3);
 	else
-		write_text(column, row, text_str_3);
-	column += strlen(text_str_3) + 1;
+		write_text_pos(column, row, text_str_3);
+	column += 8*(strlen(text_str_3) + 1);
 	if ((mainMenu_frameskip == 4) && (c != MAIN_MENU_ENTRY_FRAMESKIP || flash))
-		write_text_inv(column, row, text_str_4);
+		write_text_inv_pos(column, row, text_str_4);
 	else
-		write_text(column, row, text_str_4);
-	column += strlen(text_str_4) + 1;
+		write_text_pos(column, row, text_str_4);
+	column += 8*(strlen(text_str_4) + 1);
 	if ((mainMenu_frameskip == 5) && (c != MAIN_MENU_ENTRY_FRAMESKIP || flash))
-		write_text_inv(column, row, text_str_5);
+		write_text_inv_pos(column, row, text_str_5);
 	else
-		write_text(column, row, text_str_5);
-	column += strlen(text_str_5) + 1;
+		write_text_pos(column, row, text_str_5);
+	column += 8*(strlen(text_str_5) + 1);
 	if ((mainMenu_frameskip == -1) && (c != MAIN_MENU_ENTRY_FRAMESKIP || flash))
-		write_text_inv(column, row, text_str_auto);
+		write_text_inv_pos(column, row, text_str_auto);
 	else
-		write_text(column, row, text_str_auto);
+		write_text_pos(column, row, text_str_auto);
 
-	row += 2;
+	row += 12;
 
-	write_text(col, row, text_str_vpos);
-	column = col+11;
+	write_text_pos(col, row, text_str_vpos);
+	column = col+11*8;
 
 	if ((mainMenu_vpos == 0) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv(column, row, text_str_0);
+		write_text_inv_pos(column, row, text_str_0);
 	else
-		write_text(column, row, text_str_0);
-	column += strlen(text_str_0) + 1;
+		write_text_pos(column, row, text_str_0);
+	column += 8*(strlen(text_str_0) + 1);
 	if ((mainMenu_vpos == 1) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv(column, row, text_str_8);
+		write_text_inv_pos(column, row, text_str_8);
 	else
-		write_text(column, row, text_str_8);
-	column += strlen(text_str_8) + 1;
+		write_text_pos(column, row, text_str_8);
+	column += 8*(strlen(text_str_8) + 1);
 	if ((mainMenu_vpos == 2) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv(column, row, text_str_16);
+		write_text_inv_pos(column, row, text_str_16);
 	else
-		write_text(column, row, text_str_16);
-	column += strlen(text_str_16) + 1;
+		write_text_pos(column, row, text_str_16);
+	column += 8*(strlen(text_str_16) + 1);
 	if ((mainMenu_vpos == 3) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv(column, row, text_str_24);
+		write_text_inv_pos(column, row, text_str_24);
 	else
-		write_text(column, row, text_str_24);
-	column += strlen(text_str_24) + 1;
+		write_text_pos(column, row, text_str_24);
+	column += 8*(strlen(text_str_24) + 1);
 	if ((mainMenu_vpos == 4) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv(column, row, text_str_32);
+		write_text_inv_pos(column, row, text_str_32);
 	else
-		write_text(column, row, text_str_32);
-	column += strlen(text_str_32) + 1;
+		write_text_pos(column, row, text_str_32);
+	column += 8*(strlen(text_str_32) + 1);
 	if ((mainMenu_vpos == 5) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv(column, row, text_str_40);
+		write_text_inv_pos(column, row, text_str_40);
 	else
-		write_text(column, row, text_str_40);
+		write_text_pos(column, row, text_str_40);
 
-	row += 2;
+	row += 12;
 
-	write_text(col, row, text_str_sound);
-	column = col+11;
+	write_text_pos(col, row, text_str_sound);
+	column = col+11*8;
 
 	if (!mainMenu_sound && (c != MAIN_MENU_ENTRY_SOUND || flash))
-		write_text_inv(column, row, text_str_off);
+		write_text_inv_pos(column, row, text_str_off);
 	else
-		write_text(column, row, text_str_off);
-	column += strlen(text_str_off) + 2;
+		write_text_pos(column, row, text_str_off);
+	column += 8*(strlen(text_str_off) + 2);
 	if (mainMenu_sound && (c != MAIN_MENU_ENTRY_SOUND || flash))
-		write_text_inv(column, row, text_str_on);
+		write_text_inv_pos(column, row, text_str_on);
 	else
-		write_text(column, row, text_str_on);
+		write_text_pos(column, row, text_str_on);
 
-	row += 2;
+	row += 12;
 
-	write_text(col, row, text_str_autosave);
-	column = col+11;
+	write_text_pos(col, row, text_str_autosave);
+	column = col+11*8;
 	
 	if (!mainMenu_autosave && (c != MAIN_MENU_ENTRY_SAVE_DISKS || flash))
-		write_text_inv(column, row, text_str_off);
+		write_text_inv_pos(column, row, text_str_off);
 	else
-		write_text(column, row, text_str_off);
-	column += strlen(text_str_off) + 2;
+		write_text_pos(column, row, text_str_off);
+	column += 8*(strlen(text_str_off) + 2);
 	if (mainMenu_autosave && (c != MAIN_MENU_ENTRY_SAVE_DISKS || flash))
-		write_text_inv(column, row, text_str_on);
+		write_text_inv_pos(column, row, text_str_on);
 	else
-		write_text(column, row, text_str_on);
+		write_text_pos(column, row, text_str_on);
 
-	row += 2;
-	write_text(col, row, text_str_msens);
-	column = col+11;
+	row += 12;
+	write_text_pos(col, row, text_str_msens);
+	column = col+11*8;
 	if ((mainMenu_msens== 1) && (c != MAIN_MENU_ENTRY_MOUSE_SENSITIVITY || flash))
-		write_text_inv(column, row, text_str_1);
+		write_text_inv_pos(column, row, text_str_1);
 	else
-		write_text(column, row, text_str_1);
-	column += strlen(text_str_1) + 1;
+		write_text_pos(column, row, text_str_1);
+	column += 8*(strlen(text_str_1) + 1);
 	if ((mainMenu_msens== 2) && (c != MAIN_MENU_ENTRY_MOUSE_SENSITIVITY || flash))
-		write_text_inv(column, row, text_str_2);
+		write_text_inv_pos(column, row, text_str_2);
 	else
-		write_text(column, row, text_str_2);
-	column += strlen(text_str_2) + 1;
+		write_text_pos(column, row, text_str_2);
+	column += 8*(strlen(text_str_2) + 1);
 	if ((mainMenu_msens== 3) && (c != MAIN_MENU_ENTRY_MOUSE_SENSITIVITY || flash))
-		write_text_inv(column, row, text_str_3);
+		write_text_inv_pos(column, row, text_str_3);
 	else
-		write_text(column, row, text_str_3);
-	column += strlen(text_str_3) + 1;
+		write_text_pos(column, row, text_str_3);
+	column += 8*(strlen(text_str_3) + 1);
 	if ((mainMenu_msens== 4) && (c != MAIN_MENU_ENTRY_MOUSE_SENSITIVITY || flash))
-		write_text_inv(column, row, text_str_4);
+		write_text_inv_pos(column, row, text_str_4);
 	else
-		write_text(column, row, text_str_4);
+		write_text_pos(column, row, text_str_4);
 
-	row++;
-	write_text(col, row++, text_str_separator);
+	row+=12;
+	write_text_pos(col, row, text_str_keymap);
+	row+=12;
+	column = col + 2*8;
+	if (mainMenu_mappos == 0 && c == MAIN_MENU_ENTRY_KEYMAP && flash)
+		write_text_inv_pos(column, row, text_str_keymap1);
+	else
+		write_text_pos(column, row, text_str_keymap1);
+	column += 8*(strlen(text_str_keymap1) + 1);
+	if (mainMenu_mappos == 1 && c == MAIN_MENU_ENTRY_KEYMAP && flash)
+		write_text_inv_pos(column, row, text_str_keymap2);
+	else
+		write_text_pos(column, row, text_str_keymap2);
+	column += 8*(strlen(text_str_keymap2) + 1);
+	if (mainMenu_mappos == 2 && c == MAIN_MENU_ENTRY_KEYMAP && flash)
+		write_text_inv_pos(column, row, text_str_keymap3);
+	else
+		write_text_pos(column, row, text_str_keymap3);
+	column += 8*(strlen(text_str_keymap3) + 1);
+	if (mainMenu_mappos == 3 && c == MAIN_MENU_ENTRY_KEYMAP && flash)
+		write_text_inv_pos(column, row, text_str_keymap4);
+	else
+		write_text_pos(column, row, text_str_keymap4);
+
+	row+=8;
+	write_text_pos(col, row, text_str_separator);
+	row+=8;
 
 	if (c == MAIN_MENU_ENTRY_RESET_EMULATION && flash)
 		if(emulating)
-			write_text_inv(col, row, text_str_reset);
+			write_text_inv_pos(col, row, text_str_reset);
 		else
-			write_text_inv(col, row, text_str_start);
+			write_text_inv_pos(col, row, text_str_start);
 	else
 		if(emulating)
-			write_text(col, row, text_str_reset);
+			write_text_pos(col, row, text_str_reset);
 		else
-			write_text(col, row, text_str_start);
+			write_text_pos(col, row, text_str_start);
 
-	row += 2;
-
+	row += 12;
 	if(emulating)
 	{
 		if (c == MAIN_MENU_ENTRY_RETURN_TO_EMULATION && flash)
-			write_text_inv(col, row++, text_str_return);
+			write_text_inv_pos(col, row, text_str_return);
 		else
-			write_text(col, row++, text_str_return);
+			write_text_pos(col, row, text_str_return);
 	}
-	else
-	{
-		row++;
-	}
-
-	write_text(col, row++, text_str_separator);
+	
+	row += 8;
+	write_text_pos(col, row, text_str_separator);
+	row += 8;
 	if (c == MAIN_MENU_ENTRY_UPDATE && flash)
-		write_text_inv(col, row++, text_str_update);
+		write_text_inv_pos(col, row, text_str_update);
 	else
-		write_text(col, row++, text_str_update);
-	row++;
+		write_text_pos(col, row, text_str_update);
 
+	row += 12;
 	if (c == MAIN_MENU_ENTRY_EXIT_UAE && flash)
-		write_text_inv(col, row++, text_str_exit);
+		write_text_inv_pos(col, row, text_str_exit);
 	else
-		write_text(col, row++, text_str_exit);
+		write_text_pos(col, row, text_str_exit);
 
 	text_flip();
 	frame = (frame + 1) % 6;
@@ -430,6 +458,29 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 						else if (right)
 							++mainMenu_msens;
 						mainMenu_msens = ((mainMenu_msens + 3) % 4) + 1; 
+						break;
+					case MAIN_MENU_ENTRY_KEYMAP:
+						if (left)
+							--mainMenu_mappos;
+						else if (right)
+							++mainMenu_mappos;
+						else if (activate) {
+							switch (mainMenu_mappos) {
+							case 0:	// add
+								uae3ds_mapping_add();
+								break;
+							case 1: // del
+								uae3ds_mapping_del();
+								break;
+							case 3: // save
+								uae3ds_mapping_save();
+								break;
+							default: // list
+								uae3ds_mapping_list();
+								break;
+							}
+						}
+						mainMenu_mappos = (mainMenu_mappos + 4) % 4;
 						break;
 					case MAIN_MENU_ENTRY_LOAD:
 					case MAIN_MENU_ENTRY_SAVED_STATES:

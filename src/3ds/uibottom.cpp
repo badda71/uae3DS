@@ -21,110 +21,110 @@
 #include "menu.h"
 
 uikbd_key uikbd_keypos[] = {
-	//  x,  y,   w,   h,         key,shft,stky, flgs, name
+	//  x,  y,   w,   h,         key,stky, flgs, name
 	// toggle kb button
-	{   0,-15,  36,  15,         255,   0,   0,  0,  "ToggleKB"},
+	{   0,-15,  36,  15,         255,   0,  0,  "ToggleKB"},
 	// 1st Row
-	{   0,  0,  32,  16,      AK_ESC,   0,   0,  0,  "ESC"},
-	{  32,  0,  16,  16,       AK_F1,   0,   0,  0,  "F1"},
-	{  48,  0,  16,  16,       AK_F2,   0,   0,  0,  "F2"},
-	{  64,  0,  16,  16,       AK_F3,   0,   0,  0,  "F3"},
-	{  80,  0,  16,  16,       AK_F4,   0,   0,  0,  "F4"},
-	{  96,  0,  16,  16,       AK_F5,   0,   0,  0,  "F5"},
-	{ 112,  0,  16,  16,       AK_F6,   0,   0,  0,  "F6"},
-	{ 128,  0,  16,  16,       AK_F7,   0,   0,  0,  "F7"},
-	{ 144,  0,  16,  16,       AK_F8,   0,   0,  0,  "F8"},
-	{ 160,  0,  16,  16,       AK_F9,   0,   0,  0,  "F9"},
-	{ 176,  0,  16,  16,      AK_F10,   0,   0,  0,  "F10"},
-	{ 192,  0,  32,  16,      AK_DEL,   0,   0,  0,  "DEL"},
-	{ 224,  0,  32,  16,     AK_HELP,   0,   0,  0,  "HELP"},
-	{ 256,  0,  16,  16, AK_NPLPAREN,   0,   0,  0,  "NP ("},
-	{ 272,  0,  16,  16, AK_NPRPAREN,   0,   0,  0,  "NP )"},
-	{ 288,  0,  16,  16,    AK_NPDIV,   0,   0,  0,  "NP /"},
-	{ 304,  0,  16,  16,    AK_NPMUL,   0,   0,  0,  "NP *"},
+	{   0,  0,  32,  16,      AK_ESC,   0,  0,  "ESC"},
+	{  32,  0,  16,  16,       AK_F1,   0,  0,  "F1"},
+	{  48,  0,  16,  16,       AK_F2,   0,  0,  "F2"},
+	{  64,  0,  16,  16,       AK_F3,   0,  0,  "F3"},
+	{  80,  0,  16,  16,       AK_F4,   0,  0,  "F4"},
+	{  96,  0,  16,  16,       AK_F5,   0,  0,  "F5"},
+	{ 112,  0,  16,  16,       AK_F6,   0,  0,  "F6"},
+	{ 128,  0,  16,  16,       AK_F7,   0,  0,  "F7"},
+	{ 144,  0,  16,  16,       AK_F8,   0,  0,  "F8"},
+	{ 160,  0,  16,  16,       AK_F9,   0,  0,  "F9"},
+	{ 176,  0,  16,  16,      AK_F10,   0,  0,  "F10"},
+	{ 192,  0,  32,  16,      AK_DEL,   0,  0,  "DEL"},
+	{ 224,  0,  32,  16,     AK_HELP,   0,  0,  "HELP"},
+	{ 256,  0,  16,  16, AK_NPLPAREN,   0,  0,  "NP ("},
+	{ 272,  0,  16,  16, AK_NPRPAREN,   0,  0,  "NP )"},
+	{ 288,  0,  16,  16,    AK_NPDIV,   0,  0,  "NP /"},
+	{ 304,  0,  16,  16,    AK_NPMUL,   0,  0,  "NP *"},
 	// 2nd Row
-	{   0, 16,  32,  16,AK_BACKQUOTE,   0,   0,  0,  "`"},
-	{  32, 16,  16,  16,        AK_1,   0,   0,  0,  "1"},
-	{  48, 16,  16,  16,        AK_2,   0,   0,  0,  "2"},
-	{  64, 16,  16,  16,        AK_3,   0,   0,  0,  "3"},
-	{  80, 16,  16,  16,        AK_4,   0,   0,  0,  "4"},
-	{  96, 16,  16,  16,        AK_5,   0,   0,  0,  "5"},
-	{ 112, 16,  16,  16,        AK_6,   0,   0,  0,  "6"},
-	{ 128, 16,  16,  16,        AK_7,   0,   0,  0,  "7"},
-	{ 144, 16,  16,  16,        AK_8,   0,   0,  0,  "8"},
-	{ 160, 16,  16,  16,        AK_9,   0,   0,  0,  "9"},
-	{ 176, 16,  16,  16,        AK_0,   0,   0,  0,  "0"},
-	{ 192, 16,  16,  16,    AK_MINUS,   0,   0,  0,  "-"},
-	{ 208, 16,  16,  16,    AK_EQUAL,   0,   0,  0,  "="},
-	{ 224, 16,  16,  16,AK_BACKSLASH,   0,   0,  0,  "\\"},
-	{ 240, 16,  16,  16,       AK_BS,   0,   0,  0,  "Backspace"},
-	{ 256, 16,  16,  16,      AK_NP7,   0,   0,  0,  "NP 7"},
-	{ 272, 16,  16,  16,      AK_NP8,   0,   0,  0,  "NP 8"},
-	{ 288, 16,  16,  16,      AK_NP9,   0,   0,  0,  "NP 9"},
-	{ 304, 16,  16,  16,    AK_NPSUB,   0,   0,  0,  "NP -"},
+	{   0, 16,  32,  16,AK_BACKQUOTE,   0,  0,  "`"},
+	{  32, 16,  16,  16,        AK_1,   0,  0,  "1"},
+	{  48, 16,  16,  16,        AK_2,   0,  0,  "2"},
+	{  64, 16,  16,  16,        AK_3,   0,  0,  "3"},
+	{  80, 16,  16,  16,        AK_4,   0,  0,  "4"},
+	{  96, 16,  16,  16,        AK_5,   0,  0,  "5"},
+	{ 112, 16,  16,  16,        AK_6,   0,  0,  "6"},
+	{ 128, 16,  16,  16,        AK_7,   0,  0,  "7"},
+	{ 144, 16,  16,  16,        AK_8,   0,  0,  "8"},
+	{ 160, 16,  16,  16,        AK_9,   0,  0,  "9"},
+	{ 176, 16,  16,  16,        AK_0,   0,  0,  "0"},
+	{ 192, 16,  16,  16,    AK_MINUS,   0,  0,  "-"},
+	{ 208, 16,  16,  16,    AK_EQUAL,   0,  0,  "="},
+	{ 224, 16,  16,  16,AK_BACKSLASH,   0,  0,  "\\"},
+	{ 240, 16,  16,  16,       AK_BS,   0,  0,  "Backspace"},
+	{ 256, 16,  16,  16,      AK_NP7,   0,  0,  "NP 7"},
+	{ 272, 16,  16,  16,      AK_NP8,   0,  0,  "NP 8"},
+	{ 288, 16,  16,  16,      AK_NP9,   0,  0,  "NP 9"},
+	{ 304, 16,  16,  16,    AK_NPSUB,   0,  0,  "NP -"},
 	// 3rd Row
-	{   0, 32,  32,  16,      AK_TAB,   0,   0,  0,  "TAB"},
-	{  32, 32,  16,  16,        AK_Q,   0,   0,  0,  "Q"},
-	{  48, 32,  16,  16,        AK_W,   0,   0,  0,  "w"},
-	{  64, 32,  16,  16,        AK_E,   0,   0,  0,  "E"},
-	{  80, 32,  16,  16,        AK_R,   0,   0,  0,  "R"},
-	{  96, 32,  16,  16,        AK_T,   0,   0,  0,  "T"},
-	{ 112, 32,  16,  16,        AK_Y,   0,   0,  0,  "Y"},
-	{ 128, 32,  16,  16,        AK_U,   0,   0,  0,  "U"},
-	{ 144, 32,  16,  16,        AK_I,   0,   0,  0,  "I"},
-	{ 160, 32,  16,  16,        AK_O,   0,   0,  0,  "O"},
-	{ 176, 32,  16,  16,        AK_P,   0,   0,  0,  "P"},
-	{ 192, 32,  16,  16, AK_LBRACKET,   0,   0,  0,  "["},
-	{ 208, 32,  16,  16, AK_RBRACKET,   0,   0,  0,  "]"},
-	{ 224, 32,  32,  32,      AK_RET,   0,   0,  0,  "RETURN"},
-	{ 256, 32,  16,  16,      AK_NP4,   0,   0,  0,  "NP 4"},
-	{ 272, 32,  16,  16,      AK_NP5,   0,   0,  0,  "NP 5"},
-	{ 288, 32,  16,  16,      AK_NP6,   0,   0,  0,  "NP 6"},
-	{ 304, 32,  16,  16,    AK_NPADD,   0,   0,  0,  "NP +"},
+	{   0, 32,  32,  16,      AK_TAB,   0,  0,  "TAB"},
+	{  32, 32,  16,  16,        AK_Q,   0,  0,  "Q"},
+	{  48, 32,  16,  16,        AK_W,   0,  0,  "W"},
+	{  64, 32,  16,  16,        AK_E,   0,  0,  "E"},
+	{  80, 32,  16,  16,        AK_R,   0,  0,  "R"},
+	{  96, 32,  16,  16,        AK_T,   0,  0,  "T"},
+	{ 112, 32,  16,  16,        AK_Y,   0,  0,  "Y"},
+	{ 128, 32,  16,  16,        AK_U,   0,  0,  "U"},
+	{ 144, 32,  16,  16,        AK_I,   0,  0,  "I"},
+	{ 160, 32,  16,  16,        AK_O,   0,  0,  "O"},
+	{ 176, 32,  16,  16,        AK_P,   0,  0,  "P"},
+	{ 192, 32,  16,  16, AK_LBRACKET,   0,  0,  "["},
+	{ 208, 32,  16,  16, AK_RBRACKET,   0,  0,  "]"},
+	{ 224, 32,  32,  32,      AK_RET,   0,  0,  "RETURN"},
+	{ 256, 32,  16,  16,      AK_NP4,   0,  0,  "NP 4"},
+	{ 272, 32,  16,  16,      AK_NP5,   0,  0,  "NP 5"},
+	{ 288, 32,  16,  16,      AK_NP6,   0,  0,  "NP 6"},
+	{ 304, 32,  16,  16,    AK_NPADD,   0,  0,  "NP +"},
 	// 4th Row
-	{   0, 48,  32,  16,     AK_CTRL,   0,   2,  0,  "CTRL"},
-	{  32, 48,  16,  16,        AK_A,   0,   0,  0,  "A"},
-	{  48, 48,  16,  16,        AK_S,   0,   0,  0,  "S"},
-	{  64, 48,  16,  16,        AK_D,   0,   0,  0,  "D"},
-	{  80, 48,  16,  16,        AK_F,   0,   0,  0,  "F"},
-	{  96, 48,  16,  16,        AK_G,   0,   0,  0,  "G"},
-	{ 112, 48,  16,  16,        AK_H,   0,   0,  0,  "H"},
-	{ 128, 48,  16,  16,        AK_J,   0,   0,  0,  "J"},
-	{ 144, 48,  16,  16,        AK_K,   0,   0,  0,  "K"},
-	{ 160, 48,  16,  16,        AK_L,   0,   0,  0,  "L"},
-	{ 176, 48,  16,  16,AK_SEMICOLON,   0,   0,  0,  ";"},
-	{ 192, 48,  16,  16,    AK_QUOTE,   0,   0,  0,  "'"},
-	{ 256, 48,  16,  16,      AK_NP1,   0,   0,  0,  "NP 1"},
-	{ 272, 48,  16,  16,      AK_NP2,   0,   0,  0,  "NP 2"},
-	{ 288, 48,  16,  16,      AK_NP3,   0,   0,  0,  "NP 3"},
-	{ 304, 48,  16,  48,      AK_ENT,   0,   0,  0,  "ENTER"},
+	{   0, 48,  32,  16,     AK_CTRL,   2,  0,  "CTRL"},
+	{  32, 48,  16,  16,        AK_A,   0,  0,  "A"},
+	{  48, 48,  16,  16,        AK_S,   0,  0,  "S"},
+	{  64, 48,  16,  16,        AK_D,   0,  0,  "D"},
+	{  80, 48,  16,  16,        AK_F,   0,  0,  "F"},
+	{  96, 48,  16,  16,        AK_G,   0,  0,  "G"},
+	{ 112, 48,  16,  16,        AK_H,   0,  0,  "H"},
+	{ 128, 48,  16,  16,        AK_J,   0,  0,  "J"},
+	{ 144, 48,  16,  16,        AK_K,   0,  0,  "K"},
+	{ 160, 48,  16,  16,        AK_L,   0,  0,  "L"},
+	{ 176, 48,  16,  16,AK_SEMICOLON,   0,  0,  ";"},
+	{ 192, 48,  16,  16,    AK_QUOTE,   0,  0,  "'"},
+	{ 256, 48,  16,  16,      AK_NP1,   0,  0,  "NP 1"},
+	{ 272, 48,  16,  16,      AK_NP2,   0,  0,  "NP 2"},
+	{ 288, 48,  16,  16,      AK_NP3,   0,  0,  "NP 3"},
+	{ 304, 48,  16,  48,      AK_ENT,   0,  0,  "ENTER"},
 	// 5th Row
-	{   0, 64,  48,  16,      AK_LSH,   0,   1,  0,  "LSHIFT"},
-	{  48, 64,  16,  16,        AK_Z,   0,   0,  0,  "Z"},
-	{  64, 64,  16,  16,        AK_X,   0,   0,  0,  "X"},
-	{  80, 64,  16,  16,        AK_C,   0,   0,  0,  "C"},
-	{  96, 64,  16,  16,        AK_V,   0,   0,  0,  "V"},
-	{ 112, 64,  16,  16,        AK_B,   0,   0,  0,  "B"},
-	{ 128, 64,  16,  16,        AK_N,   0,   0,  0,  "N"},
-	{ 144, 64,  16,  16,        AK_M,   0,   0,  0,  "M"},
-	{ 160, 64,  16,  16,    AK_COMMA,   0,   0,  0,  ","},
-	{ 176, 64,  16,  16,   AK_PERIOD,   0,   0,  0,  "."},
-	{ 192, 64,  16,  16,    AK_SLASH,   0,   0,  0,  "/"},
-	{ 208, 64,  32,  16,      AK_LSH,   0,   1,  0,  "RSHIFT"},
-	{ 240, 64,  16,  16,       AK_UP,   0,   0,  0,  "C_UP"},
-	{ 256, 64,  32,  16,      AK_NP0,   0,   0,  0,  "NP 0"},
-	{ 288, 64,  16,  16,    AK_NPDEL,   0,   0,  0,  "NP ."},
+	{   0, 64,  48,  16,      AK_LSH,   1,  0,  "LSHIFT"},
+	{  48, 64,  16,  16,        AK_Z,   0,  0,  "Z"},
+	{  64, 64,  16,  16,        AK_X,   0,  0,  "X"},
+	{  80, 64,  16,  16,        AK_C,   0,  0,  "C"},
+	{  96, 64,  16,  16,        AK_V,   0,  0,  "V"},
+	{ 112, 64,  16,  16,        AK_B,   0,  0,  "B"},
+	{ 128, 64,  16,  16,        AK_N,   0,  0,  "N"},
+	{ 144, 64,  16,  16,        AK_M,   0,  0,  "M"},
+	{ 160, 64,  16,  16,    AK_COMMA,   0,  0,  ","},
+	{ 176, 64,  16,  16,   AK_PERIOD,   0,  0,  "."},
+	{ 192, 64,  16,  16,    AK_SLASH,   0,  0,  "/"},
+	{ 208, 64,  32,  16,      AK_LSH,   1,  0,  "RSHIFT"},
+	{ 240, 64,  16,  16,       AK_UP,   0,  0,  "C_UP"},
+	{ 256, 64,  32,  16,      AK_NP0,   0,  0,  "NP 0"},
+	{ 288, 64,  16,  16,    AK_NPDEL,   0,  0,  "NP ."},
 	// 6th row
-	{   0, 80,  32,  17,     AK_LALT,   0,   4,  0,  "LALT"},
-	{  32, 80,  16,  17,     AK_LAMI,   0,   8,  0,  "LAMI"},
-	{  48, 80, 144,  17,      AK_SPC,   0,   0,  0,  "SPACE"},
-	{ 192, 80,  16,  17,     AK_LAMI,   0,   8,  0,  "RAMI"},
-	{ 208, 80,  16,  17,     AK_LALT,   0,   4,  0,  "RALT"},
-	{ 224, 80,  16,  17,       AK_LF,   0,   0,  0,  "C_LEFT"},
-	{ 240, 80,  16,  17,       AK_DN,   0,   0,  0,  "C_DOWN"},
-	{ 256, 80,  16,  17,       AK_RT,   0,   0,  0,  "C_RIGHT"},
+	{   0, 80,  32,  17,     AK_LALT,   4,  0,  "LALT"},
+	{  32, 80,  16,  17,     AK_LAMI,   8,  0,  "LAMI"},
+	{  48, 80, 144,  17,      AK_SPC,   0,  0,  "SPACE"},
+	{ 192, 80,  16,  17,     AK_LAMI,   8,  0,  "RAMI"},
+	{ 208, 80,  16,  17,     AK_LALT,   4,  0,  "RALT"},
+	{ 224, 80,  16,  17,       AK_LF,   0,  0,  "C_LEFT"},
+	{ 240, 80,  16,  17,       AK_DN,   0,  0,  "C_DOWN"},
+	{ 256, 80,  16,  17,       AK_RT,   0,  0,  "C_RIGHT"},
 	// Finish
-	{   0,  0,   0,   0,          -1,   0,   0,  0,  ""}
+	{   0,  0,   0,   0,          -1,   0,  0,  ""}
 };
 
 extern void log_citra(const char *format, ...);
@@ -594,13 +594,7 @@ static void uib_statusbar_recalc()
 
 	if (show_message)
 	{
-		show_message--;
-		if (!show_message) {
-			SDL_FillRect(statusbar_img,
-				&(SDL_Rect){.x=0, .y=0, .w=td_text_length, .h=TD_TOTAL_HEIGHT}, 0x00000000);
-			*buf=0;
-			upd=1;
-		} else {
+		if (SDL_GetTicks() < show_message) {
 			if (strcmp(buf, show_message_str)) {
 				strncpy(buf, show_message_str, 99);
 				SDL_FillRect(statusbar_img,
@@ -608,6 +602,12 @@ static void uib_statusbar_recalc()
 				write_text_full (statusbar_img, buf, 2, 2, (td_text_length-4)/8, ALIGN_LEFT, FONT_NORMAL, (SDL_Color){0x30,0x30,0x30,0});
 				upd=1;
 			}
+		} else {
+			SDL_FillRect(statusbar_img,
+				&(SDL_Rect){.x=0, .y=0, .w=td_text_length, .h=TD_TOTAL_HEIGHT}, 0x00000000);
+			show_message=0;
+			*buf=0;
+			upd=1;
 		}
 	}
 	if (upd) {
@@ -660,7 +660,7 @@ int uib_handle_event(SDL_Event *e) {
 		case SDL_MOUSEBUTTONUP:
 			if (gesture1_active) {
 				sdl_e.type = SDL_KEYUP;
-				sdl_e.key.keysym.sym = sdl_e.key.keysym.unicode = DS_ZL;
+				sdl_e.key.keysym.sym = DS_ZL;
 				SDL_PushEvent(&sdl_e);
 				gesture1_active=0;
 				return 0;
@@ -684,7 +684,7 @@ int uib_handle_event(SDL_Event *e) {
 				Uint32 t = SDL_GetTicks();
 				if (t-gesture1_time < DOUBLECLICK_TIME) {
 					sdl_e.type = SDL_KEYDOWN;
-					sdl_e.key.keysym.sym = sdl_e.key.keysym.unicode = DS_ZL;
+					sdl_e.key.keysym.sym = DS_ZL;
 					SDL_PushEvent(&sdl_e);
 					gesture1_active=1;
 				} else {
@@ -705,17 +705,12 @@ int uib_handle_event(SDL_Event *e) {
 			sticky = sticky ^ uikbd_keypos[i].sticky;
 			sdl_e.type = sticky & uikbd_keypos[i].sticky ? SDL_KEYDOWN : SDL_KEYUP;
 			sdl_e.key.keysym.sym = uikbd_keypos[i].key;
-			sdl_e.key.keysym.unicode = 0;
 			SDL_PushEvent(&sdl_e);
 		}
 	} else {
 		// normal key press
 		sdl_e.type = e->button.type == SDL_MOUSEBUTTONDOWN ? SDL_KEYDOWN : SDL_KEYUP;
 		sdl_e.key.keysym.sym = uikbd_keypos[i].key;
-		if ((sticky & 1) && uikbd_keypos[i].shift)
-			sdl_e.key.keysym.unicode = uikbd_keypos[i].shift;
-		else
-			sdl_e.key.keysym.unicode = sdl_e.key.keysym.sym;
 		SDL_PushEvent(&sdl_e);
 	}
 	uib_must_redraw |= UIB_RECALC_KEYPRESS;

@@ -440,7 +440,7 @@ void restore_state (const char *filename)
     if (produce_sound)
     	update_audio();
     notice_screen_contents_lost();
-    gui_set_message("Error loadstate", 50);
+    gui_set_message("Error loadstate", 1000);
 
     end:
 #if !defined(DREAMCAST) && !defined(DINGOO)
@@ -468,7 +468,7 @@ void savestate_restore_finish (void)
     savestate_state = 0;
 //    unset_special(SPCFLAG_BRK);
     notice_screen_contents_lost();
-    gui_set_message("Restored", 50);
+    gui_set_message("Restored", 1000);
 }
 
 /* Save all subsystems  */

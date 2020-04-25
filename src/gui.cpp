@@ -56,7 +56,7 @@ static char _show_message_str[40]={
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 };
 
-int show_message=0;
+unsigned int show_message=0;
 char *show_message_str=(char *)&_show_message_str[0];
 
 extern SDL_Surface *prSDLScreen;
@@ -392,7 +392,7 @@ static void goSuperThrottle(void)
 		check_prefs_changed_cpu();
 		check_prefs_changed_audio();
 		check_prefs_changed_custom();
-		gui_set_message("SuperThrottle On",50);
+		gui_set_message("SuperThrottle On",1000);
 	}
 }
 
@@ -405,7 +405,7 @@ static void leftSuperThrottle(void)
 		check_prefs_changed_cpu();
 		check_prefs_changed_audio();
 		check_prefs_changed_custom();
-		gui_set_message("SuperThrottle Off",50);
+		gui_set_message("SuperThrottle Off",1000);
 	}
 }
 
@@ -431,7 +431,7 @@ static void inc_throttle(int sgn)
 	check_prefs_changed_audio();
 	check_prefs_changed_custom();
 	sprintf((char *)&n[0],"Throttle %i",mainMenu_throttle*20);
-	gui_set_message((char *)&n[0],50);
+	gui_set_message((char *)&n[0],1000);
 }
 
 static int in_goMenu=0;
@@ -475,7 +475,7 @@ void gui_handle_events (SDL_Event *e)
 				if (mainMenu_vpos > 6) mainMenu_vpos=6;
 				if (mainMenu_vpos < -4) mainMenu_vpos=-4;
 				snprintf(buf,50,"VPOS %d",mainMenu_vpos*8);
-				gui_set_message(buf,50);
+				gui_set_message(buf,1000);
 				getChanges();
 				check_all_prefs();
 			    notice_screen_contents_lost();
@@ -490,7 +490,7 @@ void gui_handle_events (SDL_Event *e)
 				if (scale > 200) scale=200;
 				N3DS_SetScalingDirect((float)scale/100.0f, (float)scale/100.0f, 0);
 				snprintf(buf,50,"Scale %d%%",scale);
-				gui_set_message(buf,50);
+				gui_set_message(buf,1000);
 			}
 			break;
 		case DS_SELECT:
@@ -524,9 +524,9 @@ void gui_update_gfx (void)
 //	dbg("GUI: gui_update_gfx");
 }
 
-void gui_set_message(const char *msg, int t)
+void gui_set_message(const char *msg, int msecs)
 {
-	show_message=t;
+	show_message=SDL_GetTicks() + msecs;
 	strncpy(show_message_str, msg, 36);
 }
 

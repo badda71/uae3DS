@@ -5,7 +5,7 @@
   *
   * Copyright 2020 Sebastian Weber
   */
- 
+
 typedef struct {
 	Handle mutex;
 	void **queue;
@@ -40,3 +40,11 @@ extern void tsq_free(tsq_object *o);
 extern void *tsq_get(tsq_object *o);
 extern void *tsq_put(tsq_object *o, void *p);
 extern int start_worker(int (*fn)(void *), void *data);
+
+extern void uae3ds_mapping_add();
+extern void uae3ds_mapping_del();
+extern void uae3ds_mapping_list();
+extern void uae3ds_mapping_apply(SDL_Event *e);
+extern void uae3ds_mapping_loadbuf(char *s);
+extern char *uae3ds_mapping_savebuf();
+extern void uae3ds_mapping_save();

@@ -17,8 +17,7 @@ static int autofire_thread( void *data ) {
 	SDL_Event e2;
 	e1.type = SDL_KEYDOWN;
 	e2.type = SDL_KEYUP;
-	e1.key.keysym.unicode = e1.key.keysym.sym =
-		e2.key.keysym.unicode = e2.key.keysym.sym = DS_A;
+	e1.key.keysym.sym = e2.key.keysym.sym = DS_A;
 
 	//While the program is not over
 	while( af_active >= 0 ) {

@@ -20,11 +20,11 @@ extern void gui_fps (int fps);
 extern void gui_changesettings (void);
 extern void gui_lock (void);
 extern void gui_unlock (void);
-extern void gui_set_message(const char *msg, int t);
+extern void gui_set_message(const char *msg, int msec);
 extern void gui_show_window_bar(int per, int max, int case_title);
 
 extern unsigned int gui_ledstate;
-extern int show_message;
+extern unsigned int show_message;
 extern int no_gui;
 extern char *show_message_str;
 

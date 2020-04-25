@@ -40,3 +40,8 @@ struct bstring {
 };
 
 extern const char *colormodes[];
+
+typedef struct {
+	unsigned int sdlkey, key;
+	const char *name;
+} sdl_3dsbuttons;

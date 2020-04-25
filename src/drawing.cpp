@@ -2108,7 +2108,7 @@ void vsync_handle_redraw (int long_frame, int lof_changed)
 		pause_sound();
 		save_state (savestate_filename, "Description!");
 		resume_sound();
-    		gui_set_message("Saved", 50);
+    		gui_set_message("Saved", 1000);
 		savestate_state = 0;
 	}
 	else

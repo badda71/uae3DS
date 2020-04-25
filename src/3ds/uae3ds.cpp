@@ -9,7 +9,13 @@
 #include <3ds.h>
 #include <string.h>
 #include <SDL/SDL.h>
+#include "sysconfig.h"
+#include "sysdeps.h"
+#include "config.h"
+#include "uae.h"
 #include "uae3ds.h"
+#include "uibottom.h"
+#include "menu.h"
 
 // thread safe hash functions
 
@@ -170,4 +176,167 @@ int start_worker(int (*fn)(void *), void *data) {
 	SDL_SemPost(worker_sem);	
 	p1=(p1+1)%MAXPENDING;
 	return 0;
+}
+
+static int keymaps[0x200][2] = {0};
+
+const char *get_3ds_keyname(int k)
+{
+	extern sdl_3dsbuttons buttons3ds[];
+	int i;
+	for (i=0; buttons3ds[i].key !=0; ++i)
+		if (k==buttons3ds[i].key) return buttons3ds[i].name;
+	for (i=0; uikbd_keypos[i].key !=-1; ++i)
+		if (k==uikbd_keypos[i].key) return uikbd_keypos[i].name;
+	return "unknown";
+}
+
+char *get_3ds_mapping_name(int i) {
+	static char buf[41];
+	if (!keymaps[i][0]) return NULL;
+	snprintf(buf,41,"%s",get_3ds_keyname(keymaps[i][0]));
+	if (keymaps[i][1] && strlen(buf) < 40) {
+		snprintf(buf+strlen(buf), 41-strlen(buf), " + %s",get_3ds_keyname(keymaps[i][1]));
+	}
+	return buf;
+}
+
+static int pollKey(char *title, char *message, int time) {
+	u32 t, bt;
+	SDL_Event e;
+	int ret=0;
+	char buf[strlen(message)+20];
+	bt = SDL_GetTicks();
+	while ((t = SDL_GetTicks() - bt) < time) {
+		sprintf(buf, "%s\n\n%d sec",message,(time/1000)-(t/1000));
+		text_messagebox(title, buf, MB_NONE);
+		SDL_Delay(20);
+		if (SDL_PollEvent(&e) &&
+			!uib_handle_event(&e) &&
+			e.type == SDL_KEYDOWN &&
+			e.key.keysym.sym > 0) {
+			ret = e.key.keysym.sym;
+		}
+		uib_update();
+		if (ret > 0) break;
+	}
+	return ret;
+}
+
+#define POLLTIME 5000
+
+void uae3ds_mapping_add()
+{
+	char buf[256];
+	int x,i;
+	int target[2] = {0};
+	
+	if (!(i=pollKey(" Add Key Mapping","Press source key",POLLTIME))) return;
+	for (x = 0; x < 2; x++) {
+		snprintf(buf, 256, "Press target key %d/2", x+1);
+		target[x]=pollKey(" Add Key Mapping",buf,POLLTIME);
+		if (!target[x]) break;
+	}
+	if (!target[0]) return;
+	keymaps[i][0]=target[0];
+	keymaps[i][1]=target[1];
+	snprintf(buf, 256, "Added key mapping:\n\n%s -> %s",
+		get_3ds_keyname(i),
+		get_3ds_mapping_name(i));
+	text_messagebox(" Add Key Mapping", buf, MB_OK);
+}
+
+void uae3ds_mapping_del()
+{
+	char buf[256];
+	int i;
+	
+	if ((i=pollKey(" Delete Key Mapping","Press source key",POLLTIME))<0) return;
+	if (!keymaps[i][0]) {
+		snprintf(buf, 256, "Key '%s' is not mapped", get_3ds_keyname(i));
+	} else {
+		snprintf(buf, 256, "Mapping for key '%s' deleted", get_3ds_keyname(i));
+		keymaps[i][0] = keymaps[i][1] = 0;
+	}
+	text_messagebox(" Delete Key Mapping", buf, MB_OK);
+}
+
+void uae3ds_mapping_list()
+{
+	char buf[41 * 30] = {0};
+	int pos, got = 0;
+
+	for (pos = 0; pos < 0x200; pos++) {
+		if (keymaps[pos][0]) {
+			got = 1;
+			if (strlen(buf) > 20*41) {
+				sprintf(buf + strlen(buf), "\nMORE >>");
+				text_messagebox(" List Key Mappings", buf, MB_OK);
+				*buf=0;
+			}
+			sprintf(buf + strlen(buf), "%s%-10s : ", strlen(buf)?"\n":"", get_3ds_keyname(pos));
+			sprintf(buf + strlen(buf), "%-27s", get_3ds_mapping_name(pos));
+		}
+	}
+	if (*buf != 0) {
+		text_messagebox(" List Key Mappings", buf, MB_OK);
+	} else if (!got) {
+		text_messagebox(" List Key Mappings", "No key mappings defined", MB_OK);
+	}
+}
+
+void uae3ds_mapping_apply(SDL_Event *e)
+{
+	int sym;
+	if (e->type != SDL_KEYUP && e->type != SDL_KEYDOWN) return;
+	sym = e->key.keysym.sym;
+	if (!keymaps[sym][0]) return;
+	e->key.keysym.sym = keymaps[sym][0];
+	if (!keymaps[sym][1]) return;
+	SDL_Event e1;
+	e1.type = e->type;
+	e1.key.keysym.sym = keymaps[sym][1];
+	SDL_PushEvent(&e1);
+}
+
+void uae3ds_mapping_loadbuf(char *s)
+{
+	unsigned long int l;
+	while ((l = strtoul(s, &s, 16)) != 0) {
+		int k = (l >> 18) & 0x1ff;
+		keymaps[k][0] = (l >> 9) & 0x1ff;
+		keymaps[k][1] = l & 0x1ff;
+		while (*s=='_') ++s;
+	}
+}
+
+char *uae3ds_mapping_savebuf()
+{
+	char *s;
+	int i, count=0;
+	for (i=0; i<0x200; i++) {
+		if (keymaps[i][0]) ++count;
+	}
+	s=calloc(count*9+1, 1);
+	for (i=0; i<0x200; i++) {
+		if (keymaps[i][0]) {
+			sprintf(s+strlen(s),"%s%x", strlen(s)?"_":"", (i << 18) | ((keymaps[i][0] & 0x1ff) << 9) | (keymaps[i][1] & 0x1ff));
+		}
+	}
+	return s;
+}
+
+void uae3ds_mapping_save()
+{
+	char *cfgfile = ROM_PATH_PREFIX CFG_FILE_NAME;
+	char *s = uae3ds_mapping_savebuf();
+
+	FILE *f;
+	if ((f = fopen(cfgfile, "w")) != NULL)
+	{
+		fprintf(f, "keymappings=%s", s);
+		fclose(f);	
+	}
+	free(s);
+	text_messagebox(" Save Key Mappings", "Key mappings saved", MB_OK);
 }

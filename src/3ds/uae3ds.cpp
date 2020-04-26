@@ -334,7 +334,14 @@ void uae3ds_mapping_save()
 	FILE *f;
 	if ((f = fopen(cfgfile, "w")) != NULL)
 	{
-		fprintf(f, "keymappings=%s", s);
+		fprintf(f, "keymappings=%s\n", s);
+		fprintf(f, "max_tap_time=%d\n",mainMenu_max_tap_time); 
+		fprintf(f, "click_time=%d\n",mainMenu_click_time);
+		fprintf(f, "single_tap_timeout=%d\n",mainMenu_single_tap_timeout);
+		fprintf(f, "max_double_tap_time=%d\n",mainMenu_max_double_tap_time);
+		fprintf(f, "locked_drag_timeout=%d\n",mainMenu_locked_drag_timeout);
+		fprintf(f, "tap_and_drag_gesture=%d\n",mainMenu_tap_and_drag_gesture);
+		fprintf(f, "locked_drags=%d\n",mainMenu_locked_drags);
 		fclose(f);	
 	}
 	free(s);

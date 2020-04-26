@@ -40,9 +40,9 @@ void guarda(void);
 #include "gui.h"
 #include "debug.h"
 #include "savestate.h"
-#include "menu/menu.h"
 #include "uibottom.h"
 #include "uae3ds.h"
+#include "menu.h"
 
 #ifdef DREAMCAST
 #include <SDL/SDL_dreamcast.h>
@@ -483,7 +483,6 @@ static int refresh_necessary = 0;
 
 void handle_events (void)
 {
-	extern int mainMenu_msens;
     SDL_Event rEvent;
     int iAmigaKeyCode;
     int i, j;
@@ -492,7 +491,10 @@ void handle_events (void)
     if (SDL_MUSTLOCK(prSDLScreen))
     	SDL_UnlockSurface (prSDLScreen);
 
-    while (SDL_PollEvent(&rEvent))
+	// must be called once per frame to expire mouse button presses
+	uib_handle_tap_processing(NULL);
+
+	while (SDL_PollEvent(&rEvent))
     {
 		if (uib_handle_event(&rEvent)) continue;
 
@@ -530,20 +532,18 @@ void handle_events (void)
 				}
 			}
 			break;
-/*
+
 		case SDL_MOUSEBUTTONDOWN:
 			buttonstate[(rEvent.button.button-1)%3] = 1;
 			break;
 		case SDL_MOUSEBUTTONUP:
 			buttonstate[(rEvent.button.button-1)%3] = 0;
 			break;
-*/
+
 		case SDL_MOUSEMOTION:
-			if (rEvent.motion.state) {
-				lastmx += rEvent.motion.xrel * mainMenu_msens;
-				lastmy += rEvent.motion.yrel * mainMenu_msens;
-				newmousecounters = 1;
-			}
+			lastmx += rEvent.motion.xrel * mainMenu_msens;
+			lastmy += rEvent.motion.yrel * mainMenu_msens;
+			newmousecounters = 1;
 			break;
 		default:
 			break;
@@ -558,7 +558,6 @@ void handle_events (void)
 
 int check_prefs_changed_gfx (void)
 {
-	extern int mainMenu_vpos;
 	static int last_vpos=0;
 	int ret=(last_vpos!=mainMenu_vpos);
 	last_vpos=mainMenu_vpos;

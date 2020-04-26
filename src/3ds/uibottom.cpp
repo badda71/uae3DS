@@ -638,14 +638,214 @@ void uib_update(void)
 //	requestRepaint();
 }
 
-#define DOUBLECLICK_TIME 500
+// *****************************
+// lots of stuff below inspired from synaptics touchpad driver
+// https://github.com/freedesktop/xorg-xf86-input-synaptics
+// ******************************
+
+enum TapState {
+    TS_START,                   /* No tap/drag in progress */
+    TS_1,                       /* After first touch */
+    TS_MOVE,                    /* Pointer movement enabled */
+    TS_2A,                      /* After first release */
+    TS_2B,                      /* After second/third/... release */
+    TS_SINGLETAP,               /* After timeout after first release */
+    TS_3,                       /* After second touch */
+    TS_DRAG,                    /* Pointer drag enabled */
+    TS_4,                       /* After release when "locked drags" enabled */
+    TS_5,                       /* After touch when "locked drags" enabled */
+    TS_CLICKPAD_MOVE,           /* After left button press on a clickpad */
+	TS_MOUSEDOWN,
+	TS_MOUSEUP,
+};
+
+static int get_timeout(TapState s)
+{
+	switch (s) {
+    case TS_1:
+    case TS_3:
+    case TS_5:
+        return mainMenu_max_tap_time;
+    case TS_SINGLETAP:
+        return mainMenu_click_time;
+    case TS_2A:
+        return mainMenu_single_tap_timeout;
+    case TS_2B:
+        return mainMenu_max_double_tap_time;
+    case TS_4:
+        return mainMenu_locked_drag_timeout;
+    }
+	return 0;
+}
+
+static int mouse_state = 0;
+
+static void set_tap_state(TapState s, SDL_Event *e)
+{
+    int x=-1;
+	switch (s) {
+    case TS_START:
+    case TS_1:
+    case TS_2A:
+    case TS_2B:
+	case TS_MOUSEUP:
+        x = 0;
+        break;
+    case TS_3:
+    case TS_SINGLETAP:
+	case TS_MOUSEDOWN:
+        x = 1;
+        break;
+    default:
+        break;
+    }
+    if (x != -1 && x != mouse_state) {
+		SDL_Event ev = {0};
+		if (x == 0) {
+			ev.type = SDL_MOUSEBUTTONUP;
+			ev.button.state = SDL_RELEASED;
+		} else {
+			ev.type = SDL_MOUSEBUTTONDOWN;
+			ev.button.state = SDL_PRESSED;
+		}
+		ev.button.which = 1;
+		ev.button.button = SDL_BUTTON_LEFT;
+		if (e) {
+			ev.button.x = e->button.x;
+			ev.button.y = e->button.y;
+		}
+		SDL_PushEvent(&ev);
+		mouse_state = x;
+	}
+}
+
+#define SETSTATE(x)								\
+    {status = x;								\
+	timeout = get_timeout(x);					\
+	if (timeout) timeout += SDL_GetTicks();		\
+	set_tap_state(x,e);							\
+	is_timeout=0;}
+
+int uib_handle_tap_processing(SDL_Event *e) {
+	static Uint32 timeout = 0;
+	static TapState status = TS_START;
+	static int status2 = 0;
+	int is_timeout = 0;
+
+	if (!e) {
+		switch (status2) {
+		case 2:
+			set_tap_state(TS_MOUSEDOWN, NULL);
+			--status2;
+			break;
+		case 1:
+			set_tap_state(TS_MOUSEUP, NULL);
+			--status2;
+			break;
+		}
+	}
+	
+	if (timeout && SDL_GetTicks()>=timeout) {
+		is_timeout = 1;
+		timeout = 0;
+	}
+	if (!e && !is_timeout) return 1;
+
+ restart:
+    switch (status) {
+    case TS_START: /* No tap/drag in progress */
+        if (e && e->type==SDL_MOUSEBUTTONDOWN)
+            SETSTATE(TS_1)
+        break;
+    case TS_1: /* After first touch */
+        if (is_timeout) {
+            SETSTATE(TS_MOVE)
+            goto restart;
+        }
+        else if (e && e->type==SDL_MOUSEBUTTONUP) {
+            SETSTATE(TS_2A)
+        }
+        break;
+    case TS_MOVE: /* Pointer movement enabled */
+        if (e && e->type==SDL_MOUSEBUTTONUP) {
+            SETSTATE(TS_START)
+        }
+        break;
+    case TS_2A: /* After first release */
+        if (e && e->type==SDL_MOUSEBUTTONDOWN)
+            SETSTATE(TS_3)
+        else if (is_timeout)
+            SETSTATE(TS_SINGLETAP)
+        break;
+    case TS_2B: /* After second/third/... release */
+        if (e && e->type==SDL_MOUSEBUTTONDOWN) {
+            SETSTATE(TS_3)
+        }
+        else if (is_timeout) {
+            SETSTATE(TS_START)
+            status2=2;
+        }
+        break;
+    case TS_SINGLETAP: /* After timeout after first release */
+        if (e && e->type==SDL_MOUSEBUTTONDOWN)
+            SETSTATE(TS_1)
+        else if (is_timeout)
+            SETSTATE(TS_START)
+        break;
+    case TS_3: /* After second touch */
+        if (is_timeout) {
+            if (mainMenu_tap_and_drag_gesture) {
+                SETSTATE(TS_DRAG)
+            }
+            else {
+                SETSTATE(TS_1)
+            }
+            goto restart;
+        }
+        else if (e && e->type==SDL_MOUSEBUTTONUP) {
+            SETSTATE(TS_2B)
+        }
+        break;
+    case TS_DRAG:
+        if (e && e->type==SDL_MOUSEBUTTONUP) {
+            if (mainMenu_locked_drags) {
+                SETSTATE(TS_4)
+            }
+            else {
+                SETSTATE(TS_START)
+            }
+        }
+        break;
+    case TS_4:
+        if (is_timeout) {
+            SETSTATE(TS_START)
+            goto restart;
+        }
+        if (e && e->type==SDL_MOUSEBUTTONDOWN)
+            SETSTATE(TS_5)
+        break;
+    case TS_5:
+        if (is_timeout) {
+            SETSTATE(TS_DRAG)
+            goto restart;
+        }
+        else if (e && e->type==SDL_MOUSEBUTTONUP) {
+            SETSTATE(TS_START)
+        }
+        break;
+    }
+	return 1;
+}
+
+// *************************
+// Bottom screen event handling routine
+// *************************
 
 int uib_handle_event(SDL_Event *e) {
 	extern SDL_Surface *prSDLScreen;
 	static SDL_Event sdl_e;
 	int i,x,y;
-	static Uint32 gesture1_time=0;
-	static int gesture1_active=0;
+	static int process_touchpad = 0;
 
 	if (e->type == SDL_KEYDOWN) {
 		if (e->key.keysym.sym == 255) {
@@ -653,19 +853,25 @@ int uib_handle_event(SDL_Event *e) {
 			return 1;
 		}
 	}
+	if (e->type != SDL_MOUSEMOTION &&
+		e->type != SDL_MOUSEBUTTONUP &&
+		e->type != SDL_MOUSEBUTTONDOWN) return 0;
+
+	if (e->type == SDL_MOUSEMOTION) {
+		return e->motion.state ? 0 : 1;
+	} else {
+		if (e->button.which == 1) return 0;
+	}
+
+	// check if we should do touchpad or virtual keyboard processing
+	if (process_touchpad) {
+		if (e->type == SDL_MOUSEBUTTONUP) process_touchpad=0;
+		return uib_handle_tap_processing(e);
+	}
 
 	switch (e->type) {
-		case SDL_MOUSEMOTION:
-			return 0;
 		case SDL_MOUSEBUTTONUP:
-			if (gesture1_active) {
-				sdl_e.type = SDL_KEYUP;
-				sdl_e.key.keysym.sym = DS_ZL;
-				SDL_PushEvent(&sdl_e);
-				gesture1_active=0;
-				return 0;
-			}
-			if (kb_activekey==-1) return 0; // did not get the button down, so ignore button up
+			if (kb_activekey==-1) return 1; // did not get the button down, so ignore button up
 			i=kb_activekey;
 			kb_activekey=-1;
 			break;
@@ -680,23 +886,18 @@ int uib_handle_event(SDL_Event *e) {
 					y <  uikbd_keypos[i].y + uikbd_keypos[i].h + kb_y_pos) break;
 			}
 			if (uikbd_keypos[i].key == -1) {
-				// touch outside of keyboard - check for gesture
-				Uint32 t = SDL_GetTicks();
-				if (t-gesture1_time < DOUBLECLICK_TIME) {
-					sdl_e.type = SDL_KEYDOWN;
-					sdl_e.key.keysym.sym = DS_ZL;
-					SDL_PushEvent(&sdl_e);
-					gesture1_active=1;
-				} else {
-					gesture1_time = t;
+				// touch outside of keyboard - process touchpad
+				if  (y < kb_y_pos) {
+					process_touchpad = 1;
+					return uib_handle_tap_processing(e);
 				}
-				return 0;
+				return 1;
 			}
 			if (i==kb_activekey) return 1; // ignore button down on an already pressed key
 			kb_activekey=i;
 			break;
 		default:
-			return 0;
+			return 1;
 	}
 
 	// sticky key press

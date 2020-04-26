@@ -51,6 +51,7 @@ typedef struct {
 extern void uib_update(void);
 extern int uib_handle_event(SDL_Event *);
 extern void uib_init();
+extern int uib_handle_tap_processing(SDL_Event *e);
 
 // exposed variables
 extern uikbd_key uikbd_keypos[];

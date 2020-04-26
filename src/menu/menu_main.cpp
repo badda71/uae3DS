@@ -83,6 +83,14 @@ int mainMenu_autosave=-1;
 int mainMenu_msens=2;
 int mainMenu_mappos=0;
 
+int mainMenu_max_tap_time=250;
+int mainMenu_click_time=100;
+int mainMenu_single_tap_timeout=250;
+int mainMenu_max_double_tap_time=250;
+int mainMenu_locked_drag_timeout=5000;
+int mainMenu_tap_and_drag_gesture=1;
+int mainMenu_locked_drags=0;
+
 static void draw_mainMenu(enum MainMenuEntry c)
 {
 	static int frame = 0;

@@ -81,3 +81,17 @@ int run_menuSave();
 int run_menuGame();
 int run_menuControl();
 
+extern int mainMenu_vpos;
+extern int mainMenu_throttle;
+extern int mainMenu_frameskip;
+extern int mainMenu_sound;
+extern int mainMenu_autosave;
+extern int mainMenu_msens;
+extern int mainMenu_mappos;
+extern int mainMenu_max_tap_time;
+extern int mainMenu_click_time;
+extern int mainMenu_single_tap_timeout;
+extern int mainMenu_max_double_tap_time;
+extern int mainMenu_locked_drag_timeout;
+extern int mainMenu_tap_and_drag_gesture;
+extern int mainMenu_locked_drags;

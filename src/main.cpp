@@ -49,6 +49,7 @@ KOS_INIT_ROMDISK(romdisk);
 #include "uibottom.h"
 #include "autofire.h"
 #include "uae3ds.h"
+#include "menu.h"
 
 #ifdef USE_SDL
 #include "SDL.h"
@@ -113,6 +114,13 @@ void loadconfig() {
 	{
 		fscanf(f," keymappings = %s ",buf);
 		uae3ds_mapping_loadbuf(buf);
+		fscanf(f, " max_tap_time = %d ",&mainMenu_max_tap_time); 
+		fscanf(f, " click_time = %d ",&mainMenu_click_time);
+		fscanf(f, " single_tap_timeout = %d ",&mainMenu_single_tap_timeout);
+		fscanf(f, " max_double_tap_time = %d ",&mainMenu_max_double_tap_time);
+		fscanf(f, " locked_drag_timeout = %d ",&mainMenu_locked_drag_timeout);
+		fscanf(f, " tap_and_drag_gesture = %d ",&mainMenu_tap_and_drag_gesture);
+		fscanf(f, " locked_drags = %d ",&mainMenu_locked_drags);
 		fclose(f);
 	}
 }
@@ -283,7 +291,7 @@ sdl_3dsbuttons buttons3ds[] = {
 	{KEY_CSTICK_DOWN, DS_DOWN3, "CSTK DOWN"},
 	{KEY_CSTICK_LEFT, DS_LEFT3, "CSTK LEFT"},
 	{KEY_CSTICK_RIGHT, DS_RIGHT3, "CSTK RIGHT"},
-//	{KEY_TOUCH, DS_TOUCH, "TOUCH"},
+	{KEY_TOUCH, DS_TOUCH, "TOUCH"},
 //	{KEY_CPAD_UP, DS_UP1, "CPAD UP"},	// included in KEY_UP
 //	{KEY_CPAD_DOWN, DS_DOWN1, "CPAD DOWN"},
 //	{KEY_CPAD_LEFT, DS_LEFT1, "CPAD LEFT"},

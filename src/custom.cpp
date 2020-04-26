@@ -57,6 +57,7 @@ extern signed int IO_CYCLE;
 #include "gui.h"
 #include "drawing.h"
 #include "savestate.h"
+#include "menu.h"
 
 
 #ifdef STOP_WHEN_COPPER
@@ -1513,7 +1514,6 @@ static __inline__ void reset_decisions (void)
 
 void init_hz (void)
 {
-    extern int mainMenu_vpos;
     int isntsc;
 
     beamcon0 = new_beamcon0;

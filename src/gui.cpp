@@ -472,8 +472,8 @@ void gui_handle_events (SDL_Event *e)
 		case DS_DOWN3:
 			if (v) {
 				mainMenu_vpos -= 1;
-				if (mainMenu_vpos > 6) mainMenu_vpos=6;
-				if (mainMenu_vpos < -4) mainMenu_vpos=-4;
+				if (mainMenu_vpos > 5) mainMenu_vpos=5;
+				if (mainMenu_vpos < 0) mainMenu_vpos=0;
 				snprintf(buf,50,"VPOS %d",mainMenu_vpos*8);
 				gui_set_message(buf,1000);
 				getChanges();

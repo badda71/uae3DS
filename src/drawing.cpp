@@ -2055,10 +2055,10 @@ static _INLINE_ void finish_drawing_frame (void)
 
 		i1 = i + min_ypos_for_screen;
 		where = amiga2aspect_line_map[i1];
-#if defined(USE_ALL_LINES) || !defined(USE_LINESTATE)
+//#if defined(USE_ALL_LINES) || !defined(USE_LINESTATE)
 		if (where >= GFXVIDINFO_HEIGHT)
 		    break;
-#endif
+//#endif
 		if (where == -1)
 		    continue;
 		pfield_draw_line (line, where, amiga2aspect_line_map[i1 + 1]);

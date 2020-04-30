@@ -2059,7 +2059,7 @@ static _INLINE_ void finish_drawing_frame (void)
 		if (where >= GFXVIDINFO_HEIGHT)
 		    break;
 //#endif
-		if (where == -1)
+		if (where < 0)
 		    continue;
 		pfield_draw_line (line, where, amiga2aspect_line_map[i1 + 1]);
     }

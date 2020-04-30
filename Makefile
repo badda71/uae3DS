@@ -46,7 +46,7 @@ APP_AUTHOR	:=	badda71 <me@badda.de>
 ICON		:=	icon.png
 
 VERSION_MAJOR :=	0
-VERSION_MINOR :=	2
+VERSION_MINOR :=	3
 VERSION_MICRO :=	0
 
 ifeq ($(VERSION_MICRO),0)

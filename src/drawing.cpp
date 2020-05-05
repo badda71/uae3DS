@@ -64,11 +64,11 @@ int fps_counter = 0;
 
 
 #define GFXVIDINFO_PIXBYTES 2
-#define GFXVIDINFO_WIDTH 400
+#define GFXVIDINFO_WIDTH 320
 #define GFXVIDINFO_HEIGHT 240
 #define MAXBLOCKLINES 240
-#define VISIBLE_LEFT_BORDER 32
-#define VISIBLE_RIGHT_BORDER 432
+#define VISIBLE_LEFT_BORDER 72
+#define VISIBLE_RIGHT_BORDER 392
 #define LINETOSCR_X_ADJUST_BYTES 64
 
 #define maxhpos MAXHPOS
@@ -324,7 +324,7 @@ static __inline__ void count_frame (void)
 		if ((ahora+PARTIDA)<proximo_frameskip)
 		{
 #ifdef _3DS
-			SDL_Delay(proximo_frameskip-ahora-PARTIDA+1);
+			SDL_Delay(proximo_frameskip-ahora-(PARTIDA/3)+1);
 #else
 			SDL_Delay(proximo_frameskip-ahora);
 #endif

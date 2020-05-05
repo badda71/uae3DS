@@ -852,6 +852,7 @@ int uib_handle_event(SDL_Event *e) {
 			toggle_keyboard();
 			return 1;
 		}
+		if (e->key.keysym.sym == DS_TOUCH) return 1;
 	}
 	if (e->type != SDL_MOUSEMOTION &&
 		e->type != SDL_MOUSEBUTTONUP &&

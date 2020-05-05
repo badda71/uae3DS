@@ -488,7 +488,8 @@ void gui_handle_events (SDL_Event *e)
 				scale -= 5;
 				if (scale < 100) scale=100;
 				if (scale > 200) scale=200;
-				N3DS_SetScalingDirect((float)scale/100.0f, (float)scale/100.0f, 0);
+				float f = scale==100 ? 1.0f : ((float)scale/100.0f);
+				N3DS_SetScalingDirect(f, f, 0);
 				snprintf(buf,50,"Scale %d%%",scale);
 				gui_set_message(buf,1000);
 			}

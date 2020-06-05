@@ -110,7 +110,7 @@ uikbd_key uikbd_keypos[] = {
 	{ 160, 64,  16,  16,    AK_COMMA,   0,  0,  ","},
 	{ 176, 64,  16,  16,   AK_PERIOD,   0,  0,  "."},
 	{ 192, 64,  16,  16,    AK_SLASH,   0,  0,  "/"},
-	{ 208, 64,  32,  16,      AK_LSH,   1,  0,  "RSHIFT"},
+	{ 208, 64,  32,  16,      AK_RSH,   1,  0,  "RSHIFT"},
 	{ 240, 64,  16,  16,       AK_UP,   0,  0,  "C_UP"},
 	{ 256, 64,  32,  16,      AK_NP0,   0,  0,  "NP 0"},
 	{ 288, 64,  16,  16,    AK_NPDEL,   0,  0,  "NP ."},
@@ -118,8 +118,8 @@ uikbd_key uikbd_keypos[] = {
 	{   0, 80,  32,  17,     AK_LALT,   4,  0,  "LALT"},
 	{  32, 80,  16,  17,     AK_LAMI,   8,  0,  "LAMI"},
 	{  48, 80, 144,  17,      AK_SPC,   0,  0,  "SPACE"},
-	{ 192, 80,  16,  17,     AK_LAMI,   8,  0,  "RAMI"},
-	{ 208, 80,  16,  17,     AK_LALT,   4,  0,  "RALT"},
+	{ 192, 80,  16,  17,     AK_RAMI,   8,  0,  "RAMI"},
+	{ 208, 80,  16,  17,     AK_RALT,   4,  0,  "RALT"},
 	{ 224, 80,  16,  17,       AK_LF,   0,  0,  "C_LEFT"},
 	{ 240, 80,  16,  17,       AK_DN,   0,  0,  "C_DOWN"},
 	{ 256, 80,  16,  17,       AK_RT,   0,  0,  "C_RIGHT"},
@@ -410,8 +410,11 @@ static void keypress_recalc() {
 	memset(keysPressed,0,sizeof(keysPressed));
 	for (key = 0; uikbd_keypos[key].key!=-1; ++key) {
 		state=0;
-		if (key == kb_activekey) state=1;
-		else if (uikbd_keypos[key].sticky & sticky) state=1;
+		if (uikbd_keypos[key].sticky) {
+			if (uikbd_keypos[key].sticky & sticky) state=1;
+		} else {
+			if (key == kb_activekey) state=1;
+		}
 		keysPressed[key]=state;
 	}
 }
@@ -841,7 +844,11 @@ int uib_handle_tap_processing(SDL_Event *e) {
 // Bottom screen event handling routine
 // *************************
 
+#define log2 __builtin_ctz
+
 int uib_handle_event(SDL_Event *e) {
+	static int sticky2keysym[4]={-1,-1,-1,-1};
+
 	extern SDL_Surface *prSDLScreen;
 	static SDL_Event sdl_e;
 	int i,x,y;
@@ -904,10 +911,18 @@ int uib_handle_event(SDL_Event *e) {
 	// sticky key press
 	if (uikbd_keypos[i].sticky>0) {
 		if (e->button.type == SDL_MOUSEBUTTONDOWN) {
+			int pos=log2(uikbd_keypos[i].sticky & 0x0F);
 			sticky = sticky ^ uikbd_keypos[i].sticky;
-			sdl_e.type = sticky & uikbd_keypos[i].sticky ? SDL_KEYDOWN : SDL_KEYUP;
-			sdl_e.key.keysym.sym = uikbd_keypos[i].key;
-			SDL_PushEvent(&sdl_e);
+			if (sticky & uikbd_keypos[i].sticky) {
+				sdl_e.type = SDL_KEYDOWN;
+				sticky2keysym[pos] = sdl_e.key.keysym.sym = uikbd_keypos[i].key;
+				SDL_PushEvent(&sdl_e);
+			} else {
+				sdl_e.type = SDL_KEYUP;
+				sdl_e.key.keysym.sym = sticky2keysym[pos] == -1 ? uikbd_keypos[i].key : sticky2keysym[pos];
+				sticky2keysym[pos] = -1;
+				SDL_PushEvent(&sdl_e);
+			}
 		}
 	} else {
 		// normal key press

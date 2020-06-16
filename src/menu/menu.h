@@ -41,6 +41,12 @@ enum font_size {
 	FONT_NORMAL
 };
 
+typedef struct {
+	int frame;
+	int waittimeout;
+	int offset;
+} Scrollstatus;
+
 void text_draw_background();
 void init_text(int splash);
 void quit_text(void);
@@ -65,8 +71,16 @@ void _text_draw_window(SDL_Surface *sf, int x, int y, int w, int h, const char *
 void _text_draw_window_bar(SDL_Surface *sf, int x, int y, int w, int h, int per, int max, const char *title);
 void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, SDL_Color col);
 int text_messagebox(char *title, char *text, mb_mode mode);
+void write_text_pos_scroll(Scrollstatus *ss, int invers, int nr, ... );
+
 // void text_draw_menu_msg();
 void text_flip(void);
+
+#define NUM_FAV 10
+extern char *favorites[NUM_FAV];
+extern void menu_addFavImage(char *path);
+extern void menu_load_favorites(char *s);
+extern char *menu_save_favorites();
 
 void drawPleaseWait(void);
 //void menu_raise(void);

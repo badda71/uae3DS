@@ -30,7 +30,6 @@ static const char *text_str_keymap="Key mappings";
 static const char *text_str_keymap1="Add";
 static const char *text_str_keymap2="Delete";
 static const char *text_str_keymap3="List";
-static const char *text_str_keymap4="Save";
 static const char *text_str_8="8";
 static const char *text_str_16="16";
 static const char *text_str_20="20";
@@ -301,10 +300,6 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	else
 		write_text_pos(column, row, text_str_keymap3);
 	column += 8*(strlen(text_str_keymap3) + 1);
-	if (mainMenu_mappos == 3 && c == MAIN_MENU_ENTRY_KEYMAP && flash)
-		write_text_inv_pos(column, row, text_str_keymap4);
-	else
-		write_text_pos(column, row, text_str_keymap4);
 
 	row+=8;
 	write_text_pos(col, row, text_str_separator);
@@ -480,15 +475,12 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 							case 1: // del
 								uae3ds_mapping_del();
 								break;
-							case 3: // save
-								uae3ds_mapping_save();
-								break;
 							default: // list
 								uae3ds_mapping_list();
 								break;
 							}
 						}
-						mainMenu_mappos = (mainMenu_mappos + 4) % 4;
+						mainMenu_mappos = (mainMenu_mappos + 3) % 3;
 						break;
 					case MAIN_MENU_ENTRY_LOAD:
 					case MAIN_MENU_ENTRY_SAVED_STATES:

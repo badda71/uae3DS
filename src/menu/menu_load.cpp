@@ -396,6 +396,7 @@ static int key_loadMenu(int *c)
 							copyCompleteName(uae4all_image_file,text_dir_num_files_index);
 						else if(df_num == DF_1)
 							copyCompleteName(uae4all_image_file2,text_dir_num_files_index);
+						//menu_addFavImage(text_dir_files[text_dir_num_files_index].d_name);
 					}
 					end=1;
 				}

@@ -34,6 +34,7 @@
 #include "osemu.h"
 #include "execlib.h"
 #include "savestate.h"
+#include "menu.h"
 
 #define maxhpos MAXHPOS
 
@@ -313,6 +314,9 @@ static int drive_insert (drive * drv, int dnum, const char *fname)
     drive_settype_id(drv);	/* Set DD or HD drive */
     drv->buffered_side = 2;	/* will force read */
     drive_fill_bigbuf (drv);
+
+	menu_addFavImage(fname);
+
     return 1;
 }
 

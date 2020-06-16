@@ -102,6 +102,30 @@ void discard_prefs ()
 {
 }
 
+void saveconfig()
+{
+	char *s,*cfgfile = ROM_PATH_PREFIX CFG_FILE_NAME;
+
+	FILE *f;
+	if ((f = fopen(cfgfile, "w")) != NULL)
+	{
+		s = uae3ds_mapping_savebuf();
+		fprintf(f, "keymappings=%s\n", s);
+		free(s);
+		fprintf(f, "max_tap_time=%d\n",mainMenu_max_tap_time);
+		fprintf(f, "click_time=%d\n",mainMenu_click_time);
+		fprintf(f, "single_tap_timeout=%d\n",mainMenu_single_tap_timeout);
+		fprintf(f, "max_double_tap_time=%d\n",mainMenu_max_double_tap_time);
+		fprintf(f, "locked_drag_timeout=%d\n",mainMenu_locked_drag_timeout);
+		fprintf(f, "tap_and_drag_gesture=%d\n",mainMenu_tap_and_drag_gesture);
+		fprintf(f, "locked_drags=%d\n",mainMenu_locked_drags);
+		s = menu_save_favorites();
+		fprintf(f, "favorites=%s\n",s);
+		free(s);
+		fclose(f);
+	}
+}
+
 void loadconfig() {
 	char *cfgfile1 = ROM_PATH_PREFIX CFG_FILE_NAME;
 	char *cfgfile2 = DATA_PREFIX CFG_FILE_NAME;
@@ -121,8 +145,12 @@ void loadconfig() {
 		fscanf(f, " locked_drag_timeout = %d ",&mainMenu_locked_drag_timeout);
 		fscanf(f, " tap_and_drag_gesture = %d ",&mainMenu_tap_and_drag_gesture);
 		fscanf(f, " locked_drags = %d ",&mainMenu_locked_drags);
+		fscanf(f, " favorites = %[^\n]",buf);
+		menu_load_favorites(buf);
 		fclose(f);
 	}
+
+	atexit(saveconfig);
 }
 
 void default_prefs ()

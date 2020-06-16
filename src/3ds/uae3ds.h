@@ -47,4 +47,3 @@ extern void uae3ds_mapping_list();
 extern void uae3ds_mapping_apply(SDL_Event *e);
 extern void uae3ds_mapping_loadbuf(char *s);
 extern char *uae3ds_mapping_savebuf();
-extern void uae3ds_mapping_save();

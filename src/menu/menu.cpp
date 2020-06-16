@@ -303,6 +303,66 @@ void _write_text_inv(SDL_Surface *sf, int x, int y, const char *str)
 	text_screen=back;
 }
 
+// ... is list of scrollargs {int x, int y, int width, char *str}
+void write_text_pos_scroll(Scrollstatus *ss, int invers, int nr, ... ) 
+{
+	const int speed = 6;
+	const int wait = 6;
+	int i, x, y, w, nrend = nr, offset;
+	char *str;
+
+	va_list vl;
+	va_start(vl,nr);
+	for (i=0; i < nr; ++i) {
+		x = va_arg(vl, int);
+		y = va_arg(vl, int);
+		w = va_arg(vl, int);
+		str = va_arg(vl, char*);
+		char text[w+1];
+		if (!str) continue;
+		int len = strlen(str);
+		if (len <= w) {
+			if (invers) write_text_inv_pos(x,y,str);
+			else write_text_pos(x,y,str);
+			continue;
+		}
+
+		if (ss->offset >= len - w) {
+			offset = len - w;
+		} else {
+			--nrend;
+			offset = ss->offset;
+		}
+		snprintf(text, w+1, "%s", str + offset);
+		if (invers) write_text_inv_pos(x,y,text);
+		else write_text_pos(x,y,text);
+	}
+	va_end(vl);
+
+	// advance step
+	ss->frame = (ss->frame + 1) % speed;
+	if (ss->frame == 0) {
+		// advance step
+		if (ss->waittimeout) {
+			--ss->waittimeout;
+			if (!ss->waittimeout) {
+				if (ss->offset) {
+					ss->offset = 0;
+				} else {
+					++ss->offset;
+				}
+			}
+		} else {
+			if (nrend == nr)
+				ss->waittimeout = wait;
+			else if (ss->offset == 0)
+				ss->waittimeout = wait;
+			else
+				++ss->offset;
+		}
+	}
+}
+
 /* Write text, horizontally centered... */
 
 void write_centered_text(int y, const char *str)

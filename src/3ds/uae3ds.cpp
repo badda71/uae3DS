@@ -282,7 +282,9 @@ void uae3ds_mapping_list()
 void uae3ds_mapping_apply(SDL_Event *e)
 {
 	int sym;
-	if (e->type != SDL_KEYUP && e->type != SDL_KEYDOWN) return;
+	if ((e->type != SDL_KEYUP && e->type != SDL_KEYDOWN) ||
+		e->key.keysym.mod == KMOD_MODE)
+		return;
 	sym = e->key.keysym.sym;
 	if (!keymaps[sym][0]) return;
 	e->key.keysym.sym = (SDLKey)keymaps[sym][0];

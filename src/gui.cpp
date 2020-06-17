@@ -217,7 +217,16 @@ int gui_init (void)
 	uae4all_image_file2[0]=0;
 	init_text(1);
 	loadConfig();
-	run_mainMenu();
+	// start menu as soon as possible
+	//run_mainMenu();
+	SDL_Event e;
+	e.type = SDL_KEYDOWN;
+	e.key.keysym.sym = DS_SELECT;
+	e.key.keysym.mod = KMOD_MODE; // not mappable
+	SDL_PushEvent(&e);
+	e.type = SDL_KEYUP;
+	SDL_PushEvent(&e);
+
 	quit_text();
 	uae4all_pause_music();
 	emulating=1;

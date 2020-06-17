@@ -368,7 +368,7 @@ static void m68k_run (void)
 
 void m68k_go (int may_quit)
 {
-    gui_purge_events();
+//    gui_purge_events();
 #if !defined(DREAMCAST) || defined(DEBUG_UAE4ALL)
     if (in_m68k_go || !may_quit) {
 #ifdef DEBUG_UAE4ALL

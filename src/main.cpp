@@ -102,111 +102,6 @@ void discard_prefs ()
 {
 }
 
-char *getvar(char *buf, char *varname) {
-	static char *r=NULL;
-	if (r != NULL) {
-		free(r);
-		r=NULL;
-	}
-	char *v=concat(varname, "=", NULL);
-	char *p,*e;
-	if ( (p=strstr(buf, v)) != NULL) {
-		p += strlen(v);
-		e = strchr(p, '\n');
-		if (!e) e = p + strlen(p);
-		r=(char*)calloc(e-p+1, 1);
-		strncpy(r, p, e-p);
-	}
-	free(v);
-	return r;
-}
-
-char *getconfig() {
-	char *config_format =
-		"keymappings=%s\n"
-		"max_tap_time=%d\n"
-		"click_time=%d\n"
-		"single_tap_timeout=%d\n"
-		"max_double_tap_time=%d\n"
-		"locked_drag_timeout=%d\n"
-		"tap_and_drag_gesture=%d\n"
-		"locked_drags=%d\n"
-		"favorites=%s\n";
-
-	int l,lo=10;
-	char *p = (char*)malloc(lo);
-	char *s1 = uae3ds_mapping_savebuf();
-	char *s2 = menu_save_favorites();
-
-	while (1) {
-		l=snprintf(p, lo, config_format,
-			s1,
-			mainMenu_max_tap_time,
-			mainMenu_click_time,
-			mainMenu_single_tap_timeout,
-			mainMenu_max_double_tap_time,
-			mainMenu_locked_drag_timeout,
-			mainMenu_tap_and_drag_gesture,
-			mainMenu_locked_drags,
-			s2);
-		if ( l > -1 && l < lo ) break;
-		p = (char*)realloc(p, lo = l+1);
-	}
-	free(s1);
-	free(s2);
-	return p;
-}
-
-void saveconfig()
-{
-	char *s,*cfgfile = ROM_PATH_PREFIX CFG_FILE_NAME;
-
-	FILE *f;
-	if ((f = fopen(cfgfile, "w")) != NULL)
-	{
-		s = getconfig();
-		fprintf(f, "%s",s);
-		fclose(f);
-		free(s);
-	}
-}
-
-void applyconfig(char *s) {
-	char *p;
-	if ((p=getvar(s,"keymappings"))!=NULL) uae3ds_mapping_loadbuf(p);
-	if ((p=getvar(s,"max_tap_time"))!=NULL) mainMenu_max_tap_time = strtol(p,NULL,0);
-	if ((p=getvar(s,"click_time"))!=NULL) mainMenu_click_time = strtol(p,NULL,0);
-	if ((p=getvar(s,"single_tap_timeout"))!=NULL) mainMenu_single_tap_timeout = strtol(p,NULL,0);
-	if ((p=getvar(s,"max_double_tap_time"))!=NULL) mainMenu_max_double_tap_time = strtol(p,NULL,0);
-	if ((p=getvar(s,"locked_drag_timeout"))!=NULL) mainMenu_locked_drag_timeout = strtol(p,NULL,0);
-	if ((p=getvar(s,"tap_and_drag_gesture"))!=NULL) mainMenu_tap_and_drag_gesture = strtol(p,NULL,0);
-	if ((p=getvar(s,"locked_drags"))!=NULL) mainMenu_locked_drags = strtol(p,NULL,0);
-	if ((p=getvar(s,"favorites"))!=NULL) menu_load_favorites(p);
-}
-
-void loadconfig() {
-	char *cfgfile1 = ROM_PATH_PREFIX CFG_FILE_NAME;
-	char *cfgfile2 = DATA_PREFIX CFG_FILE_NAME;
-
-	// read resources
-	FILE *f;
-	if ((f = fopen(cfgfile1,"r")) != NULL ||
-		(f = fopen(cfgfile2,"r")) != NULL)
-	{
-		fseek(f, 0, SEEK_END);
-		long fsize = ftell(f);
-		fseek(f, 0, SEEK_SET);  /* same as rewind(f); */
-
-		char *s = (char*)calloc(fsize + 1, 1);
-		fread(s, 1, fsize, f);
-		fclose(f);
-		applyconfig(s);
-		free(s);
-	}
-
-	atexit(saveconfig);
-}
-
 void default_prefs ()
 {
 #ifdef NO_SOUND
@@ -432,7 +327,6 @@ void real_main (int argc, char **argv)
     if (! graphics_setup ()) {
 	exit (1);
     }
-	loadconfig();
 
     rtarea_init ();
 

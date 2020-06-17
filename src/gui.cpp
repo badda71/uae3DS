@@ -27,6 +27,7 @@
 #include "joystick.h"
 #include "uibottom.h"
 #include "autofire.h"
+#include "uae3ds.h"
 
 #ifdef HOME_DIR
 #include "homedir.h"
@@ -90,13 +91,13 @@ void loadConfig()
 {
 #if defined(HOME_DIR)
 	FILE *f;
-	char *config = (char *)malloc(strlen(config_dir) + strlen("/uae4all.cfg") + 1);
+	char *config = (char *)malloc(strlen(config_dir) + strlen("/uae3DS.cfg") + 1);
 	extern char last_directory[PATH_MAX];
 
 	if(config == NULL)
 		return;
 
-	sprintf(config, "%s/uae4all.cfg", config_dir);
+	sprintf(config, "%s/uae3DS.cfg", config_dir);
 
 	f = fopen(config, "r");
 
@@ -107,7 +108,7 @@ void loadConfig()
 		return;
 	}
 
-	char line[PATH_MAX + 17];
+	char line[PATH_MAX * 10 + 30];
 
 	while(fgets(line, sizeof(line), f))
 	{
@@ -146,6 +147,24 @@ void loadConfig()
 
 			strcpy(last_directory, arg);
 		}
+		else if(!strcmp(line, "MAX_TAP_TIME"))
+			sscanf(arg, "%d", &mainMenu_max_tap_time);
+		else if(!strcmp(line, "CLICK_TIME"))
+			sscanf(arg, "%d", &mainMenu_click_time);
+		else if(!strcmp(line, "SINGLE_TAP_TIMEOUT"))
+			sscanf(arg, "%d", &mainMenu_single_tap_timeout);
+		else if(!strcmp(line, "MAX_DOUBLE_TAP_TIME"))
+			sscanf(arg, "%d", &mainMenu_max_double_tap_time);
+		else if(!strcmp(line, "LOCKED_DRAG_TIMEOUT"))
+			sscanf(arg, "%d", &mainMenu_locked_drag_timeout);
+		else if(!strcmp(line, "TAP_AND_DRAG_GESTURE"))
+			sscanf(arg, "%d", &mainMenu_tap_and_drag_gesture);
+		else if(!strcmp(line, "LOCKED_DRAGS"))
+			sscanf(arg, "%d", &mainMenu_locked_drags);
+		else if(!strcmp(line, "KEYMAPPINGS"))
+			uae3ds_mapping_loadbuf(arg);
+		else if(!strcmp(line, "FAVORITES"))
+			menu_load_favorites(arg);
 	}
 
 	fclose(f);
@@ -157,13 +176,13 @@ void storeConfig()
 {
 #if defined(HOME_DIR)
 	FILE *f;
-	char *config = (char *)malloc(strlen(config_dir) + strlen("/uae4all.cfg") + 1);
+	char *config = (char *)malloc(strlen(config_dir) + strlen("/uae3DS.cfg") + 1);
 	extern char last_directory[PATH_MAX];
 
 	if(config == NULL)
 		return;
 
-	sprintf(config, "%s/uae4all.cfg", config_dir);
+	sprintf(config, "%s/uae3DS.cfg", config_dir);
 
 	f = fopen(config, "w");
 
@@ -174,7 +193,39 @@ void storeConfig()
 		return;
 	}
 
-	fprintf(f, "THROTTLE %d\nFRAMESKIP %d\nSCREEN_POS %d\nSOUND %d\nSAVE_DISKS %d\n", mainMenu_throttle, mainMenu_frameskip, mainMenu_vpos, mainMenu_sound, mainMenu_autosave);
+	char *s1 = uae3ds_mapping_savebuf();
+	char *s2 = menu_save_favorites();
+
+	fprintf(f,
+		"THROTTLE %d\n"
+		"FRAMESKIP %d\n"
+		"SCREEN_POS %d\n"
+		"SOUND %d\n"
+		"SAVE_DISKS %d\n"
+		"MAX_TAP_TIME %d\n"
+		"CLICK_TIME %d\n"
+		"SINGLE_TAP_TIMEOUT %d\n"
+		"MAX_DOUBLE_TAP_TIME %d\n"
+		"LOCKED_DRAG_TIMEOUT %d\n"
+		"TAP_AND_DRAG_GESTURE %d\n"
+		"LOCKED_DRAGS %d\n"
+		"KEYMAPPINGS %s\n"
+		"FAVORITES %s\n",
+		mainMenu_throttle,
+		mainMenu_frameskip,
+		mainMenu_vpos,
+		mainMenu_sound,
+		mainMenu_autosave,
+		mainMenu_max_tap_time,
+		mainMenu_click_time,
+		mainMenu_single_tap_timeout,
+		mainMenu_max_double_tap_time,
+		mainMenu_locked_drag_timeout,
+		mainMenu_tap_and_drag_gesture,
+		mainMenu_locked_drags,
+		s1,
+		s2
+	);
 
 	if(last_directory[0])
 	{

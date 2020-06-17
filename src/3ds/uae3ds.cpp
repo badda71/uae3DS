@@ -65,12 +65,6 @@ void *tsh_get(tsh_object *o, char *key) {
 	return r;
 }
 
-char *stralloc(const char *src) {
-	char *r = (char*)malloc(strlen(src)+1);
-	strcpy(r,src);
-	return r;
-}
-
 int tsh_put(tsh_object *o, char *key, void *val) {
 //log_citra("enter %s: %s",__func__,key);
 	if (key==NULL) return -1;
@@ -291,23 +285,33 @@ void uae3ds_mapping_apply(SDL_Event *e)
 	if (e->type != SDL_KEYUP && e->type != SDL_KEYDOWN) return;
 	sym = e->key.keysym.sym;
 	if (!keymaps[sym][0]) return;
-	e->key.keysym.sym = keymaps[sym][0];
+	e->key.keysym.sym = (SDLKey)keymaps[sym][0];
 	if (!keymaps[sym][1]) return;
 	SDL_Event e1;
 	e1.type = e->type;
-	e1.key.keysym.sym = keymaps[sym][1];
+	e1.key.keysym.sym = (SDLKey)keymaps[sym][1];
 	SDL_PushEvent(&e1);
 }
 
 void uae3ds_mapping_loadbuf(char *s)
 {
 	unsigned long int l;
+	// clear mappings
+	for (int i=0; i<0x200; i++) {
+		keymaps[i][0] = keymaps[i][1] = 0;
+	}
+	// read new mappings from string
 	while ((l = strtoul(s, &s, 16)) != 0) {
 		int k = (l >> 18) & 0x1ff;
 		keymaps[k][0] = (l >> 9) & 0x1ff;
 		keymaps[k][1] = l & 0x1ff;
 		while (*s=='_') ++s;
 	}
+}
+
+uae_u8 *restore_keymap (uae_u8 *src) {
+	uae3ds_mapping_loadbuf((char*)src);
+	return src;
 }
 
 char *uae3ds_mapping_savebuf()
@@ -317,11 +321,59 @@ char *uae3ds_mapping_savebuf()
 	for (i=0; i<0x200; i++) {
 		if (keymaps[i][0]) ++count;
 	}
-	s=calloc(count*9+1, 1);
+	s=(char*)calloc(count*9+1, 1);
 	for (i=0; i<0x200; i++) {
 		if (keymaps[i][0]) {
 			sprintf(s+strlen(s),"%s%x", strlen(s)?"_":"", (i << 18) | ((keymaps[i][0] & 0x1ff) << 9) | (keymaps[i][1] & 0x1ff));
 		}
 	}
 	return s;
+}
+
+char *stralloc(char *s) {
+	if (!s) return NULL;
+	char *p=(char*)malloc(strlen(s)+1);
+	if (!p) return NULL;
+	strcpy(p, s);
+	return p;
+}
+
+char *concat(char *s, ...)
+{
+#define _CONCAT_MAX_ARGS 128
+    char *arg;
+    char *newp, *ptr;
+    int num_args;
+    size_t arg_len[_CONCAT_MAX_ARGS], tot_len;
+    int i;
+    va_list ap;
+
+    arg_len[0] = tot_len = strlen(s);
+
+    va_start(ap, s);
+    for (i = 1;
+         i < _CONCAT_MAX_ARGS && (arg = va_arg(ap, char *)) != NULL;
+         i++) {
+        arg_len[i] = strlen(arg);
+        tot_len += arg_len[i];
+    }
+    num_args = i;
+    va_end(ap);
+
+    newp = (char*)malloc(tot_len + 1);
+
+    if (arg_len[0] > 0) {
+        memcpy(newp, s, arg_len[0]);
+    }
+    ptr = newp + arg_len[0];
+
+    va_start(ap, s);
+    for (i = 1; i < num_args; i++) {
+        memcpy(ptr, va_arg(ap, char *), arg_len[i]);
+        ptr += arg_len[i];
+    }
+    *ptr = '\0';
+    va_end(ap);
+
+    return newp;
 }

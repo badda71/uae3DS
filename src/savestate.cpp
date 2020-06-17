@@ -54,6 +54,7 @@
 #include "audio.h"
 #include "m68k/m68k_intrf.h"
 #include "debug_uae4all.h"
+#include "uae3ds.h"
 
 #ifdef USE_LIB7Z
 #include "lib7z/lzma.h"
@@ -215,7 +216,6 @@ static void save_chunk_compressed (FILE *f, const uae_u8 *chunk, long len, const
 static uae_u8 *restore_chunk (FILE *f, char *name, long *len, long *filepos)
 {
     uae_u8 tmp[4], dummy[4], *mem, *src;
-    uae_u32 flags;
     long len2;
 
     /* chunk name */
@@ -234,7 +234,7 @@ static uae_u8 *restore_chunk (FILE *f, char *name, long *len, long *filepos)
     /* chunk flags */
     fread (tmp, 1, 4, f);
     src = tmp;
-    flags = restore_u32 ();
+    restore_u32 ();
 
     *filepos = ftell (f);
     /* chunk data.  RAM contents will be loaded during the reset phase,
@@ -408,6 +408,8 @@ void restore_state (const char *filename)
 	    end = restore_expansion (chunk);
 	else if (!strcmp (name, "ROM "))
 	    end = restore_rom (chunk);
+	else if (!strcmp (name, "KMAP"))
+		end = restore_keymap (chunk);
 	else
 	    write_log ("unknown chunk '%s' size %d bytes\n", name, len);
 	if (len != end - chunk)
@@ -641,7 +643,12 @@ void save_state (const char *filename, const char *description)
 #endif
     } while ((dst = save_rom (0, &len)));
 
-    gui_show_window_bar(9, 10, 0);
+	// save key mappings (3DS)
+	dst = (uae_u8*)uae3ds_mapping_savebuf();
+	save_chunk(f, dst, strlen((char*)dst)+1, "KMAP");
+	free(dst);
+	
+	gui_show_window_bar(9, 10, 0);
 #ifdef DEBUG_SAVESTATE
     puts("--> save END");fflush(stdout);
 #endif

@@ -12,6 +12,7 @@
 #include "disk.h"
 #include "uibottom.h"
 #include "keyboard.h"
+#include "uae3ds.h"
 
 extern int emulating;
 
@@ -326,39 +327,6 @@ int run_menuDfSel()
 #endif
 }
 
-char *stralloc(char *s) {
-	if (!s) return NULL;
-	char *p=(char*)malloc(strlen(s)+1);
-	if (!p) return NULL;
-	strcpy(p, s);
-	return p;
-}
-
-char *concat(char *s, ...) {
-	char *p, *ret;
-	if (!s) return NULL;
-	int l = strlen(s);
-
-	va_list vl;
-	va_start(vl,s);
-	while ((p = va_arg(vl, char*))!=NULL) {
-		l += strlen(p);
-	}
-	va_end(vl);
-
-	ret = (char*)malloc(l);
-	if (!ret) return NULL;
-	strcpy(ret, s);
-	l=strlen(ret);
-	va_start(vl,s);
-	while ((p = va_arg(vl, char*))!=NULL) {
-		strcpy(ret + l, p);
-		l += strlen(p);
-	}
-	va_end(vl);
-	return ret;
-}
-
 void menu_addFavImage(char *path)
 {
 	int num=0, i, i1;
@@ -405,7 +373,7 @@ void menu_load_favorites(char *s)
 
 char *menu_save_favorites()
 {
-	int l=0;
+	int l=1;
 	char *p;
 	for (int i=0; favorites[i]!=NULL; ++i)
 		l += strlen(favorites[i])+1;

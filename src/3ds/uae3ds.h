@@ -5,6 +5,7 @@
   *
   * Copyright 2020 Sebastian Weber
   */
+#include "3ds.h"
 
 typedef struct {
 	Handle mutex;
@@ -47,3 +48,6 @@ extern void uae3ds_mapping_list();
 extern void uae3ds_mapping_apply(SDL_Event *e);
 extern void uae3ds_mapping_loadbuf(char *s);
 extern char *uae3ds_mapping_savebuf();
+extern uae_u8 *restore_keymap (uae_u8 *src);
+extern char *stralloc(char *s);
+extern char *concat(char *s, ...);

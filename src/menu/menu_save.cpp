@@ -9,6 +9,7 @@
 
 #include "menu.h"
 #include "sysdeps.h"
+#include "config.h"
 #include "uae.h"
 #include "options.h"
 #include "sound.h"
@@ -307,15 +308,19 @@ int run_menuSave()
 			case SAVE_MENU_CASE_LOAD_MEM:
 				{
 				extern char uae4all_image_file[];
-				strcpy(savestate_filename,uae4all_image_file);
+				strcpy(savestate_filename, SAVESTATE_PREFIX);
+				strcat(savestate_filename, uae4all_image_file[0] ? uae4all_image_file : "null");
 				switch(saveMenu_n_savestate)
 				{
 					case 1:
 						strcat(savestate_filename,"-1.asf");
+						break;
 					case 2:
 						strcat(savestate_filename,"-2.asf");
+						break;
 					case 3:
 						strcat(savestate_filename,"-3.asf");
+						break;
 					default: 
 						strcat(savestate_filename,".asf");
 				}

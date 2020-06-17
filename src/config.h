@@ -110,5 +110,6 @@
 #define ROM_PATH_PREFIX "/3ds/uae3DS/"
 #define DATA_PREFIX "romfs:/"
 #define SAVE_PREFIX "/3ds/uae3DS/"
+#define SAVESTATE_PREFIX "/3ds/uae3DS/save/"
 
 #define CFG_FILE_NAME "uae.cfg"

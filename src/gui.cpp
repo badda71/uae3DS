@@ -287,16 +287,20 @@ int gui_update (void)
 // SE EJECUTA DESPUES DE INICIAR EL CORE 68k
     strcpy(changed_df[0],uae4all_image_file);
     strcpy(changed_df[1],uae4all_image_file2);
-    strcpy(savestate_filename,uae4all_image_file);
+	strcpy(savestate_filename, SAVESTATE_PREFIX);
+	strcat(savestate_filename, uae4all_image_file[0] ? uae4all_image_file : "null");
 #ifndef NO_SAVE_MENU
     switch(saveMenu_n_savestate)
     {
 	    case 1:
     		strcat(savestate_filename,"-1.asf");
+			break;
 	    case 2:
     		strcat(savestate_filename,"-2.asf");
+			break;
 	    case 3:
     		strcat(savestate_filename,"-3.asf");
+			break;
 	    default: 
     	   	strcat(savestate_filename,".asf");
     }
@@ -350,16 +354,20 @@ static void goMenu(void)
             	strcpy(changed_df[1],uae4all_image_file2);
 	    	real_changed_df[1]=1;
 	    }
-    	    strcpy(savestate_filename,uae4all_image_file);
+		strcpy(savestate_filename, SAVESTATE_PREFIX);
+		strcat(savestate_filename, uae4all_image_file[0] ? uae4all_image_file : "null");
 #ifndef NO_SAVE_MENU
 	    switch(saveMenu_n_savestate)
     	    {
 	    	case 1:
     			strcat(savestate_filename,"-1.asf");
+				break;
 	    	case 2:
     			strcat(savestate_filename,"-2.asf");
+				break;
 	    	case 3:
     			strcat(savestate_filename,"-3.asf");
+				break;
 	    	default: 
     	   		strcat(savestate_filename,".asf");
     	    }

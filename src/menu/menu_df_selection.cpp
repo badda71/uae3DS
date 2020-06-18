@@ -94,10 +94,7 @@ static void draw_dfMenu(enum DfMenuEntry c)
 		}
 		if (favorites[i]) {
 			if (dfMenu_fav==i && c == DF_MENU_ENTRY_FAV) {
-				if (flash)
-					write_text_pos_scroll(&ss2, 1, 1, col, row, width, strrchr(favorites[i],'/')+1);
-				else
-					write_text_pos_scroll(&ss2, 0, 1, col, row, width, strrchr(favorites[i],'/')+1);
+					write_text_pos_scroll(&ss2, flash ? 1 : 0, 1, col, row, width, strrchr(favorites[i],'/')+1);
 			} else {
 				snprintf(text,width+1,"%s",strrchr(favorites[i],'/')+1);
 				write_text_pos(col, row, text);

@@ -602,7 +602,7 @@ static void uib_statusbar_recalc()
 				strncpy(buf, show_message_str, 99);
 				SDL_FillRect(statusbar_img,
 					&(SDL_Rect){.x=0, .y=0, .w=td_text_length, .h=TD_TOTAL_HEIGHT}, 0x70708aff);			
-				write_text_full (statusbar_img, buf, 2, 2, (td_text_length-4)/8, ALIGN_LEFT, FONT_NORMAL, (SDL_Color){0x30,0x30,0x30,0});
+				write_text_full (statusbar_img, buf, 2, 2, (td_text_length-4)/8, ALIGN_LEFT, FONT_NORMAL, (SDL_Color){0x30,0x30,0x30,0}, 0);
 				upd=1;
 			}
 		} else {

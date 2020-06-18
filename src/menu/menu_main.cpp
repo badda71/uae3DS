@@ -20,7 +20,8 @@ extern int emulating;
 
 static const char *text_str_title="- UAE3DS v" VERSION3DS " by badda71";
 static const char *text_str_load="Load disk image (X)";
-static const char *text_str_save="Saved states (Y)";
+static const char *text_str_save1="Load state (Y)";
+static const char *text_str_save2="Save state";
 static const char *text_str_throttle="Throttle";
 static const char *text_str_frameskip="Frameskip";
 static const char *text_str_autosave="Save disks";
@@ -81,6 +82,7 @@ int mainMenu_sound=-1;
 int mainMenu_autosave=-1;
 int mainMenu_msens=2;
 int mainMenu_mappos=0;
+int mainMenu_savepos=0;
 
 int mainMenu_max_tap_time=250;
 int mainMenu_click_time=100;
@@ -111,10 +113,15 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	row+=8;
 	if(emulating)
 	{
-		if (c == MAIN_MENU_ENTRY_SAVED_STATES && flash)
-			write_text_inv_pos(col, row, text_str_save);
+		if (c == MAIN_MENU_ENTRY_SAVED_STATES && mainMenu_savepos==0 && flash)
+			write_text_inv_pos(col, row, text_str_save1);
 		else
-			write_text_pos(col, row, text_str_save);
+			write_text_pos(col, row, text_str_save1);
+
+		if (c == MAIN_MENU_ENTRY_SAVED_STATES && mainMenu_savepos==1 && flash)
+			write_text_inv_pos(col+16*8, row, text_str_save2);
+		else
+			write_text_pos(col+16*8, row, text_str_save2);	
 	}
 	row+=8;
 	write_text_pos(col, row, text_str_separator);
@@ -395,9 +402,10 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				return MAIN_MENU_ENTRY_RESET_EMULATION;
 			else if (load)
 				return MAIN_MENU_ENTRY_LOAD;
-			else if (toStates && emulating)
+			else if (toStates && emulating) {
+				mainMenu_savepos = 0;
 				return MAIN_MENU_ENTRY_SAVED_STATES;
-			else if (up)
+			} else if (up)
 			{
 				if (*sel > 0) *sel = (enum MainMenuEntry) ((*sel - 1) % MAIN_MENU_ENTRY_COUNT);
 				else *sel = (enum MainMenuEntry) (MAIN_MENU_ENTRY_COUNT - 1);
@@ -421,6 +429,12 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 			{
 				switch (*sel)
 				{
+					case MAIN_MENU_ENTRY_SAVED_STATES:
+						if (left || right)
+							mainMenu_savepos = (mainMenu_savepos + 1) % 2;
+						else if (activate)
+							return *sel;
+						break;
 					case MAIN_MENU_ENTRY_THROTTLE:
 						if (left)
 							mainMenu_throttle = (mainMenu_throttle > 0)
@@ -483,7 +497,6 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 						mainMenu_mappos = (mainMenu_mappos + 3) % 3;
 						break;
 					case MAIN_MENU_ENTRY_LOAD:
-					case MAIN_MENU_ENTRY_SAVED_STATES:
 					case MAIN_MENU_ENTRY_RESET_EMULATION:
 					case MAIN_MENU_ENTRY_RETURN_TO_EMULATION:
 					case MAIN_MENU_ENTRY_UPDATE:
@@ -537,6 +550,8 @@ static void unraise_mainMenu()
 
 int run_mainMenu()
 {
+	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+
 #if defined(AUTO_RUN) || defined(AUTO_FRAMERATE) || defined(AUTO_PROFILER)
 	return 1;
 #else
@@ -557,7 +572,7 @@ static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 		{
 			case MAIN_MENU_ENTRY_SAVED_STATES:
 #ifndef NO_SAVE_MENU
-				run_menuSave();
+				run_menuSave(mainMenu_savepos? MODE_SAVE : MODE_LOAD);
 				if (savestate_state == STATE_DORESTORE || savestate_state == STATE_DOSAVE)
 					return 1; /* leave, returning to the emulation */
 #endif
@@ -582,5 +597,6 @@ static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 		}
 	}
 #endif
+	SDL_EnableKeyRepeat(0, 0);
 }
 

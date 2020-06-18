@@ -50,6 +50,8 @@ Uint32 menu_msg_time=0x12345678;
 extern int __sdl_dc_emulate_keyboard;
 #endif
 
+SDL_Color text_color = (SDL_Color){0x30,0x30,0x30,0x00};
+
 static void obten_colores(void)
 {
 	FILE *f=fopen(DATA_PREFIX "colors.txt", "rt");
@@ -80,6 +82,8 @@ static void obten_colores(void)
 	menu_win0_color_base=menu_win0_color;
 	menu_win1_color_base=menu_win1_color;
 }
+
+
 
 /*
 void menu_raise(void)
@@ -222,7 +226,7 @@ void get_font_info(font_info *f, enum font_size size) {
 	}
 }
 
-void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, SDL_Color col) {
+void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, SDL_Color col, int inv) {
 	int xof, w;
 	if (str==NULL || str[0]==0) return;
 	font_info f;
@@ -241,6 +245,15 @@ void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchar
 			xof=x;
 	}
 
+	if (inv) {
+		SDL_Rect dest;
+		dest.x = xof - 2;
+		dest.y = y - 2;
+		dest.w = (strlen(str) * 8) + 4;
+		dest.h = 12;
+		SDL_FillRect(s, &dest, menu_inv_color);
+	}
+
 	int c;
 	SDL_SetPalette(f.img, SDL_LOGPAL, &col, 1, 1);
 	for (int i=0; i < w; i++) {
@@ -257,7 +270,7 @@ void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchar
 
 void _write_text_pos(SDL_Surface *sf, int x, int y, const char *str)
 {
-	write_text_full (sf, str, x, y, 0, ALIGN_LEFT, FONT_NORMAL, (SDL_Color){0x30,0x30,0x30,0});
+	write_text_full (sf, str, x, y, 0, ALIGN_LEFT, FONT_NORMAL, text_color, 0);
 }
 
 void write_text_pos(int x, int y, const char *str)
@@ -278,16 +291,7 @@ void write_text(int x, int y, const char *str)
 /* Write text, inverted: */
 void write_text_inv_pos(int x, int y, const char *str)
 {
-  SDL_Rect dest;
-  
-  dest.x = x - 2;
-  dest.y = y - 2;
-  dest.w = (strlen(str) * 8) + 4;
-  dest.h = 12;
-
-  SDL_FillRect(text_screen, &dest, menu_inv_color);
-
-  write_text_pos(x, y, str);
+  write_text_full (text_screen, str, x, y, 0, ALIGN_LEFT, FONT_NORMAL, text_color, 1);
 }
 
 void write_text_inv(int x, int y, const char *str)
@@ -619,4 +623,56 @@ int text_messagebox(char *title, char *message, mb_mode mode) {
 		frame = (frame + 1) % 6;
 	} while (1);
 	return 0;
+}
+
+static void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
+{
+    int bpp = surface->format->BytesPerPixel;
+    /* Here p is the address to the pixel we want to set */
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+    switch(bpp) {
+    case 1:
+        *p = pixel;
+        break;
+
+    case 2:
+        *(Uint16 *)p = pixel;
+        break;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+            p[0] = (pixel >> 16) & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = pixel & 0xff;
+        } else {
+            p[0] = pixel & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = (pixel >> 16) & 0xff;
+        }
+        break;
+
+    case 4:
+        *(Uint32 *)p = pixel;
+        break;
+    }
+}
+
+void draw_scrollbar(int x, int y, int w, int h, int total, int visible, int offset)
+{
+	int i;
+	Uint32 scrollbar_color = SDL_MapRGB(text_screen->format, 0x30, 0x30, 0x30);
+
+	// draw lines
+	for (i=1;i<w;++i) {
+		putpixel(text_screen, x+i, y, scrollbar_color);
+		putpixel(text_screen, x+i, y+h-1, scrollbar_color);
+	}
+	for (i=1;i<h-1;++i) {
+		putpixel(text_screen, x, y+i, scrollbar_color);
+		//putpixel(text_screen, x+w-1, y+i, scrollbar_color);
+	}
+	int by = y + (offset * h) / total;
+	int bh = (visible * h) / total;
+	SDL_FillRect(text_screen, &((SDL_Rect){x+1, by, w-1, bh}), scrollbar_color);
 }

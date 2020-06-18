@@ -121,6 +121,12 @@ void loadConfig()
 		*arg = '\0';
 		arg++;
 
+		int len = strlen(arg);
+		if(arg[len-1] == '\n')
+		{
+			arg[len-1] = '\0';
+		}
+
 		if(!strcmp(line, "THROTTLE"))
 			sscanf(arg, "%d", &mainMenu_throttle);
 		else if(!strcmp(line, "FRAMESKIP"))
@@ -133,19 +139,12 @@ void loadConfig()
 			sscanf(arg, "%d", &mainMenu_autosave);
 		else if(!strcmp(line, "LAST_DIR"))
 		{
-			int len = strlen(arg);
-
 			if(len == 0 || len > sizeof(last_directory) - 1)
 			{
 				continue;
 			}
-
-			if(arg[len-1] == '\n')
-			{
-				arg[len-1] = '\0';
-			}
-
 			strcpy(last_directory, arg);
+			chdir(last_directory);
 		}
 		else if(!strcmp(line, "MAX_TAP_TIME"))
 			sscanf(arg, "%d", &mainMenu_max_tap_time);
@@ -272,7 +271,7 @@ int gui_init (void)
 	//run_mainMenu();
 	SDL_Event e;
 	e.type = SDL_KEYDOWN;
-	e.key.keysym.sym = DS_SELECT;
+	e.key.keysym.sym = (SDLKey)DS_SELECT;
 	e.key.keysym.mod = KMOD_MODE; // not mappable
 	SDL_PushEvent(&e);
 	e.type = SDL_KEYUP;
@@ -331,13 +330,14 @@ int gui_init (void)
 
 int gui_update (void)
 {
-    extern char *savestate_filename;
+//    extern char *savestate_filename;
 #ifndef NO_SAVE_MENU
-    extern int saveMenu_n_savestate;
+//    extern int saveMenu_n_savestate;
 #endif
 // SE EJECUTA DESPUES DE INICIAR EL CORE 68k
     strcpy(changed_df[0],uae4all_image_file);
     strcpy(changed_df[1],uae4all_image_file2);
+/*
 	strcpy(savestate_filename, SAVESTATE_PREFIX);
 	strcat(savestate_filename, uae4all_image_file[0] ? uae4all_image_file : "null");
 #ifndef NO_SAVE_MENU
@@ -353,9 +353,10 @@ int gui_update (void)
     		strcat(savestate_filename,"-3.asf");
 			break;
 	    default: 
-    	   	strcat(savestate_filename,".asf");
+    	   	strcat(savestate_filename,"-0.asf");
     }
 #endif
+*/
     real_changed_df[0]=1;
     real_changed_df[1]=1;
     show_mhz();
@@ -389,11 +390,12 @@ static void goMenu(void)
    SDL_DC_EmulateKeyboard(SDL_FALSE);
 #endif
     getChanges();
+
     if (exitmode==1 || exitmode==2)
     {
-    	    extern char *savestate_filename;
+//    	    extern char *savestate_filename;
 #ifndef NO_SAVE_MENU
-    	    extern int saveMenu_n_savestate;
+//    	    extern int saveMenu_n_savestate;
 #endif
 	    if (strcmp(changed_df[0],uae4all_image_file))
 	    {
@@ -405,6 +407,7 @@ static void goMenu(void)
             	strcpy(changed_df[1],uae4all_image_file2);
 	    	real_changed_df[1]=1;
 	    }
+/*
 		strcpy(savestate_filename, SAVESTATE_PREFIX);
 		strcat(savestate_filename, uae4all_image_file[0] ? uae4all_image_file : "null");
 #ifndef NO_SAVE_MENU
@@ -420,10 +423,12 @@ static void goMenu(void)
     			strcat(savestate_filename,"-3.asf");
 				break;
 	    	default: 
-    	   		strcat(savestate_filename,".asf");
+    	   		strcat(savestate_filename,"-0.asf");
     	    }
 #endif
+*/
     }
+
     if (exitmode==2)
     {
 	    if (autosave!=mainMenu_autosave)
@@ -477,6 +482,7 @@ static void leftSuperThrottle(void)
 	}
 }
 
+/*
 static void inc_throttle(int sgn)
 {
 	char n[40];
@@ -501,8 +507,9 @@ static void inc_throttle(int sgn)
 	sprintf((char *)&n[0],"Throttle %i",mainMenu_throttle*20);
 	gui_set_message((char *)&n[0],1000);
 }
+*/
 
-static int in_goMenu=0;
+//static int in_goMenu=0;
 extern "C" void N3DS_SetScalingDirect(float x, float y, int permanent);
 
 void gui_handle_events (SDL_Event *e)

@@ -315,7 +315,7 @@ static int drive_insert (drive * drv, int dnum, const char *fname)
     drv->buffered_side = 2;	/* will force read */
     drive_fill_bigbuf (drv);
 
-	menu_addFavImage(fname);
+	menu_addFavImage((char*)fname);
 
     return 1;
 }
@@ -413,7 +413,6 @@ static void read_floppy_data (drive * drv, int track, int offset, unsigned char 
 #ifdef DEBUG_DISK
     dbgf("disc.c : read_floppy_data track %i len %i\n",track,len);
 #endif
-    unsigned i;
     trackid *ti;
 
     ti = &drv->trackdata[track];
@@ -1549,20 +1548,24 @@ uae_u8 *restore_disk(int num,uae_u8 *src)
     	drv->dskready = dskready;
     	drv->drive_id_scnt = drive_id_scnt;
     	drv->mfmpos = mfmpos;
-    	strncpy(changed_df[num],(char *)src,127);
-    	changed_df[num][127] = 0;
-	{
-		FILE *f=fopen(changed_df[num],"rb");
-		extern char uae4all_image_file[];
-		extern char uae4all_image_file2[];
-		if (f)
-		{
-			fclose(f);
+    	
+		if (access((char *)src, F_OK)==0) {
+			char *p=strrchr((char *)src, '/');
+			if (p) {
+				*p=0; p++;
+				chdir((char*)src);
+				extern char last_directory[PATH_MAX];
+				getcwd(last_directory, PATH_MAX);
+			} else p=(char*)src;
+			strncpy(changed_df[num],p,127);
+	    	changed_df[num][127] = 0;
+			extern char uae4all_image_file[];
+			extern char uae4all_image_file2[];
 			if (!num)
 			{
 				if (strcmp(uae4all_image_file,changed_df[0]))
 				{
-    					strcpy(uae4all_image_file,changed_df[0]);
+    				strcpy(uae4all_image_file,changed_df[0]);
 					real_changed_df[num] = 1;
 				}
 			}
@@ -1575,7 +1578,6 @@ uae_u8 *restore_disk(int num,uae_u8 *src)
 				}
 			}
 		}
-	}
     }
     else
     {
@@ -1597,7 +1599,9 @@ uae_u8 *save_disk(int num,int *len)
     dstbak = dst = (uae_u8 *)malloc (2+1+1+1+1+4+4+256);
     if (num<NUM_DRIVES)
     {
-    	drv = &floppy[num];
+		extern char uae4all_image_file[];
+		extern char uae4all_image_file2[];
+		drv = &floppy[num];
     	save_u32 (drv->drive_id);	    /* drive type ID */
     	save_u8 ((drv->motoroff ? 0:1) | ((disabled & (1 << num)) ? 2 : 0));  /* state */
     	save_u8 (drv->cyl);		    /* cylinder */
@@ -1605,7 +1609,11 @@ uae_u8 *save_disk(int num,int *len)
     	save_u8 (drv->drive_id_scnt);   /* id mode position */
     	save_u32 (drv->mfmpos);	    /* disk position */
     	save_u32 (0);		    /* CRC of disk image */
-    	strcpy ((char *)dst, prefs_df[num]);/* image name */
+    	char *p=num ? uae4all_image_file2 : uae4all_image_file;
+		if (p && *p) {
+			getcwd((char *)dst, 256);
+			snprintf((char *)dst + strlen((char *)dst), 256 - strlen((char *)dst), "%s", p);
+		} else strcpy((char *)dst, "");
     }
     else
     {

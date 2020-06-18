@@ -19,6 +19,11 @@ extern SDL_Surface *prSDLScreen;
 #define MENU_DIR_DEFAULT "."
 #endif
 
+enum SaveMode {
+	MODE_SAVE,
+	MODE_LOAD
+};
+
 enum DiskOrder
 {
 	DF_0,
@@ -69,9 +74,10 @@ void _write_num(SDL_Surface *sf, int x, int y, int v);
 void _write_num_inv(SDL_Surface *sf, int x, int y, int v);
 void _text_draw_window(SDL_Surface *sf, int x, int y, int w, int h, const char *title);
 void _text_draw_window_bar(SDL_Surface *sf, int x, int y, int w, int h, int per, int max, const char *title);
-void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, SDL_Color col);
+void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, SDL_Color col, int inv);
 int text_messagebox(char *title, char *text, mb_mode mode);
 void write_text_pos_scroll(Scrollstatus *ss, int invers, int nr, ... );
+void draw_scrollbar(int x, int y, int w, int h, int total, int visible, int offset);
 
 // void text_draw_menu_msg();
 void text_flip(void);
@@ -91,7 +97,7 @@ void drawPleaseWait(void);
 int run_mainMenu();
 int run_menuDfSel();
 int run_menuLoad(enum DiskOrder new_df_num);
-int run_menuSave();
+int run_menuSave(SaveMode m);
 int run_menuGame();
 int run_menuControl();
 

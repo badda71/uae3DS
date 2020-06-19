@@ -74,7 +74,7 @@ char uae4all_image_file2[128];
 
 int drawfinished=0;
 
-extern int mainMenu_throttle, mainMenu_frameskip, mainMenu_sound, mainMenu_case, mainMenu_autosave, mainMenu_vpos;
+extern int mainMenu_throttle, mainMenu_frameskip, mainMenu_case, mainMenu_autosave, mainMenu_vpos;
 
 int emulated_left=0;
 int emulated_right=0;
@@ -132,8 +132,6 @@ void loadConfig()
 			sscanf(arg, "%d", &mainMenu_frameskip);
 		else if(!strcmp(line, "SCREEN_POS"))
 			sscanf(arg, "%d", &mainMenu_vpos);
-		else if(!strcmp(line, "SOUND"))
-			sscanf(arg, "%d", &mainMenu_sound);
 		else if(!strcmp(line, "SAVE_DISKS"))
 			sscanf(arg, "%d", &mainMenu_autosave);
 		else if(!strcmp(line, "LAST_DIR"))
@@ -198,7 +196,6 @@ void storeConfig()
 		"THROTTLE %d\n"
 		"FRAMESKIP %d\n"
 		"SCREEN_POS %d\n"
-		"SOUND %d\n"
 		"SAVE_DISKS %d\n"
 		"MAX_TAP_TIME %d\n"
 		"CLICK_TIME %d\n"
@@ -212,7 +209,6 @@ void storeConfig()
 		mainMenu_throttle,
 		mainMenu_frameskip,
 		mainMenu_vpos,
-		mainMenu_sound,
 		mainMenu_autosave,
 		mainMenu_max_tap_time,
 		mainMenu_click_time,
@@ -238,15 +234,8 @@ void storeConfig()
 static void getChanges(void)
 {
     m68k_speed=mainMenu_throttle;
-#ifndef NO_SOUND
-    if (mainMenu_sound)
-    {
-	    changed_produce_sound=2;
-	    sound_default_evtime();
-    }
-    else
-#endif
-	    changed_produce_sound=0;
+	changed_produce_sound=2;
+	sound_default_evtime();
     changed_gfx_framerate=mainMenu_frameskip;
     init_hz();
 }

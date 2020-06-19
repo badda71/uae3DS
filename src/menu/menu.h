@@ -105,7 +105,6 @@ int run_menuControl();
 extern int mainMenu_vpos;
 extern int mainMenu_throttle;
 extern int mainMenu_frameskip;
-extern int mainMenu_sound;
 extern int mainMenu_autosave;
 extern int mainMenu_msens;
 extern int mainMenu_mappos;

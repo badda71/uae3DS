@@ -45,7 +45,6 @@ static const char *text_str_3="3";
 static const char *text_str_4="4";
 static const char *text_str_5="5";
 static const char *text_str_auto="auto";
-static const char *text_str_sound="Sound";
 static const char *text_str_on="on";
 static const char *text_str_off="off";
 static const char *text_str_separator="------------------------------";
@@ -61,7 +60,6 @@ enum MainMenuEntry {
 	MAIN_MENU_ENTRY_THROTTLE,
 	MAIN_MENU_ENTRY_FRAMESKIP,
 	MAIN_MENU_ENTRY_SCREEN_POSITION,
-	MAIN_MENU_ENTRY_SOUND,
 	MAIN_MENU_ENTRY_SAVE_DISKS,
 	MAIN_MENU_ENTRY_MOUSE_SENSITIVITY,
 	MAIN_MENU_ENTRY_KEYMAP,
@@ -75,7 +73,6 @@ enum MainMenuEntry {
 int mainMenu_vpos=0;
 int mainMenu_throttle=0;
 int mainMenu_frameskip=-1;
-int mainMenu_sound=-1;
 int mainMenu_autosave=-1;
 int mainMenu_msens=2;
 int mainMenu_mappos=0;
@@ -95,12 +92,12 @@ static void draw_mainMenu(enum MainMenuEntry c)
 {
 	static int frame = 0;
 	int flash = frame / 3;
-	int row = 3*8, col = 10*8;
+	int row = 4*8, col = 10*8;
 		
 	int column = 0;
 
 	text_draw_background();
-	text_draw_window(72,20,260,200,text_str_title);
+	text_draw_window(72,28,260,184,text_str_title);
 
 	if (c == MAIN_MENU_ENTRY_LOAD && flash)
 		write_text_inv_pos(col, row, text_str_load);
@@ -233,21 +230,6 @@ static void draw_mainMenu(enum MainMenuEntry c)
 		write_text_inv_pos(column, row, text_str_40);
 	else
 		write_text_pos(column, row, text_str_40);
-
-	row += 12;
-
-	write_text_pos(col, row, text_str_sound);
-	column = col+11*8;
-
-	if (!mainMenu_sound && (c != MAIN_MENU_ENTRY_SOUND || flash))
-		write_text_inv_pos(column, row, text_str_off);
-	else
-		write_text_pos(column, row, text_str_off);
-	column += 8*(strlen(text_str_off) + 2);
-	if (mainMenu_sound && (c != MAIN_MENU_ENTRY_SOUND || flash))
-		write_text_inv_pos(column, row, text_str_on);
-	else
-		write_text_pos(column, row, text_str_on);
 
 	row += 12;
 
@@ -439,10 +421,6 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 								: 5;
 						else if (right)
 							mainMenu_vpos = (mainMenu_vpos + 1) % 6;
-						break;
-					case MAIN_MENU_ENTRY_SOUND:
-						if (left || right)
-							mainMenu_sound = ~mainMenu_sound;
 						break;
 					case MAIN_MENU_ENTRY_SAVE_DISKS:
 						if (left || right)

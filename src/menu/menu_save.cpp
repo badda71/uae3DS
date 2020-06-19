@@ -225,7 +225,7 @@ static inline void draw_saveMenu(int c)
 static inline int key_saveMenu(int *cp)
 {
 	int c=(*cp);
-	int end=0;
+	int i,end=0;
 	int left=0, right=0, up=0, down=0;
 	int hit0=0, hit1=0, hit2=0, hit3=0, hit4=0, hit5=0;
 	SDL_Event event;
@@ -267,13 +267,9 @@ static inline int key_saveMenu(int *cp)
 				case AK_SPC:
 				case DS_START:
 				case DS_A: hit0=1; break;
-				case DS_R:
-				case AK_R: hit3=1; break;
-				case DS_L:
-				case AK_L: hit2=1; break;
-				case AK_X:
+				case DS_R: hit3=1; break;
+				case DS_L: hit2=1; break;
 				case DS_X: hit5=1; break;
-				case AK_Y:
 				case DS_Y: hit4=1; break;
 				case AK_ESC:
 				case DS_B: hit1=1; break;
@@ -326,7 +322,6 @@ static inline int key_saveMenu(int *cp)
 					if (c < 0) c=nrfiles-1;
 					if (c >= nrfiles) c=0;
 					saveMenu_n_savestate = saveMenu_n_savestate_real;
-					adjustSavestate(c);
 				}
 			}
 			else if (left || right)
@@ -337,6 +332,13 @@ static inline int key_saveMenu(int *cp)
 					mode != MODE_SAVE &&
 					(((*files)[c].snaps & (1 << saveMenu_n_savestate)) == 0));
 				saveMenu_n_savestate_real = saveMenu_n_savestate;
+			}
+			else if ((*buf=amiga2ascii(event.key.keysym.sym))!=0) {
+				for(i=0;i<nrfiles;++i) {
+					if(strncasecmp((*files)[i].name,buf,1)>=0)
+						break;
+				}
+				c=i;
 			}
 		}
 	}

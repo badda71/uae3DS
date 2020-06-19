@@ -41,6 +41,8 @@
   * set savestate_state = STATE_DORESTORE, savestate_filename = "..."
   *
   */
+#include <png.h>
+
 #include "sysconfig.h"
 #include "uae.h"
 #include "sysdeps.h"
@@ -660,6 +662,22 @@ void save_state (const char *filename, const char *description)
     sync();
 #endif
     gui_show_window_bar(10, 10, 0);
+
+	// save a screenshot
+	char *buf=(char*)header;
+	strncpy(buf,filename,sizeof(header)-5);
+	char *p=strrchr(buf,'.');
+	if (p) *p=0;
+	strcat(buf,".png");
+
+	extern SDL_Surface *scr_backup;
+	png_image image = {0};
+	image.version = PNG_IMAGE_VERSION;
+	image.width = scr_backup->w;
+	image.height = scr_backup->h;
+	image.format = PNG_FORMAT_RGBA;
+	png_image_write_to_file(&image, buf, 0, scr_backup->pixels, 0, NULL);
+
     clear_events();
     notice_screen_contents_lost();
 #ifdef DEBUG_SAVESTATE

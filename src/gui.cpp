@@ -69,7 +69,6 @@ extern int keycode2amiga(SDL_keysym *prKeySym);
 extern int uae4all_keystate[];
 
 int emulated_mouse_speed=4;
-int emulating=0;
 char uae4all_image_file[128];
 char uae4all_image_file2[128];
 
@@ -262,7 +261,6 @@ int gui_init (void)
     SDL_JoystickOpen(0);
     if (prSDLScreen!=NULL)
     {
-	emulating=0;
 	uae4all_image_file[0]=0;
 	uae4all_image_file2[0]=0;
 	init_text(1);
@@ -279,7 +277,6 @@ int gui_init (void)
 
 	quit_text();
 	uae4all_pause_music();
-	emulating=1;
 	getChanges();
 	check_all_prefs();
 	reset_frameskip();
@@ -363,6 +360,7 @@ int gui_update (void)
     return 0;
 }
 
+SDL_Surface *scr_backup = NULL;
 
 static void goMenu(void)
 {
@@ -370,13 +368,17 @@ static void goMenu(void)
    int autosave=mainMenu_autosave;
    if (quit_program != 0)
 	    return;
+
+	if (!scr_backup)
+		scr_backup = SDL_CreateRGBSurface(SDL_SWSURFACE, 320, 240, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+	SDL_BlitSurface(prSDLScreen, &(SDL_Rect){40,0,320,240}, scr_backup, NULL);
+
 #ifdef PROFILER_UAE4ALL
    uae4all_prof_show();
 #endif
 #ifdef DEBUG_FRAMERATE
    uae4all_show_time();
 #endif
-   emulating=1;
    init_text(0);
    pause_sound();
    menu_raise();

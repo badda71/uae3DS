@@ -67,6 +67,7 @@ void text_draw_window(int x, int y, int w, int h, const char *title);
 void text_draw_barra(int x, int y, int w, int h, int per, int max);
 void text_draw_window_bar(int x, int y, int w, int h, int per, int max, const char *title);
 void _write_text(SDL_Surface *sf, int x, int y, const char *str);
+void _write_text_pos(SDL_Surface *sf, int x, int y, const char *str);
 void _write_text_inv(SDL_Surface *sf, int x, int y, const char *str);
 void _write_text_inv_n(SDL_Surface *sf, int x, int y, int n, const char *str);
 void _write_centered_text(SDL_Surface *sf, int y, char * str);
@@ -74,7 +75,7 @@ void _write_num(SDL_Surface *sf, int x, int y, int v);
 void _write_num_inv(SDL_Surface *sf, int x, int y, int v);
 void _text_draw_window(SDL_Surface *sf, int x, int y, int w, int h, const char *title);
 void _text_draw_window_bar(SDL_Surface *sf, int x, int y, int w, int h, int per, int max, const char *title);
-void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, SDL_Color col, int inv);
+void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, Uint32 col, int inv);
 int text_messagebox(char *title, char *text, mb_mode mode);
 void write_text_pos_scroll(Scrollstatus *ss, int invers, int nr, ... );
 void draw_scrollbar(int x, int y, int w, int h, int total, int visible, int offset);
@@ -115,3 +116,13 @@ extern int mainMenu_max_double_tap_time;
 extern int mainMenu_locked_drag_timeout;
 extern int mainMenu_tap_and_drag_gesture;
 extern int mainMenu_locked_drags;
+
+extern Uint32 menu_text_color;			// text
+extern Uint32 menu_text_color_inactive;	// inactive text
+extern Uint32 menu_inv_color;			// blink text underlay
+extern Uint32 menu_inv2_color;			// light text underlay (almost like background)
+extern Uint32 menu_win0_color;			// window dropshadow
+extern Uint32 menu_win1_color;			// window frame
+
+extern void menu_set_text_color(Uint32 c);
+extern void menu_restore_text_color();

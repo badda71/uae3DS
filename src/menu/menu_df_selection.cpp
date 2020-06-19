@@ -14,8 +14,6 @@
 #include "keyboard.h"
 #include "uae3ds.h"
 
-extern int emulating;
-
 static const char *text_str_title_df_menu="Select disk";
 static const char *text_str_load_df0="DF0 image (X)";
 static const char *text_str_load_df1="DF1 image (Y)";

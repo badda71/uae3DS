@@ -36,10 +36,6 @@ void reinit_sdcard(void);
 
 SDL_Surface *text_screen=NULL, *text_image, *text_background, *text_window_background;
 
-static Uint32 menu_inv_color2=0, menu_inv_color=0, menu_win0_color=0, menu_win1_color=0;
-static Uint32 menu_barra0_color=0, menu_barra1_color=0;
-static Uint32 menu_win0_color_base=0, menu_win1_color_base=0;
-
 void write_text_pos(int x, int y, const char* str);
 void write_num(int x, int y, int v);
 int menu_msg_pos=330;
@@ -50,40 +46,26 @@ Uint32 menu_msg_time=0x12345678;
 extern int __sdl_dc_emulate_keyboard;
 #endif
 
-SDL_Color text_color = (SDL_Color){0x30,0x30,0x30,0x00};
+Uint32 menu_text_color=0;			// text
+Uint32 menu_text_color_inactive=0;	// inactive text
+Uint32 menu_inv_color=0;			// dark text underlay
+Uint32 menu_inv2_color=0;			// light text underlay (almost like background)
+Uint32 menu_win0_color=0;			// window dropshadow
+Uint32 menu_win1_color=0;			// window frame
+Uint32 menu_barra0_color=0;			// progress bar color 0
+Uint32 menu_barra1_color=0;			// progress bar color 1
 
 static void obten_colores(void)
 {
-	FILE *f=fopen(DATA_PREFIX "colors.txt", "rt");
-	if (f)
-	{
-		Uint32 r,g,b;
-		fscanf(f,"menu_inv_color=0x%X,0x%X,0x%X\n",&r,&g,&b);
-		menu_inv_color=SDL_MapRGB(text_screen->format,r,g,b);
-		fscanf(f,"menu_win0_color=0x%X,0x%X,0x%X\n",&r,&g,&b);
-		menu_win0_color=SDL_MapRGB(text_screen->format,r,g,b);
-		fscanf(f,"menu_win1_color=0x%X,0x%X,0x%X\n",&r,&g,&b);
-		menu_win1_color=SDL_MapRGB(text_screen->format,r,g,b);
-		fscanf(f,"menu_barra0_color=0x%X,0x%X,0x%X\n",&r,&g,&b);
-		menu_barra0_color=SDL_MapRGB(text_screen->format,r,g,b);
-		fscanf(f,"menu_barra1_color=0x%X,0x%X,0x%X\n",&r,&g,&b);
-		menu_barra1_color=SDL_MapRGB(text_screen->format,r,g,b);
-		fclose(f);
-	}
-	else
-	{
-		menu_inv_color=SDL_MapRGB(text_screen->format, 0x20, 0x20, 0x40);
-		menu_win0_color=SDL_MapRGB(text_screen->format, 0x10, 0x08, 0x08);
-		menu_win1_color=SDL_MapRGB(text_screen->format, 0x20, 0x10, 0x10);
-		menu_barra0_color=SDL_MapRGB(text_screen->format, 0x30, 0x20, 0x20);
-		menu_barra1_color=SDL_MapRGB(text_screen->format, 0x50, 0x40, 0x40);
-	}
-	menu_inv_color2=SDL_MapRGB(text_screen->format, 0x70, 0x70, 0x8a);
-	menu_win0_color_base=menu_win0_color;
-	menu_win1_color_base=menu_win1_color;
+	menu_text_color=SDL_MapRGB(text_screen->format, 0x30, 0x30, 0x30);
+	menu_text_color_inactive=SDL_MapRGB(text_screen->format, 0x80, 0x80, 0x80);
+	menu_inv_color=SDL_MapRGB(text_screen->format, 0x9a, 0x9a, 0xaa);
+	menu_inv2_color=SDL_MapRGB(text_screen->format, 0xce, 0xcf, 0xce);
+	menu_win0_color=SDL_MapRGB(text_screen->format, 0x20, 0x20, 0x30);
+	menu_win1_color=SDL_MapRGB(text_screen->format, 0x70, 0x70, 0x80);
+	menu_barra0_color=SDL_MapRGB(text_screen->format, 0x40, 0x40, 0x50);
+	menu_barra1_color=SDL_MapRGB(text_screen->format, 0x80, 0x80, 0x90);
 }
-
-
 
 /*
 void menu_raise(void)
@@ -226,7 +208,7 @@ void get_font_info(font_info *f, enum font_size size) {
 	}
 }
 
-void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, SDL_Color col, int inv) {
+void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchars, enum str_alignment align, enum font_size size, Uint32 col, int inv) {
 	int xof, w;
 	if (str==NULL || str[0]==0) return;
 	font_info f;
@@ -255,7 +237,9 @@ void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchar
 	}
 
 	int c;
-	SDL_SetPalette(f.img, SDL_LOGPAL, &col, 1, 1);
+	SDL_Color scol;
+	SDL_GetRGB(col, text_screen->format, &(scol.r), &(scol.g), &(scol.b));
+	SDL_SetPalette(f.img, SDL_LOGPAL, &scol, 1, 1);
 	for (int i=0; i < w; i++) {
 		c=(str[i] & 0x7f)-32;
 		if (c<0) c=0;
@@ -270,7 +254,7 @@ void write_text_full (SDL_Surface *s, const char *str, int x, int y, int maxchar
 
 void _write_text_pos(SDL_Surface *sf, int x, int y, const char *str)
 {
-	write_text_full (sf, str, x, y, 0, ALIGN_LEFT, FONT_NORMAL, text_color, 0);
+	write_text_full (sf, str, x, y, 0, ALIGN_LEFT, FONT_NORMAL, menu_text_color, 0);
 }
 
 void write_text_pos(int x, int y, const char *str)
@@ -291,7 +275,7 @@ void write_text(int x, int y, const char *str)
 /* Write text, inverted: */
 void write_text_inv_pos(int x, int y, const char *str)
 {
-  write_text_full (text_screen, str, x, y, 0, ALIGN_LEFT, FONT_NORMAL, text_color, 1);
+  write_text_full (text_screen, str, x, y, 0, ALIGN_LEFT, FONT_NORMAL, menu_text_color, 1);
 }
 
 void write_text_inv(int x, int y, const char *str)
@@ -675,4 +659,17 @@ void draw_scrollbar(int x, int y, int w, int h, int total, int visible, int offs
 	int by = y + (offset * h) / total;
 	int bh = (visible * h) / total;
 	SDL_FillRect(text_screen, &((SDL_Rect){x+1, by, w-1, bh}), scrollbar_color);
+}
+
+static Uint32 backup_col;
+
+void menu_set_text_color(Uint32 c)
+{
+	backup_col = menu_text_color;
+	menu_text_color = c;
+}
+
+extern void menu_restore_text_color()
+{
+	menu_text_color = backup_col;
 }

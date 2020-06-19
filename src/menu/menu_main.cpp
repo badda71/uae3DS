@@ -16,8 +16,6 @@
 #include "update.h"
 #include "uae3ds.h"
 
-extern int emulating;
-
 static const char *text_str_title="- UAE3DS v" VERSION3DS " by badda71";
 static const char *text_str_load="Load disk image (X)";
 static const char *text_str_save1="Load state (Y)";
@@ -51,7 +49,6 @@ static const char *text_str_sound="Sound";
 static const char *text_str_on="on";
 static const char *text_str_off="off";
 static const char *text_str_separator="------------------------------";
-static const char *text_str_start="Start Amiga (R)";
 static const char *text_str_reset="Reset Amiga (R)";
 static const char *text_str_return="Return to Amiga (B)";
 static const char *text_str_update="Check for Updates";
@@ -92,6 +89,8 @@ int mainMenu_locked_drag_timeout=5000;
 int mainMenu_tap_and_drag_gesture=1;
 int mainMenu_locked_drags=0;
 
+static int save_ok=0;
+
 static void draw_mainMenu(enum MainMenuEntry c)
 {
 	static int frame = 0;
@@ -111,18 +110,18 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	row+=8;
 	write_text_pos(col, row, text_str_separator);
 	row+=8;
-	if(emulating)
-	{
-		if (c == MAIN_MENU_ENTRY_SAVED_STATES && mainMenu_savepos==0 && flash)
-			write_text_inv_pos(col, row, text_str_save1);
-		else
-			write_text_pos(col, row, text_str_save1);
+	if (!save_ok) mainMenu_savepos=0;
+	if (c == MAIN_MENU_ENTRY_SAVED_STATES && mainMenu_savepos==0 && flash)
+		write_text_inv_pos(col, row, text_str_save1);
+	else
+		write_text_pos(col, row, text_str_save1);
 
-		if (c == MAIN_MENU_ENTRY_SAVED_STATES && mainMenu_savepos==1 && flash)
-			write_text_inv_pos(col+16*8, row, text_str_save2);
-		else
-			write_text_pos(col+16*8, row, text_str_save2);	
-	}
+	if (!save_ok) menu_set_text_color(menu_text_color_inactive);
+	if (c == MAIN_MENU_ENTRY_SAVED_STATES && mainMenu_savepos==1 && flash)
+		write_text_inv_pos(col+16*8, row, text_str_save2);
+	else
+		write_text_pos(col+16*8, row, text_str_save2);
+	if (!save_ok) menu_restore_text_color();
 	row+=8;
 	write_text_pos(col, row, text_str_separator);
 	row+=8;
@@ -313,24 +312,15 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	row+=8;
 
 	if (c == MAIN_MENU_ENTRY_RESET_EMULATION && flash)
-		if(emulating)
-			write_text_inv_pos(col, row, text_str_reset);
-		else
-			write_text_inv_pos(col, row, text_str_start);
+		write_text_inv_pos(col, row, text_str_reset);
 	else
-		if(emulating)
-			write_text_pos(col, row, text_str_reset);
-		else
-			write_text_pos(col, row, text_str_start);
+		write_text_pos(col, row, text_str_reset);
 
 	row += 12;
-	if(emulating)
-	{
-		if (c == MAIN_MENU_ENTRY_RETURN_TO_EMULATION && flash)
-			write_text_inv_pos(col, row, text_str_return);
-		else
-			write_text_pos(col, row, text_str_return);
-	}
+	if (c == MAIN_MENU_ENTRY_RETURN_TO_EMULATION && flash)
+		write_text_inv_pos(col, row, text_str_return);
+	else
+		write_text_pos(col, row, text_str_return);
 	
 	row += 8;
 	write_text_pos(col, row, text_str_separator);
@@ -396,34 +386,23 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				case AK_ESC:
 				case DS_B: cancel = 1; break;
 			}
-			if (cancel && emulating)
+			if (cancel)
 				return MAIN_MENU_ENTRY_RETURN_TO_EMULATION;
 			else if (reset)
 				return MAIN_MENU_ENTRY_RESET_EMULATION;
 			else if (load)
 				return MAIN_MENU_ENTRY_LOAD;
-			else if (toStates && emulating) {
+			else if (toStates) {
 				mainMenu_savepos = 0;
 				return MAIN_MENU_ENTRY_SAVED_STATES;
 			} else if (up)
 			{
 				if (*sel > 0) *sel = (enum MainMenuEntry) ((*sel - 1) % MAIN_MENU_ENTRY_COUNT);
 				else *sel = (enum MainMenuEntry) (MAIN_MENU_ENTRY_COUNT - 1);
-
-				if(!emulating && (*sel == MAIN_MENU_ENTRY_SAVED_STATES || *sel == MAIN_MENU_ENTRY_RETURN_TO_EMULATION))
-				{
-					if (*sel > 0) *sel = (enum MainMenuEntry) ((*sel - 1) % MAIN_MENU_ENTRY_COUNT);
-					else *sel = (enum MainMenuEntry) (MAIN_MENU_ENTRY_COUNT - 1);
-				}
 			}
 			else if (down)
 			{
 				*sel = (enum MainMenuEntry) ((*sel + 1) % MAIN_MENU_ENTRY_COUNT);
-
-				if(!emulating && (*sel == MAIN_MENU_ENTRY_SAVED_STATES || *sel == MAIN_MENU_ENTRY_RETURN_TO_EMULATION))
-				{
-					*sel = (enum MainMenuEntry) ((*sel + 1) % MAIN_MENU_ENTRY_COUNT);
-				}
 			}
 			else
 			{
@@ -431,7 +410,7 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 				{
 					case MAIN_MENU_ENTRY_SAVED_STATES:
 						if (left || right)
-							mainMenu_savepos = (mainMenu_savepos + 1) % 2;
+							mainMenu_savepos = save_ok ? ((mainMenu_savepos + 1) % 2) : 0;
 						else if (activate)
 							return *sel;
 						break;
@@ -557,9 +536,12 @@ int run_mainMenu()
 #else
 static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 
+	extern char uae4all_image_file[];
+
 	while (1)
 	{
 		enum MainMenuEntry action = MAIN_MENU_ENTRY_NONE;
+		save_ok = uae4all_image_file[0] ? 1 : 0;
 		raise_mainMenu();
 		while (action == MAIN_MENU_ENTRY_NONE)
 		{
@@ -581,8 +563,7 @@ static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 				run_menuDfSel();
 				break;
 			case MAIN_MENU_ENTRY_RESET_EMULATION:
-				if (emulating)
-					return 2; /* leave, resetting */
+				return 2; /* leave, resetting */
 				/* Fall through */
 			case MAIN_MENU_ENTRY_RETURN_TO_EMULATION:
 				return 1; /* leave, returning to the emulation */
@@ -599,4 +580,3 @@ static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 #endif
 	SDL_EnableKeyRepeat(0, 0);
 }
-

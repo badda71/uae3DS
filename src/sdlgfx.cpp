@@ -330,7 +330,9 @@ static void graphics_subshutdown (void)
     dbg("Function: graphics_subshutdown");
 #endif
 
-    SDL_FreeSurface(prSDLScreen);
+    extern SDL_Surface *scr_backup;
+	if (scr_backup) SDL_FreeSurface(scr_backup);
+	SDL_FreeSurface(prSDLScreen);
 }
 
 void graphics_leave (void)

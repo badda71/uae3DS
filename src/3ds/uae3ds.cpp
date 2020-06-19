@@ -288,10 +288,12 @@ void uae3ds_mapping_apply(SDL_Event *e)
 	sym = e->key.keysym.sym;
 	if (!keymaps[sym][0]) return;
 	e->key.keysym.sym = (SDLKey)keymaps[sym][0];
+	e->key.keysym.mod = KMOD_MODE; // not mappable
 	if (!keymaps[sym][1]) return;
 	SDL_Event e1;
 	e1.type = e->type;
 	e1.key.keysym.sym = (SDLKey)keymaps[sym][1];
+	e1.key.keysym.mod = KMOD_MODE; // not mappable
 	SDL_PushEvent(&e1);
 }
 

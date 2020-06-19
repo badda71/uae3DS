@@ -61,8 +61,7 @@ enum {
 	SAVE_MENU_CASE_EXIT,
 	SAVE_MENU_CASE_LOAD_MEM,
 	SAVE_MENU_CASE_SAVE_MEM,
-	SAVE_MENU_CASE_LOAD_VMU,
-	SAVE_MENU_CASE_SAVE_VMU,
+	SAVE_MENU_CASE_DEL_MEM,
 	SAVE_MENU_CASE_CANCEL };
 
 static u8 noimg[]={
@@ -118,6 +117,19 @@ static SDL_Surface *getThumb(char *ssname, int idx)
 	return r;
 }
 
+static void adjustSavestate(int c) {
+	int d=0;
+	while (
+		(saveMenu_n_savestate < 0 ||
+		saveMenu_n_savestate >= NUM_SS ||
+		((*files)[c].snaps & (1 << saveMenu_n_savestate)) == 0) &&
+		abs(d) < NUM_SS)
+	{
+		d=(-1*d)+(d>0?-1:1);
+		saveMenu_n_savestate += d;
+	}
+}
+
 static inline void draw_saveMenu(int c)
 {
 	static int b=0;
@@ -136,9 +148,13 @@ static inline void draw_saveMenu(int c)
 	text_draw_background();
 	text_draw_window(192-width*4, 112-height*4, (width+2)*8, (height+2)*8, text_str_title);
 
-	// adjust offest if needed
+	// adjust c, offset & savestate if needed
+	if (c<0) c==0;
+	if (c>=nrfiles) c=nrfiles-1;
 	if (c >= offset + lines) offset = c+1-lines;
 	if (c < offset) offset = c;
+	if (mode==MODE_LOAD) adjustSavestate(c);
+
 	// adjust thumbnail positions
 	if (old_offset != offset) {
 		int shft = (offset - old_offset) * NUM_SS;
@@ -182,7 +198,7 @@ static inline void draw_saveMenu(int c)
 				SDL_FillRect(text_screen, &(SDL_Rect){(Sint16)(col+5+x*90), (Sint16)row, 80, 60}, menu_inv2_color);
 			}
 			Uint32 back1, back2;
-			buf[1]=x+'0';
+			buf[1]=x+'1';
 			if (!((*files)[i].snaps & (1<<x))) {
 				back1 = menu_text_color;
 				menu_text_color = menu_text_color_inactive;
@@ -198,44 +214,12 @@ static inline void draw_saveMenu(int c)
 			if (!((*files)[i].snaps & (1<<x))) {
 				menu_text_color = back1;
 			}
-
-
-/*			
-			extern SDL_Color text_color;
-			char buf[2]={0};
-			SDL_Color back;
-			buf[0]=x+'0';
-			if (!((*files)[i].snaps & (1<<x))) {
-				back = text_color;
-				text_color = (SDL_Color){0x80,0x80,0x80,0x00};
-			}
-			if (saveMenu_n_savestate==x && c==i+1 && bb)
-				write_text_inv_pos(col+(2+x*2)*8,row,buf);
-			else
-				write_text_pos(col+(2+x*2)*8,row,buf);
-			if (!((*files)[i].snaps & (1<<x))) {
-				text_color = back;
-			}
-*/
 		}
 		row+=63;
 	}
 
 	text_flip();
 	b++;
-}
-
-static void adjustSavestate(int c) {
-	int d=0;
-	while (
-		(saveMenu_n_savestate < 0 ||
-		saveMenu_n_savestate >= NUM_SS ||
-		((*files)[c].snaps & (1 << saveMenu_n_savestate)) == 0) &&
-		abs(d) < NUM_SS)
-	{
-		d=(-1*d)+(d>0?-1:1);
-		saveMenu_n_savestate += d;
-	}
 }
 
 static inline int key_saveMenu(int *cp)
@@ -245,6 +229,8 @@ static inline int key_saveMenu(int *cp)
 	int left=0, right=0, up=0, down=0;
 	int hit0=0, hit1=0, hit2=0, hit3=0, hit4=0, hit5=0;
 	SDL_Event event;
+	char buf[300];
+
 
 	while (SDL_PollEvent(&event) > 0)
 	{
@@ -325,6 +311,13 @@ static inline int key_saveMenu(int *cp)
 			}
 			else if (hit5)	// X
 			{
+				if (mode == MODE_LOAD) {
+					snprintf(buf,sizeof(buf),"Delete state file #%d for\n%s ?", saveMenu_n_savestate+1, (*files)[c].name);
+					if (text_messagebox("Delete State", buf, MB_YESNO)==0) {
+						saveMenu_case = SAVE_MENU_CASE_DEL_MEM;
+						end=1;
+					}
+				}
 			}
 			else if (up || down)
 			{
@@ -399,11 +392,32 @@ static int mycmp(const void *a, const void *b) {
 	return strcasecmp((*((ASFFile*)a)).name,(*((ASFFile*)b)).name);
 }
 
+static void cleanup()
+{
+	int i;
+	// free the file listing
+	if (files) {
+		for (i=0; i<nrfiles; ++i)
+			free((*files)[i].name);
+		free(files);
+		files = NULL;
+	}
+	nrfiles=0;
+	// free thumbnails
+	for (i=0; i < lines * NUM_SS; i++) {
+		if (thumbs[i]) {
+			SDL_FreeSurface(thumbs[i]);
+			thumbs[i]=NULL;
+		}
+	}
+}
+
 int run_menuSave(SaveMode m)
 {
 	static int c=0;
 	int end, i;
 	saveMenu_case=-1;
+	char buf[300];
 
 	mode = m;
 
@@ -433,6 +447,7 @@ int run_menuSave(SaveMode m)
 			addFile(uae4all_image_file[0] ? uae4all_image_file : "null", 0);
 
 		qsort(*files, nrfiles, sizeof(ASFFile), mycmp);
+
 		if (mode == MODE_SAVE) {
 			for (i=0;i<nrfiles;++i)
 				if (strcmp(uae4all_image_file[0] ? uae4all_image_file : "null", (*files)[i].name) == 0) {
@@ -442,7 +457,7 @@ int run_menuSave(SaveMode m)
 		}
 		text_str_title = (char*)( mode == MODE_LOAD ? text_str_title1 : text_str_title2);
 
-		if (mode == MODE_LOAD && !nrfiles) {
+		if (nrfiles <= 0) {
 			text_messagebox(text_str_title, "No saved states found", MB_OK);
 			saveMenu_case=1;
 			break;
@@ -470,24 +485,23 @@ int run_menuSave(SaveMode m)
 					"%s%s-%d.asf", SAVESTATE_PREFIX, (*files)[c].name, saveMenu_n_savestate);
 				saveMenu_case=1;
 				break;
-			case SAVE_MENU_CASE_EXIT:	
+			case SAVE_MENU_CASE_DEL_MEM:
+				snprintf(buf,sizeof(buf),"%s%s-%d.asf", SAVESTATE_PREFIX, (*files)[c].name, saveMenu_n_savestate);
+				unlink(buf);
+				snprintf(buf,sizeof(buf),"%s%s-%d.png", SAVESTATE_PREFIX, (*files)[c].name, saveMenu_n_savestate);
+				unlink(buf);
+				cleanup();
+				saveMenu_case=-1; // stay in menu
+				break;
+			case SAVE_MENU_CASE_EXIT:
 			case SAVE_MENU_CASE_CANCEL:	
 				saveMenu_case=1;
 				break;
 			default:
-				saveMenu_case=-1;
+				saveMenu_case=1;
 		}
 	}
-	
-	// free the file listing
-	if (files) {
-		for (i=0; i<nrfiles; ++i)
-			free((*files)[i].name);
-		free(files);
-		files = NULL;
-	}
-	nrfiles=0;
-
+	cleanup();
 	return saveMenu_case;
 }
 #endif

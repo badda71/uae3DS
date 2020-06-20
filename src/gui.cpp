@@ -86,91 +86,126 @@ int emulated_mouse=0;
 int emulated_mouse_button1=0;
 int emulated_mouse_button2=0;
 
+void loadConfigBuf(char *s)
+{
+	char *saveptr;
+	extern char last_directory[PATH_MAX];
+	char *line=strtok_r(s, "\n", &saveptr);
+	while (line) {
+		char *arg = strchr(line, ' ');
+
+		if(arg) {
+			*arg = '\0';
+			arg++;
+
+			int len = strlen(arg);
+
+			if(!strcmp(line, "THROTTLE"))
+				sscanf(arg, "%d", &mainMenu_throttle);
+			else if(!strcmp(line, "FRAMESKIP"))
+				sscanf(arg, "%d", &mainMenu_frameskip);
+			else if(!strcmp(line, "SCREEN_POS"))
+				sscanf(arg, "%d", &mainMenu_vpos);
+			else if(!strcmp(line, "SAVE_DISKS"))
+				sscanf(arg, "%d", &mainMenu_autosave);
+			else if(!strcmp(line, "LAST_DIR"))
+			{
+				if(len != 0 && len <= sizeof(last_directory) - 1) {
+					strcpy(last_directory, arg);
+					chdir(last_directory);
+				}
+			}
+			else if(!strcmp(line, "MAX_TAP_TIME"))
+				sscanf(arg, "%d", &mainMenu_max_tap_time);
+			else if(!strcmp(line, "CLICK_TIME"))
+				sscanf(arg, "%d", &mainMenu_click_time);
+			else if(!strcmp(line, "SINGLE_TAP_TIMEOUT"))
+				sscanf(arg, "%d", &mainMenu_single_tap_timeout);
+			else if(!strcmp(line, "MAX_DOUBLE_TAP_TIME"))
+				sscanf(arg, "%d", &mainMenu_max_double_tap_time);
+			else if(!strcmp(line, "LOCKED_DRAG_TIMEOUT"))
+				sscanf(arg, "%d", &mainMenu_locked_drag_timeout);
+			else if(!strcmp(line, "TAP_AND_DRAG_GESTURE"))
+				sscanf(arg, "%d", &mainMenu_tap_and_drag_gesture);
+			else if(!strcmp(line, "LOCKED_DRAGS"))
+				sscanf(arg, "%d", &mainMenu_locked_drags);
+			else if(!strcmp(line, "KEYMAPPINGS"))
+				uae3ds_mapping_loadbuf(arg);
+			else if(!strcmp(line, "FAVORITES"))
+				menu_load_favorites(arg);
+		}
+		line = strtok_r(NULL, "\n", &saveptr);
+	}
+}
+
 void loadConfig()
 {
-#if defined(HOME_DIR)
 	FILE *f;
-	char *config = (char *)malloc(strlen(config_dir) + strlen("/uae3DS.cfg") + 1);
-	extern char last_directory[PATH_MAX];
-
-	if(config == NULL)
-		return;
-
-	sprintf(config, "%s/uae3DS.cfg", config_dir);
+	char *config = concat(config_dir, "/uae3DS.cfg", NULL);
+	if(config == NULL) return;
 
 	f = fopen(config, "r");
-
 	if(f == NULL)
 	{
-		printf("Failed to open config file: \"%s\" for reading.\n", config);
 		free(config);
 		return;
 	}
 
-	char line[PATH_MAX * 10 + 30];
+	fseek(f, 0, SEEK_END);
+	long fsize = ftell(f);
+	fseek(f, 0, SEEK_SET);  /* same as rewind(f); */
 
-	while(fgets(line, sizeof(line), f))
-	{
-		char *arg = strchr(line, ' ');
-
-		if(!arg)
-		{
-			continue;
-		}
-		*arg = '\0';
-		arg++;
-
-		int len = strlen(arg);
-		if(arg[len-1] == '\n')
-		{
-			arg[len-1] = '\0';
-		}
-
-		if(!strcmp(line, "THROTTLE"))
-			sscanf(arg, "%d", &mainMenu_throttle);
-		else if(!strcmp(line, "FRAMESKIP"))
-			sscanf(arg, "%d", &mainMenu_frameskip);
-		else if(!strcmp(line, "SCREEN_POS"))
-			sscanf(arg, "%d", &mainMenu_vpos);
-		else if(!strcmp(line, "SAVE_DISKS"))
-			sscanf(arg, "%d", &mainMenu_autosave);
-		else if(!strcmp(line, "LAST_DIR"))
-		{
-			if(len == 0 || len > sizeof(last_directory) - 1)
-			{
-				continue;
-			}
-			strcpy(last_directory, arg);
-			chdir(last_directory);
-		}
-		else if(!strcmp(line, "MAX_TAP_TIME"))
-			sscanf(arg, "%d", &mainMenu_max_tap_time);
-		else if(!strcmp(line, "CLICK_TIME"))
-			sscanf(arg, "%d", &mainMenu_click_time);
-		else if(!strcmp(line, "SINGLE_TAP_TIMEOUT"))
-			sscanf(arg, "%d", &mainMenu_single_tap_timeout);
-		else if(!strcmp(line, "MAX_DOUBLE_TAP_TIME"))
-			sscanf(arg, "%d", &mainMenu_max_double_tap_time);
-		else if(!strcmp(line, "LOCKED_DRAG_TIMEOUT"))
-			sscanf(arg, "%d", &mainMenu_locked_drag_timeout);
-		else if(!strcmp(line, "TAP_AND_DRAG_GESTURE"))
-			sscanf(arg, "%d", &mainMenu_tap_and_drag_gesture);
-		else if(!strcmp(line, "LOCKED_DRAGS"))
-			sscanf(arg, "%d", &mainMenu_locked_drags);
-		else if(!strcmp(line, "KEYMAPPINGS"))
-			uae3ds_mapping_loadbuf(arg);
-		else if(!strcmp(line, "FAVORITES"))
-			menu_load_favorites(arg);
+	char *string = (char*)calloc(fsize + 1, 1);
+	if (string==NULL) {
+		fclose(f);
+		free(config);
+		return;
 	}
-
+	fread(string, 1, fsize, f);
 	fclose(f);
+
+	loadConfigBuf(string);
+
+	free(string);
 	free(config);
-#endif
+}
+
+char *getSnapshotConfig() {
+	char *fmt = "THROTTLE %d\n"
+		"FRAMESKIP %d\n"
+		"SCREEN_POS %d\n"
+		"SAVE_DISKS %d\n"
+		"MAX_TAP_TIME %d\n"
+		"CLICK_TIME %d\n"
+		"SINGLE_TAP_TIMEOUT %d\n"
+		"MAX_DOUBLE_TAP_TIME %d\n"
+		"LOCKED_DRAG_TIMEOUT %d\n"
+		"TAP_AND_DRAG_GESTURE %d\n"
+		"LOCKED_DRAGS %d\n"
+		"KEYMAPPINGS %s\n";
+	
+	char *s = uae3ds_mapping_savebuf();
+	int len = strlen(fmt)+11*4+1+strlen(s);
+	char *r = (char*)malloc(len);
+	snprintf(r, len, fmt,
+		mainMenu_throttle,
+		mainMenu_frameskip,
+		mainMenu_vpos,
+		mainMenu_autosave,
+		mainMenu_max_tap_time,
+		mainMenu_click_time,
+		mainMenu_single_tap_timeout,
+		mainMenu_max_double_tap_time,
+		mainMenu_locked_drag_timeout,
+		mainMenu_tap_and_drag_gesture,
+		mainMenu_locked_drags,
+		s);
+	free(s);
+	return r;
 }
 
 void storeConfig()
 {
-#if defined(HOME_DIR)
 	FILE *f;
 	char *config = (char *)malloc(strlen(config_dir) + strlen("/uae3DS.cfg") + 1);
 	extern char last_directory[PATH_MAX];
@@ -189,37 +224,17 @@ void storeConfig()
 		return;
 	}
 
-	char *s1 = uae3ds_mapping_savebuf();
+	char *s1 = getSnapshotConfig();
 	char *s2 = menu_save_favorites();
 
 	fprintf(f,
-		"THROTTLE %d\n"
-		"FRAMESKIP %d\n"
-		"SCREEN_POS %d\n"
-		"SAVE_DISKS %d\n"
-		"MAX_TAP_TIME %d\n"
-		"CLICK_TIME %d\n"
-		"SINGLE_TAP_TIMEOUT %d\n"
-		"MAX_DOUBLE_TAP_TIME %d\n"
-		"LOCKED_DRAG_TIMEOUT %d\n"
-		"TAP_AND_DRAG_GESTURE %d\n"
-		"LOCKED_DRAGS %d\n"
-		"KEYMAPPINGS %s\n"
+		"%s"
 		"FAVORITES %s\n",
-		mainMenu_throttle,
-		mainMenu_frameskip,
-		mainMenu_vpos,
-		mainMenu_autosave,
-		mainMenu_max_tap_time,
-		mainMenu_click_time,
-		mainMenu_single_tap_timeout,
-		mainMenu_max_double_tap_time,
-		mainMenu_locked_drag_timeout,
-		mainMenu_tap_and_drag_gesture,
-		mainMenu_locked_drags,
 		s1,
 		s2
 	);
+	free(s1);
+	free(s2);
 
 	if(last_directory[0])
 	{
@@ -228,7 +243,6 @@ void storeConfig()
 
 	fclose(f);
 	free(config);
-#endif
 }
 
 static void getChanges(void)

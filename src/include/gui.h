@@ -7,6 +7,8 @@
   */
 #include <SDL/SDL.h>
 
+extern void loadConfigBuf(char *s);
+extern char *getSnapshotConfig();
 extern void loadConfig(void);
 extern void storeConfig(void);
 extern int gui_init (void);

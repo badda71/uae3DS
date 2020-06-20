@@ -313,11 +313,6 @@ void uae3ds_mapping_loadbuf(char *s)
 	}
 }
 
-uae_u8 *restore_keymap (uae_u8 *src) {
-	uae3ds_mapping_loadbuf((char*)src);
-	return src;
-}
-
 char *uae3ds_mapping_savebuf()
 {
 	char *s;

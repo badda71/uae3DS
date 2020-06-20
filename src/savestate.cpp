@@ -410,8 +410,8 @@ void restore_state (const char *filename)
 	    end = restore_expansion (chunk);
 	else if (!strcmp (name, "ROM "))
 	    end = restore_rom (chunk);
-	else if (!strcmp (name, "KMAP"))
-		end = restore_keymap (chunk);
+	else if (!strcmp (name, "CONF"))
+		loadConfigBuf((char*)(end = chunk));
 	else
 	    write_log ("unknown chunk '%s' size %d bytes\n", name, len);
 	if (len != end - chunk)
@@ -646,8 +646,8 @@ void save_state (const char *filename, const char *description)
     } while ((dst = save_rom (0, &len)));
 
 	// save key mappings (3DS)
-	dst = (uae_u8*)uae3ds_mapping_savebuf();
-	save_chunk(f, dst, strlen((char*)dst)+1, "KMAP");
+	dst = (uae_u8*)getSnapshotConfig();
+	save_chunk(f, dst, strlen((char*)dst)+1, "CONF");
 	free(dst);
 	
 	gui_show_window_bar(9, 10, 0);

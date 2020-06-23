@@ -108,6 +108,10 @@ void loadConfigBuf(char *s)
 				sscanf(arg, "%d", &mainMenu_vpos);
 			else if(!strcmp(line, "SAVE_DISKS"))
 				sscanf(arg, "%d", &mainMenu_autosave);
+			else if(!strcmp(line, "MOUSE_SENSITIVITY"))
+				sscanf(arg, "%d", &mainMenu_msens);
+			else if(!strcmp(line, "CPAD_MODE"))
+				sscanf(arg, "%d", &mainMenu_cpad);
 			else if(!strcmp(line, "LAST_DIR"))
 			{
 				if(len != 0 && len <= sizeof(last_directory) - 1) {
@@ -175,6 +179,8 @@ char *getSnapshotConfig() {
 		"FRAMESKIP %d\n"
 		"SCREEN_POS %d\n"
 		"SAVE_DISKS %d\n"
+		"MOUSE_SENSITIVITY %d\n"
+		"CPAD_MODE %d\n"
 		"MAX_TAP_TIME %d\n"
 		"CLICK_TIME %d\n"
 		"SINGLE_TAP_TIMEOUT %d\n"
@@ -192,6 +198,8 @@ char *getSnapshotConfig() {
 		mainMenu_frameskip,
 		mainMenu_vpos,
 		mainMenu_autosave,
+		mainMenu_msens,
+		mainMenu_cpad,
 		mainMenu_max_tap_time,
 		mainMenu_click_time,
 		mainMenu_single_tap_timeout,
@@ -535,17 +543,25 @@ void gui_handle_events (SDL_Event *e)
 		case DS_X:
 		case DS_L:
 			buttonstate[2] = v; break;
-		case DS_UP1:
 		case DS_UP2:
+			if (mainMenu_cpad) break;
+			// fallthrough
+		case DS_UP1:
 			emulated_top=v; break;
-		case DS_DOWN1:
 		case DS_DOWN2:
+			if (mainMenu_cpad) break;
+			// fallthrough
+		case DS_DOWN1:
 			emulated_bot=v; break;
-		case DS_LEFT1:
 		case DS_LEFT2:
+			if (mainMenu_cpad) break;
+			// fallthrough
+		case DS_LEFT1:
 			emulated_left=v; break;
-		case DS_RIGHT1:
 		case DS_RIGHT2:
+			if (mainMenu_cpad) break;
+			// fallthrough
+		case DS_RIGHT1:
 			emulated_right=v; break;
 		case DS_UP3:
 			if (v) mainMenu_vpos += 2;

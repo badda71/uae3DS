@@ -552,6 +552,26 @@ void handle_events (void)
 		}
     }
 
+	// dpad mouse movement
+	if (mainMenu_cpad) {
+		const int circleDeadzone = 20;
+		circlePosition circle;
+
+		// C-Pad used to control the cursor
+		hidCircleRead(&circle);
+		if (circle.dx < circleDeadzone && circle.dx > -circleDeadzone) {
+		 circle.dx = 0;
+		}
+		if (circle.dy < circleDeadzone && circle.dy > -circleDeadzone) {
+		 circle.dy = 0;
+		}
+		if (circle.dx || circle.dy) {
+			lastmx += (circle.dx * mainMenu_msens) / 32;
+			lastmy -= (circle.dy * mainMenu_msens) / 32;
+			newmousecounters = 1;
+		}
+	}
+
 	uib_update();
 
     if (SDL_MUSTLOCK(prSDLScreen))

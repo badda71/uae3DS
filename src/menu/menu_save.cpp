@@ -138,7 +138,8 @@ static inline void draw_saveMenu(int c)
 	static int old_c=c, old_offset=offset;
 	static Scrollstatus ss = {0};
 	int row = 15*8-height*4-4, col = 25*8-width*4;
-	char *buf="#x";
+	char buf[3];
+	strcpy(buf,"#x");
 
 	if (old_c != c) {
 		memset(&ss, 0, sizeof(ss));

@@ -6,6 +6,7 @@
   * Copyright 2020 Sebastian Weber
   */
 #include "3ds.h"
+#include <SDL/SDL.h>
 
 typedef struct {
 	Handle mutex;

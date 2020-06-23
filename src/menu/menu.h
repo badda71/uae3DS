@@ -107,6 +107,7 @@ extern int mainMenu_throttle;
 extern int mainMenu_frameskip;
 extern int mainMenu_autosave;
 extern int mainMenu_msens;
+extern int mainMenu_cpad;
 extern int mainMenu_mappos;
 extern int mainMenu_max_tap_time;
 extern int mainMenu_click_time;

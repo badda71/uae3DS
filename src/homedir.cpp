@@ -6,6 +6,7 @@
 #include <errno.h>
 #include "homedir.h"
 #include "config.h"
+#include "uae3ds.h"
 
 #define MKDIRMOD 0644
 #define PATH_SEP_CHAR '/'
@@ -35,5 +36,7 @@ void get_config_dir()
 {
 	// create the directory if doesn't exist
 	mkpath(config_dir, 1);
-	mkpath(SAVESTATE_PREFIX, 0);
+	char *s=concat(SAVESTATE_PREFIX,"x",NULL);
+	mkpath(s, 0);
+	free(s);
 }

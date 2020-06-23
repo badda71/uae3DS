@@ -25,6 +25,9 @@ static const char *text_str_frameskip="Frameskip";
 static const char *text_str_autosave="Save disks";
 static const char *text_str_vpos="Screen pos";
 static const char *text_str_msens="Mouse sens";
+static const char *text_str_cpad= "C-Pad mode";
+static const char *text_str_cpad1= "Joystick";
+static const char *text_str_cpad2= "Mouse";
 static const char *text_str_keymap="Key mappings";
 static const char *text_str_keymap1="Add";
 static const char *text_str_keymap2="Delete";
@@ -62,6 +65,7 @@ enum MainMenuEntry {
 	MAIN_MENU_ENTRY_SCREEN_POSITION,
 	MAIN_MENU_ENTRY_SAVE_DISKS,
 	MAIN_MENU_ENTRY_MOUSE_SENSITIVITY,
+	MAIN_MENU_ENTRY_CPAD,
 	MAIN_MENU_ENTRY_KEYMAP,
 	MAIN_MENU_ENTRY_RESET_EMULATION,
 	MAIN_MENU_ENTRY_RETURN_TO_EMULATION,
@@ -75,6 +79,7 @@ int mainMenu_throttle=0;
 int mainMenu_frameskip=-1;
 int mainMenu_autosave=-1;
 int mainMenu_msens=2;
+int mainMenu_cpad=0;
 int mainMenu_mappos=0;
 int mainMenu_savepos=0;
 
@@ -92,12 +97,12 @@ static void draw_mainMenu(enum MainMenuEntry c)
 {
 	static int frame = 0;
 	int flash = frame / 3;
-	int row = 4*8, col = 10*8;
+	int row = 3*8, col = 10*8;
 		
 	int column = 0;
 
 	text_draw_background();
-	text_draw_window(72,28,260,184,text_str_title);
+	text_draw_window(72,20,260,200,text_str_title);
 
 	if (c == MAIN_MENU_ENTRY_LOAD && flash)
 		write_text_inv_pos(col, row, text_str_load);
@@ -269,6 +274,19 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	else
 		write_text_pos(column, row, text_str_4);
 
+	row += 12;
+	write_text_pos(col, row, text_str_cpad);
+	column = col+11*8;
+	if (!mainMenu_cpad && (c != MAIN_MENU_ENTRY_CPAD || flash))
+		write_text_inv_pos(column, row, text_str_cpad1);
+	else
+		write_text_pos(column, row, text_str_cpad1);
+	column += 8*(strlen(text_str_cpad1) + 1);
+	if (mainMenu_cpad && (c != MAIN_MENU_ENTRY_CPAD || flash))
+		write_text_inv_pos(column, row, text_str_cpad2);
+	else
+		write_text_pos(column, row, text_str_cpad2);
+
 	row+=12;
 	write_text_pos(col, row, text_str_keymap);
 	row+=12;
@@ -432,6 +450,10 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 						else if (right)
 							++mainMenu_msens;
 						mainMenu_msens = ((mainMenu_msens + 3) % 4) + 1; 
+						break;
+					case MAIN_MENU_ENTRY_CPAD:
+						if (left || right)
+							mainMenu_cpad = ~mainMenu_cpad;
 						break;
 					case MAIN_MENU_ENTRY_KEYMAP:
 						if (left)

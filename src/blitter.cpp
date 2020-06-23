@@ -144,8 +144,8 @@ static void blitter_dofast(void)
 #ifdef DEBUG_BLITTER
     dbgf("blitter_dofast bltafwm=0x%X, bltcon0=0x%X\n",blt_info.bltafwm,bltcon0);
 #endif
-    if (bltcon0 & 0x800) {
-//    if ((bltcon0 & 0x800)&&(bltapt<=0xFFFFF)) {
+//    if (bltcon0 & 0x800) {
+    if ((bltcon0 & 0x800)&&(bltapt<=0xFFFFF)) {
 #ifndef USE_LARGE_BLITFUNC
 	blt_info.pta = bltapt;
 #else
@@ -166,8 +166,8 @@ static void blitter_dofast(void)
     else 
 	blt_info.pta = 0;
 #endif
-    if (bltcon0 & 0x400) {
-//    if ((bltcon0 & 0x400)&&(bltbpt<=0xFFFFF)) {
+//    if (bltcon0 & 0x400) {
+    if ((bltcon0 & 0x400)&&(bltbpt<=0xFFFFF)) {
 #ifndef USE_LARGE_BLITFUNC
 	blt_info.ptb = bltbpt;
 #else
@@ -188,8 +188,8 @@ static void blitter_dofast(void)
     else 
 	blt_info.ptb = 0;
 #endif
-    if (bltcon0 & 0x200) {
-//    if ((bltcon0 & 0x200)&&(bltcpt<=0xFFFFF)) {
+//    if (bltcon0 & 0x200) {
+    if ((bltcon0 & 0x200)&&(bltcpt<=0xFFFFF)) {
 #ifndef USE_LARGE_BLITFUNC
 	blt_info.ptc = bltcpt;
 #else
@@ -210,8 +210,8 @@ static void blitter_dofast(void)
     else 
 	blt_info.ptc = 0;
 #endif
-    if (bltcon0 & 0x100) {
-//    if ((bltcon0 & 0x100)&&(bltdpt<=0xFFFFF)) {
+//    if (bltcon0 & 0x100) {
+    if ((bltcon0 & 0x100)&&(bltdpt<=0xFFFFF)) {
 #ifndef USE_LARGE_BLITFUNC
 	blt_info.ptd = bltdpt;
 #else

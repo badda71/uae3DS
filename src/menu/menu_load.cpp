@@ -333,9 +333,6 @@ static int key_loadMenu(int *c)
 	while (SDL_PollEvent(&event) > 0)
 	{
 		if (uib_handle_event(&event)) continue;
-		if (event.type == SDL_QUIT)
-			end=-1;
-		else
 		if (event.type == SDL_KEYDOWN)
 		{
 			uae4all_play_click();

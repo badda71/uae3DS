@@ -237,12 +237,6 @@ static inline int key_saveMenu(int *cp)
 	{
 		if (uib_handle_event(&event)) continue;
 
-		if (event.type == SDL_QUIT)
-		{
-			saveMenu_case=SAVE_MENU_CASE_EXIT;
-			end=-1;
-		}
-		else
 		if (event.type == SDL_KEYDOWN)
 		{
 			uae4all_play_click();

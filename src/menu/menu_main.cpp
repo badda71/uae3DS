@@ -350,9 +350,7 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 
 		int left = 0, right = 0, up = 0, down = 0,
 		    activate = 0, cancel = 0, reset = 0, load = 0, toStates = 0;
-		if (event.type == SDL_QUIT)
-			return MAIN_MENU_ENTRY_EXIT_UAE;
-		else if (event.type == SDL_KEYDOWN)
+		if (event.type == SDL_KEYDOWN)
 		{
 			uae4all_play_click();
 			switch(event.key.keysym.sym)

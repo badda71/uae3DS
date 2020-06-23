@@ -506,9 +506,6 @@ void handle_events (void)
 
 		switch (rEvent.type)
 		{
-		case SDL_QUIT:
-			uae_quit();
-			break;
 		case SDL_KEYDOWN:
 			if ((rEvent.key.keysym.sym & 0x100) == 0)
 			{

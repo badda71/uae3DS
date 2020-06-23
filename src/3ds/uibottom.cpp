@@ -19,6 +19,7 @@
 #include "uae3ds.h"
 #include "gui.h"
 #include "menu.h"
+#include "uae.h"
 
 uikbd_key uikbd_keypos[] = {
 	//  x,  y,   w,   h,         key,stky, flgs, name
@@ -853,6 +854,13 @@ int uib_handle_event(SDL_Event *e) {
 	static SDL_Event sdl_e;
 	int i,x,y;
 	static int process_touchpad = 0;
+
+
+	if (e->type == SDL_QUIT) {
+		storeConfig();
+		do_leave_program();
+		exit(0);
+	}
 
 	if (e->type == SDL_KEYDOWN) {
 		if (e->key.keysym.sym == 255) {

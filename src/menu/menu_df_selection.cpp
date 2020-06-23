@@ -131,9 +131,7 @@ static enum DfMenuEntry key_dfMenu(enum DfMenuEntry *sel)
 		if (uib_handle_event(&event)) continue;
 		int left = 0, right = 0, up = 0, down = 0,
 		    activate = 0, cancel = 0, load_df0 = 0, load_df1 = 0;
-		if (event.type == SDL_QUIT)
-			return DF_MENU_ENTRY_BACK;
-		else if (event.type == SDL_KEYDOWN)
+		if (event.type == SDL_KEYDOWN)
 		{
 			uae4all_play_click();
 			switch(event.key.keysym.sym)

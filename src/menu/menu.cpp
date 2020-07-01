@@ -448,7 +448,7 @@ void text_draw_window(int x, int y, int w, int h, const char *title)
 	SDL_SetClipRect(text_screen, NULL);
 
 	write_text(x / 8, y / 8 - 1, "OOO");
-	write_text(x / 8 + ((w / 8 -strlen(title)) / 2), y / 8 - 1, title);
+	write_text(x / 8 + MAX(((w / 8 -strlen(title)) / 2), 4), y / 8 - 1, title);
 }
 
 void _text_draw_window(SDL_Surface *sf, int x, int y, int w, int h, const char *title)
@@ -502,6 +502,9 @@ int text_messagebox(char *title, char *message, mb_mode mode) {
 	char *c;
 	extern SDL_Surface *text_screen;
 
+	int maxwidth = (text_screen->w - MSGBOX_PADDING * 2) / FONT_W - 2;
+	int maxheight = text_screen->h / FONT_H - 3 - MSGBOX_PADDING * 2 / FONT_H;;
+
 	for (c=message, w=0; *c!=0; c++)
 	{
 		if (*c == '\n')
@@ -513,17 +516,18 @@ int text_messagebox(char *title, char *message, mb_mode mode) {
 		else
 		{
 			++w;
+			if (w > maxwidth) {
+ 				++height;
+				width=maxwidth;
+				w=0;
+			}
 		}
 	}
 	if (width<w) width=w;
 	height += mode==MB_NONE ? 0 : 2;
-
-	int maxwidth = (text_screen->w - MSGBOX_PADDING * 2) / FONT_W - 2;
 	if (mode == MB_OK && width<4) width=4;
 	if (mode == MB_YESNO && width<9) width=9;
 	if (width > maxwidth) width = maxwidth;
-
-	int maxheight = text_screen->h / FONT_H - 3 - MSGBOX_PADDING * 2 / FONT_H;;
 	if (height > maxwidth) height = maxheight;
 
 	int x= (text_screen->w / FONT_W - width) / 2;
@@ -536,14 +540,17 @@ int text_messagebox(char *title, char *message, mb_mode mode) {
 		SDL_Event e;
 		text_draw_background();
 		text_draw_window(x * FONT_W - MSGBOX_PADDING, y * FONT_H - MSGBOX_PADDING, width*FONT_W + MSGBOX_PADDING*2, height*FONT_H + MSGBOX_PADDING*2, title);
-		
+
 		char *n=NULL;
-		for (c=message; c!=1; c=n+1)
+		for (c=message; *c!=0; c=n)
 		{
 			n=strchr(c,'\n');
-			snprintf(buf, MIN(n?n-c:strlen(c), width)+1, "%s", c);
+			if (!n) n=c+strlen(c);
+			if (n-c > width) n=c+width;
+			snprintf(buf, n-c+1, "%s", c);
 			write_text(x, y+yo, buf);
 			++yo;
+			if (*n == '\n') ++n;
 		}
 
 		int flash = frame / 3;

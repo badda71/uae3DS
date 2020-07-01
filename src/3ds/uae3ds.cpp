@@ -17,6 +17,55 @@
 #include "uibottom.h"
 #include "menu.h"
 
+#define EMULATION
+
+int vasprintf (char **str, const char *fmt, va_list args) {
+	int size = 0;
+	va_list tmpa;
+
+	// copy
+	va_copy(tmpa, args);
+
+	// apply variadic arguments to
+	// sprintf with format to get size
+	size = vsnprintf(NULL, 0, fmt, tmpa);
+
+	// toss args
+	va_end(tmpa);
+
+	// return -1 to be compliant if
+	// size is less than 0
+	if (size < 0) { return -1; }
+
+	// alloc with size plus 1 for `\0'
+	*str = (char *) malloc(size + 1);
+
+	// return -1 to be compliant
+	// if pointer is `NULL'
+	if (NULL == *str) { return -1; }
+
+	// format string with original
+	// variadic arguments and set new size
+	size = vsprintf(*str, fmt, args);
+	return size;
+}
+
+int asprintf (char **str, const char *fmt, ...) {
+	int size = 0;
+	va_list args;
+
+	// init variadic argumens
+	va_start(args, fmt);
+
+	// format and get size
+	size = vasprintf(str, fmt, args);
+
+	// toss args
+	va_end(args);
+
+	return size;
+}
+
 // thread safe hash functions
 
 // Fowler-Noll-Vo Hash (FNV1a)
@@ -448,4 +497,35 @@ static char lokeymap[] =
 char amiga2ascii(int key) {
 	if (key < 0 || key >= sizeof(lokeymap)) return 0;
 	return lokeymap[key];
+}
+
+const char *humanSize(uint64_t bytes)
+{
+	char *suffix[] = {"B", "KB", "MB", "GB", "TB"};
+	char length = sizeof(suffix) / sizeof(suffix[0]);
+
+	int i = 0;
+	double dblBytes = bytes;
+
+	if (bytes > 1024) {
+		for (i = 0; (bytes / 1024) > 0 && i<length-1; i++, bytes /= 1024)
+			dblBytes = bytes / 1024.0;
+	}
+
+	static char output[200];
+	sprintf(output, "%.02lf %s", dblBytes, suffix[i]);
+	return output;
+}
+
+int getWifiStatus()
+{
+	u32 wifi_status;
+#ifndef EMULATION
+	acInit();
+	ACU_GetWifiStatus(&wifi_status);
+	acExit();
+#else
+	wifi_status=1;
+#endif
+	return wifi_status;
 }

@@ -52,3 +52,9 @@ extern char *uae3ds_mapping_savebuf();
 extern char *stralloc(char *s);
 extern char *concat(char *s, ...);
 extern char amiga2ascii(int key);
+
+extern char *scan_qr_code(SDL_Surface *s);
+extern int asprintf (char **str, const char *fmt, ...);
+extern int vasprintf (char **str, const char *fmt, va_list args);
+extern const char *humanSize(uint64_t bytes);
+extern int getWifiStatus();

@@ -35,6 +35,7 @@
 #include "menu.h"
 #include "homedir.h"
 #include "3ds_cia.h"
+#include "uae3ds.h"
 #include "http.h"
 #include "uibottom.h"
 #include "keyboard.h"
@@ -44,7 +45,6 @@ extern char** __system_argv;
 __attribute__((weak)) const char* __romfs_path = NULL;
 
 #define ERRBUFSIZE 256
-//#define EMULATION
 #define UPDATE_INFO_URL "https://api.github.com/repos/badda71/uae3DS/releases/latest"
 //#define UPDATE_INFO_URL "http://badda.de/uae3DS/latest"
 
@@ -54,24 +54,6 @@ static char errbuf[ERRBUFSIZE];
 // *******************************************************
 // exposed functions
 // *******************************************************
-
-static const char *humanSize(uint64_t bytes)
-{
-	char *suffix[] = {"B", "KB", "MB", "GB", "TB"};
-	char length = sizeof(suffix) / sizeof(suffix[0]);
-
-	int i = 0;
-	double dblBytes = bytes;
-
-	if (bytes > 1024) {
-		for (i = 0; (bytes / 1024) > 0 && i<length-1; i++, bytes /= 1024)
-			dblBytes = bytes / 1024.0;
-	}
-
-	static char output[200];
-	sprintf(output, "%.02lf %s", dblBytes, suffix[i]);
-	return output;
-}
 
 static char *prog_title=NULL;
 static char *prog_text=NULL;
@@ -111,22 +93,16 @@ int check_update()
 	char buf[256];
 
 	bool ishomebrew=0;
-	u32 wifi_status;
-	acInit();
-	ACU_GetWifiStatus(&wifi_status);
-	acExit();
 
-#ifndef EMULATION
-	if (wifi_status == 0) {
+	if (!getWifiStatus()) {
 		text_messagebox("Update","Error:\nWiFi not enabled",MB_OK);
 		return 0;
 	}
-#endif
 	// check if we need an update
 	char *update_info, *p;
 	prog_title="Update";
 	prog_text="Checking for update ...";
-	if (downloadFile(UPDATE_INFO_URL, &update_info, progress_callback, MODE_MEMORY)) {
+	if (downloadFile(UPDATE_INFO_URL, &update_info, progress_callback, MODE_MEMORY, NULL)) {
 		snprintf(buf,256,"Error: Could not check update\n%s,",http_errbuf);
 		write_log("%s",buf);
 		text_messagebox("Update",buf,MB_OK);
@@ -200,7 +176,7 @@ int check_update()
 
 	prog_title="Update";
 	prog_text="Downloading Update";
-	if (downloadFile(update_url, update_fname, progress_callback, MODE_FILE)) {
+	if (downloadFile(update_url, update_fname, progress_callback, MODE_FILE, NULL)) {
 		snprintf(buf,256,"Error: Could not download update\n%s,",http_errbuf);
 		write_log("%s",buf);
 		free(update_info);

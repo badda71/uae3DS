@@ -1,11 +1,14 @@
 #include "sysconfig.h"
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <curl/curl.h>
 
 #include "menu.h"
 #include "sysdeps.h"
+#include "gui.h"
 #include "uae.h"
+#include "http.h"
 #include "options.h"
 #include "sound.h"
 #include "savestate.h"
@@ -17,6 +20,7 @@
 static const char *text_str_title_df_menu="Select disk";
 static const char *text_str_load_df0="DF0 image (X)";
 static const char *text_str_load_df1="DF1 image (Y)";
+static const char *text_str_download="<Download>";
 static const char *text_str_eject="<Eject>";
 static const char *text_str_back="Main Menu (B)";
 static const char *text_str_separator="----------------------------------";
@@ -36,6 +40,7 @@ enum DfMenuEntry {
 	DF_MENU_ENTRY_NONE = -1 /* pseudo-entry */,
 	DF_MENU_ENTRY_LOAD,
 	DF_MENU_ENTRY_FAV,
+	DF_MENU_ENTRY_DOWNLOAD,
 	DF_MENU_ENTRY_EJECT,
 	DF_MENU_ENTRY_BACK,
 	DF_MENU_ENTRY_COUNT, /* the number of entries to be shown */
@@ -53,7 +58,7 @@ static void draw_dfMenu(enum DfMenuEntry c)
 	static Scrollstatus ss2 = {0};
 	static int frame = 0;
 	int flash = frame / 3;
-	const int height = 24;
+	const int height = 25;
 	const int width = 34;
 	int row = 15*8-height*4, col = 25*8-width*4;
 
@@ -102,6 +107,13 @@ static void draw_dfMenu(enum DfMenuEntry c)
 		row+=12;
 	}
 
+	// download
+	if (c == DF_MENU_ENTRY_DOWNLOAD && flash)
+		write_text_inv_pos(col, row, text_str_download);
+	else
+		write_text_pos(col, row, text_str_download);
+	row+=12;
+	
 	// eject
 	if (c == DF_MENU_ENTRY_EJECT && flash)
 		write_text_inv_pos(col, row, text_str_eject);
@@ -204,6 +216,7 @@ static enum DfMenuEntry key_dfMenu(enum DfMenuEntry *sel)
 			else if (left || right) {
 				if (*sel == DF_MENU_ENTRY_LOAD ||
 					*sel == DF_MENU_ENTRY_FAV ||
+					*sel == DF_MENU_ENTRY_DOWNLOAD ||
 					*sel == DF_MENU_ENTRY_EJECT) {
 					dfMenu_df = (dfMenu_df + 1) % 2;
 				}
@@ -214,6 +227,7 @@ static enum DfMenuEntry key_dfMenu(enum DfMenuEntry *sel)
 				{
 					case DF_MENU_ENTRY_LOAD:
 					case DF_MENU_ENTRY_EJECT:
+					case DF_MENU_ENTRY_DOWNLOAD:
 					case DF_MENU_ENTRY_BACK:
 					case DF_MENU_ENTRY_FAV:
 						if (activate)
@@ -242,7 +256,7 @@ static void raise_dfMenu()
 	for(i=0;i<10;i+=2)
 	{
 		text_draw_background();
-		text_draw_window(72,(10-i)*24,260,200,text_str_title_df_menu);
+		text_draw_window(56,240-23*i,288,216,text_str_title_df_menu);
 		text_flip();
 	}
 	clear_events();
@@ -255,12 +269,68 @@ static void unraise_dfMenu()
 	for(i=9;i>=0;i-=2)
 	{
 		text_draw_background();
-		text_draw_window(72,(10-i)*24,260,200,text_str_title_df_menu);
+		text_draw_window(56,240-23*i,288,216,text_str_title_df_menu);
 		text_flip();
 	}
 	text_draw_background();
 	text_flip();
 	clear_events();
+}
+
+static int progress_callback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
+{
+	// check events
+	SDL_Event e;
+	if (SDL_PollEvent(&e) && 
+		!uib_handle_event(&e) &&
+		e.type==SDL_KEYDOWN && (
+		e.key.keysym.sym == AK_ESC ||
+		e.key.keysym.sym == DS_B))
+	{
+		return -1;
+	}
+	
+	// draw update message box
+	char *bar="##############################";
+	char buf[512];
+	sprintf(buf, "%s\n\n%-30s\n%s / ",
+		"Downloading Image ...",
+		bar+30-((dlnow * 30) / dltotal),
+		humanSize(dlnow));
+	strcat(buf,humanSize(dltotal));
+	text_messagebox(
+		"Download Disk Image", buf, MB_NONE);
+	return 0;
+}
+
+static char *dl_and_unzip_url_to(char *url, char *dir) {
+	
+	char buf[4096] = {0};
+	char *exts[] = {".adf",".adz",NULL};
+	strcpy(buf, dir);
+	if (downloadFile(url, buf, progress_callback, MODE_AUTOFILE, exts)) {
+		snprintf(buf,4096,"Error: %s,",http_errbuf);
+		write_log("%s",buf);
+		text_messagebox("Download Disk Image",buf,MB_OK);
+		return NULL;
+	} else {
+		return stralloc(buf);
+	}
+}
+
+static void attachImage(char *path, int df)
+{
+	extern char last_directory[];
+	char *p=strrchr(path,'/');
+	if (p) {
+		char bk = *(++p);
+		*(p) = 0;
+		chdir(path);
+		*(p) = bk;
+	} else p=path;
+	getcwd(last_directory, PATH_MAX);
+	snprintf(df ? uae4all_image_file2 : uae4all_image_file,
+		128, "%s", p);
 }
 
 int run_menuDfSel()
@@ -274,7 +344,7 @@ int run_menuDfSel()
 	pause_scroll_timer = 0;
 	pause_scroll_timer2 = 0;
 	dfMenu_fav=0;
-	char *p;
+	char *p,*buf;
 	extern char last_directory[];
 
 	static enum DfMenuEntry c = DF_MENU_ENTRY_LOAD;
@@ -304,14 +374,27 @@ int run_menuDfSel()
 					disk_eject(0);
 				}
 				break;
+			case DF_MENU_ENTRY_DOWNLOAD:
+				p=scan_qr_code(prSDLScreen);
+				if (p) {
+					if (*last_directory == 0)
+						getcwd(last_directory, PATH_MAX);
+					if (asprintf(&buf,"Download (and extract if required)\n%s\nto directory\n%s?",p,last_directory) > 0) {
+						if (text_messagebox("Download Disk Image", buf, MB_YESNO) == 0) {
+							char *f = dl_and_unzip_url_to(p, last_directory);
+							if (f) {
+								log_citra("attach: %s",f);
+								attachImage(f, dfMenu_df);
+								free(f);
+							}
+						}
+						free(buf);
+					}
+					free(p);
+				}
+				break;
 			case DF_MENU_ENTRY_FAV:
-				p=strrchr(favorites[dfMenu_fav],'/');
-				*p=0;
-				chdir(favorites[dfMenu_fav]);
-				getcwd(last_directory, PATH_MAX);
-				snprintf(dfMenu_df ? uae4all_image_file2 : uae4all_image_file,
-					128, "%s", p+1);
-				*p='/';
+				attachImage(favorites[dfMenu_fav], dfMenu_df);
 				break;
 			case DF_MENU_ENTRY_BACK:
 				return 1; /* leave, returning to main menu */
@@ -359,7 +442,9 @@ void menu_load_favorites(char *s)
 	int i=0;
 	p = strtok_r(s, "|", &saveptr);
 	while (p) {
-		favorites[i++]=stralloc(p);
+		if (!access(p, F_OK)) {
+			favorites[i++]=stralloc(p);
+		}
 		p = strtok_r(NULL, "|", &saveptr);
 	}
 }

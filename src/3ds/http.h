@@ -1,14 +1,12 @@
 #include <curl/curl.h>
 
-#define SOC_ALIGN       0x1000
-#define SOC_BUFFERSIZE  0x100000
 #define HTTP_ERRBUFSIZE 256
 
 typedef enum {
 	MODE_FILE,
 	MODE_MEMORY,
-	MODE_CALLBACK,
-	MODE_HEAD
+	MODE_HEAD,
+	MODE_AUTOFILE
 } http_dlmode;
 
 typedef struct {
@@ -23,7 +21,9 @@ typedef struct {
 extern int downloadFile(char *url,
 	void *arg,
 	int (*progress_callback)(void*, curl_off_t, curl_off_t, curl_off_t, curl_off_t),
-	http_dlmode mode);
+	http_dlmode mode,
+	char **valid_extensions
+	);
 
 extern http_info http_last_req_info;
 extern char http_errbuf[HTTP_ERRBUFSIZE];

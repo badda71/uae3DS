@@ -3,6 +3,7 @@
 #include "sysdeps.h"
 #include "keyboard.h"
 #include "uibottom.h"
+#include "uae3ds.h"
 
 #include <malloc.h>
 #include <string.h>
@@ -51,11 +52,6 @@ static SDL_Surface *qr_screen = NULL;
 static SDL_Surface *qr_im = NULL;
 static SDL_Surface *qr_bw = NULL;
 static SDL_Surface *qr_msg = NULL;
-
-static void ui_error(const char *s)
-{
-	text_messagebox("Download Error", (char*)s, MB_OK);
-}
 
 static void capture_cam_thread(void* arg) {
     capture_cam_data* data = (capture_cam_data*) arg;
@@ -248,7 +244,7 @@ static int qr_update(char **payload) {
     if(!installData->capturing) {
         Result capRes = capture_cam(&installData->captureInfo);
         if(R_FAILED(capRes)) {
-            ui_error("Failed to start camera capture.");
+            ui_error(NULL,"Error: Failed to start camera capture.");
             qr_free_data();
             return -1;
         } else {
@@ -258,7 +254,7 @@ static int qr_update(char **payload) {
 
     if(installData->captureInfo.finished) {
         if(R_FAILED(installData->captureInfo.result)) {
-            ui_error("Error while capturing camera frames.");
+            ui_error(NULL,"Error: while capturing camera frames.");
         }
         qr_free_data();
         return -1;
@@ -310,7 +306,7 @@ static int qr_init(SDL_Surface *s) {
 
 	installData = (qr_data*) calloc(1, sizeof(qr_data));
     if(installData == NULL) {
-        ui_error("Failed to allocate QR install data.");
+        ui_error(NULL,"Error: Failed to allocate QR install data.");
         return -1;
     }
 
@@ -325,20 +321,20 @@ static int qr_init(SDL_Surface *s) {
 
     installData->qrContext = quirc_new();
     if(installData->qrContext == NULL) {
-        ui_error("Failed to create QR context.");
+        ui_error(NULL,"Error: Failed to create QR context.");
         qr_free_data();
         return -1;
     }
 
     if(quirc_resize(installData->qrContext, QR_IMAGE_WIDTH, QR_IMAGE_HEIGHT) != 0) {
-        ui_error("Failed to resize QR context.");
+        ui_error(NULL,"Error: Failed to resize QR context.");
         qr_free_data();
         return -1;
     }
 
     qr_im = SDL_CreateRGBSurface(0, QR_IMAGE_WIDTH, QR_IMAGE_HEIGHT, 16, 0xF800, 0x07E0, 0x001F, 0);
     if(qr_im == NULL) {
-        ui_error("Failed to create buffer image.");
+        ui_error(NULL,"Error: Failed to create buffer image.");
         qr_free_data();
         return -1;
     }	

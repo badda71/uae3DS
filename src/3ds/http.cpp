@@ -287,8 +287,8 @@ mode_file:
 	curl_easy_setopt(curl, CURLOPT_NOPROGRESS,
 		progress_callback != NULL ? 0L : 1L );
 
-//	curl_easy_setopt(curl, CURLOPT_PROXY, "");
-log_citra("setting proxy");curl_easy_setopt(curl, CURLOPT_PROXY, "http://127.0.0.1:3128");
+	curl_easy_setopt(curl, CURLOPT_PROXY, "");
+//log_citra("setting proxy");curl_easy_setopt(curl, CURLOPT_PROXY, "http://127.0.0.1:3128");
 
 	if (progress_callback != NULL)
 		curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progress_callback);

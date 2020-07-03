@@ -79,7 +79,7 @@ static int progress_callback(void *clientp, curl_off_t dltotal, curl_off_t dlnow
 		humanSize(dlnow));
 	strcat(buf,humanSize(dltotal));
 	text_messagebox(
-		prog_title?prog_title:"Download", buf, MB_NONE);
+		(char*)(prog_title?prog_title:"Download"), buf, MB_NONE);
 	return 0;
 }
 
@@ -141,7 +141,7 @@ int check_update()
 	ishomebrew = envIsHomebrew();
 //ishomebrew = true;
 	
-	char *ext = ishomebrew? "3dsx" : "cia";
+	char *ext = (char*)(ishomebrew? "3dsx" : "cia");
 	char *update_url=update_info;
 	while ((update_url=strstr(update_url, "browser_download_url"))!=NULL) {
 		update_url+=24;

@@ -49,7 +49,6 @@ extern void uae3ds_mapping_list();
 extern void uae3ds_mapping_apply(SDL_Event *e);
 extern void uae3ds_mapping_loadbuf(char *s);
 extern char *uae3ds_mapping_savebuf();
-extern char *stralloc(char *s);
 extern char *concat(char *s, ...);
 extern char amiga2ascii(int key);
 
@@ -58,3 +57,5 @@ extern int asprintf (char **str, const char *fmt, ...);
 extern int vasprintf (char **str, const char *fmt, va_list args);
 extern const char *humanSize(uint64_t bytes);
 extern int getWifiStatus();
+extern void ui_error(char *title, char *fmt, ...);
+extern int mkpath(char* file_path);

@@ -92,7 +92,7 @@ CXXFLAGS	:= $(COMMON_CFLAGS) -fno-rtti -std=gnu++11
 ASFLAGS		:=	-g $(ARCH)
 LDFLAGS		=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-SUBLIBS		:=  UAE3DS_SDL
+SUBLIBS		:=  UAE3DS_SDL ZIP
 
 LIBS		:=	-lcurl -lmbedtls -lmbedx509 -lmbedcrypto -lSDL_image -lSDL_gfx -lpng -lz -lcitro3d -lctru -lm
 

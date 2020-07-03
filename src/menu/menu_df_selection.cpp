@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <curl/curl.h>
+#include <zip.h>
 
 #include "menu.h"
 #include "sysdeps.h"
@@ -277,6 +278,8 @@ static void unraise_dfMenu()
 	clear_events();
 }
 
+static char *dtitle = "Download Disk Image";
+
 static int progress_callback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
 {
 	// check events
@@ -294,28 +297,101 @@ static int progress_callback(void *clientp, curl_off_t dltotal, curl_off_t dlnow
 	char *bar="##############################";
 	char buf[512];
 	sprintf(buf, "%s\n\n%-30s\n%s / ",
-		"Downloading Image ...",
+		"Downloading ...",
 		bar+30-((dlnow * 30) / dltotal),
 		humanSize(dlnow));
 	strcat(buf,humanSize(dltotal));
 	text_messagebox(
-		"Download Disk Image", buf, MB_NONE);
+		dtitle, buf, MB_NONE);
 	return 0;
+}
+
+static int mycmp(const void *a, const void *b) {
+	return strcasecmp(*((char**)a),*((char**)b));
 }
 
 static char *dl_and_unzip_url_to(char *url, char *dir) {
 	
-	char buf[4096] = {0};
-	char *exts[] = {".adf",".adz",NULL};
-	strcpy(buf, dir);
-	if (downloadFile(url, buf, progress_callback, MODE_AUTOFILE, exts)) {
-		snprintf(buf,4096,"Error: %s,",http_errbuf);
-		write_log("%s",buf);
-		text_messagebox("Download Disk Image",buf,MB_OK);
-		return NULL;
+	char *ret = NULL, *p;
+	char fname[4096] = {0};
+	char iname[256] = {0};
+	char buf2[1024];
+	char *exts[] = {".adf",".adz", ".zip", NULL};
+	char **zdir = NULL;
+	int i, len, zdir_count = 0;
+
+	strcpy(fname, dir);
+	if (downloadFile(url, fname, progress_callback, MODE_AUTOFILE, exts)) {
+		ui_error(dtitle,"Error: %s", http_errbuf);
 	} else {
-		return stralloc(buf);
+		if (strcasecmp(fname+strlen(fname)-4, ".zip") == 0) {
+			// handle zip archive
+			struct zip *za;
+			struct zip_file *zf;
+			struct zip_stat sb;
+			if ((za = zip_open(fname, 0, NULL)) == NULL) {
+				ui_error(dtitle, "Error: Could not extract\n"
+					             "downloaded archive");
+				unlink(fname);
+				goto bail;
+			} else {
+				// read in the directory and sort
+				zdir = (char**)alloca(zip_get_num_entries(za, 0) * sizeof(char*));
+				for (i = 0; i < zip_get_num_entries(za, 0); i++) {
+					if (zip_stat_index(za, i, 0, &sb) == 0) {
+						if (*(sb.name + strlen(sb.name) - 1) == '/') continue;
+						zdir[zdir_count++] = strdup(sb.name);
+					}
+				}
+				qsort(zdir, zdir_count, sizeof(char*), mycmp);
+
+				// check if file contains any .adf or adz files
+				for (i = 0; i < zdir_count; i++) {
+					if (strlen(zdir[i]) >= 4 &&
+						(strcasecmp(zdir[i] + strlen(zdir[i]) - 4, ".adf") == 0 ||
+						strcasecmp(zdir[i] + strlen(zdir[i]) - 4, ".adz") == 0))
+						break;
+				}
+				if (i >= zdir_count) {
+					ui_error(dtitle, "Error: Downloaded archive does\n"
+						             "not contain any disk images\n"
+							         "(ADF or ADZ files)");
+					zip_close(za);
+					unlink(fname);
+					goto bail;
+				}
+				strcpy(iname, zdir[i]);
+
+				// unzip file
+				for (i = 0; i < zdir_count; i++) {
+					len = asprintf(&p, "%s/%s", dir, zdir[i]);
+					zf = zip_fopen(za, zdir[i], 0);
+					if (zf) {
+						mkpath(p);
+						FILE *fd = fopen(p, "w");
+						if (fd) {
+							while ((len=zip_fread(zf, buf2, 1024))>0) {
+								fwrite(buf2, 1, len, fd);
+							}
+							fclose(fd);
+						}
+						zip_fclose(zf);
+					}
+					free(p);
+				}
+				zip_close(za);
+				unlink(fname);
+				strcpy(fname,iname);
+			}
+		}
+		ret = strdup(fname);
 	}
+bail:
+	if (zdir) {
+		for (i=0; i<zdir_count; i++)
+			if (zdir[i]) free(zdir[i]);
+	}
+	return ret;
 }
 
 static void attachImage(char *path, int df)
@@ -375,15 +451,19 @@ int run_menuDfSel()
 				}
 				break;
 			case DF_MENU_ENTRY_DOWNLOAD:
+				if (!getWifiStatus()) {
+					ui_error(dtitle,"Error:\nWiFi not enabled");
+					break;
+				}
 				p=scan_qr_code(prSDLScreen);
 				if (p) {
 					if (*last_directory == 0)
 						getcwd(last_directory, PATH_MAX);
-					if (asprintf(&buf,"Download (and extract if required)\n%s\nto directory\n%s?",p,last_directory) > 0) {
-						if (text_messagebox("Download Disk Image", buf, MB_YESNO) == 0) {
+					if (asprintf(&buf,"Download (and extract if required)\n\n%s\n\nto directory\n\n%s?",p,last_directory) > 0) {
+						if (text_messagebox(dtitle, buf, MB_YESNO) == 0) {
 							char *f = dl_and_unzip_url_to(p, last_directory);
 							if (f) {
-								log_citra("attach: %s",f);
+//log_citra("attach: %s",f);
 								attachImage(f, dfMenu_df);
 								free(f);
 							}
@@ -411,7 +491,7 @@ void menu_addFavImage(char *path)
 
 	// complete path
 	if (strchr(path, '/')) {
-		p=stralloc(path);
+		p=strdup(path);
 	} else {
 		p=(char*)malloc(strlen(path)+strlen(last_directory)+1);
 		sprintf(p,"%s%s",last_directory, path);
@@ -443,7 +523,7 @@ void menu_load_favorites(char *s)
 	p = strtok_r(s, "|", &saveptr);
 	while (p) {
 		if (!access(p, F_OK)) {
-			favorites[i++]=stralloc(p);
+			favorites[i++]=strdup(p);
 		}
 		p = strtok_r(NULL, "|", &saveptr);
 	}

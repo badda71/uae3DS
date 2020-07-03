@@ -379,7 +379,7 @@ static void addFile(const char *file, int nr) {
 	if (i==nrfiles) {
 		++nrfiles;
 		files = (ASFFile (*)[])realloc(files , nrfiles * sizeof(ASFFile));
-		(*files)[i].name=stralloc((char*)file);
+		(*files)[i].name=strdup((char*)file);
 		(*files)[i].snaps=0;
 	}
 	(*files)[i].snaps |= nr;

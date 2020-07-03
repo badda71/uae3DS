@@ -17,7 +17,7 @@
 #include "uibottom.h"
 #include "menu.h"
 
-#define EMULATION
+//#define EMULATION
 
 int vasprintf (char **str, const char *fmt, va_list args) {
 	int size = 0;
@@ -131,7 +131,7 @@ int tsh_put(tsh_object *o, char *key, void *val) {
 		free(o->hash[i].key);
 		if (o->free_callback) o->free_callback(o->hash[i].val);
 	}
-	o->hash[i].key = (val == NULL) ? NULL : stralloc(key);
+	o->hash[i].key = (val == NULL) ? NULL : strdup(key);
 	o->hash[i].val = val;
 	svcReleaseMutex(o->mutex);
 	return 0;
@@ -378,14 +378,6 @@ char *uae3ds_mapping_savebuf()
 	return s;
 }
 
-char *stralloc(char *s) {
-	if (!s) return NULL;
-	char *p=(char*)malloc(strlen(s)+1);
-	if (!p) return NULL;
-	strcpy(p, s);
-	return p;
-}
-
 char *concat(char *s, ...)
 {
 #define _CONCAT_MAX_ARGS 128
@@ -528,4 +520,32 @@ int getWifiStatus()
 	wifi_status=1;
 #endif
 	return wifi_status;
+}
+
+void ui_error(char *title, char *fmt, ...)
+{
+	char *p;
+	va_list args;
+	va_start(args, fmt);
+	vasprintf(&p, fmt, args);
+	va_end(args);
+	text_messagebox((char*)(title?title:"Error"), p , MB_OK);
+	free(p);
+}
+
+#define MKDIRMOD 0644
+
+int mkpath(char* file_path) {
+    if (!file_path || !*file_path) return -1;
+    for (char* p = strchr(file_path + 1, '/'); p; p = strchr(p + 1, '/')) {
+        *p = '\0';
+        if (mkdir(file_path, MKDIRMOD) == -1) {
+            if (errno != EEXIST) {
+                *p = '/';
+                return -1;
+            }
+        }
+        *p = '/';
+    }
+    return 0;
 }

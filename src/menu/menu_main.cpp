@@ -24,6 +24,7 @@ static const char *text_str_throttle="Throttle";
 static const char *text_str_frameskip="Frameskip";
 static const char *text_str_autosave="Save disks";
 static const char *text_str_vpos="Screen pos";
+static const char *text_str_scale="Scrn scale";
 static const char *text_str_msens="Mouse sens";
 static const char *text_str_cpad= "C-Pad mode";
 static const char *text_str_cpad1= "Joystick";
@@ -63,6 +64,7 @@ enum MainMenuEntry {
 	MAIN_MENU_ENTRY_THROTTLE,
 	MAIN_MENU_ENTRY_FRAMESKIP,
 	MAIN_MENU_ENTRY_SCREEN_POSITION,
+	MAIN_MENU_ENTRY_SCREEN_SCALE,
 	MAIN_MENU_ENTRY_SAVE_DISKS,
 	MAIN_MENU_ENTRY_MOUSE_SENSITIVITY,
 	MAIN_MENU_ENTRY_CPAD,
@@ -82,6 +84,7 @@ int mainMenu_msens=2;
 int mainMenu_cpad=0;
 int mainMenu_mappos=0;
 int mainMenu_savepos=0;
+int mainMenu_scale = 100;
 
 int mainMenu_max_tap_time=250;
 int mainMenu_click_time=100;
@@ -93,8 +96,11 @@ int mainMenu_locked_drags=0;
 
 static int save_ok=0;
 
+extern "C" void N3DS_SetScalingDirect(float x, float y, int permanent);
+
 static void draw_mainMenu(enum MainMenuEntry c)
 {
+	char buf[32];
 	static int frame = 0;
 	int flash = frame / 3;
 	int row = 3*8, col = 10*8;
@@ -102,7 +108,7 @@ static void draw_mainMenu(enum MainMenuEntry c)
 	int column = 0;
 
 	text_draw_background();
-	text_draw_window(72,20,260,200,text_str_title);
+	text_draw_window(72,20,260,208,text_str_title);
 
 	if (c == MAIN_MENU_ENTRY_LOAD && flash)
 		write_text_inv_pos(col, row, text_str_load);
@@ -238,6 +244,15 @@ static void draw_mainMenu(enum MainMenuEntry c)
 
 	row += 12;
 
+	write_text_pos(col, row, text_str_scale);
+	column = col+11*8;
+	snprintf(buf, 32, "%c %d%% %c", mainMenu_scale == 100?' ':'<', mainMenu_scale, mainMenu_scale == 200?' ':'>');
+	if (c == MAIN_MENU_ENTRY_SCREEN_SCALE && flash)
+		write_text_inv_pos(column, row, buf);
+	else
+		write_text_pos(column, row, buf);
+
+	row += 12;
 	write_text_pos(col, row, text_str_autosave);
 	column = col+11*8;
 	
@@ -432,11 +447,15 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 						break;
 					case MAIN_MENU_ENTRY_SCREEN_POSITION:
 						if (left)
-							mainMenu_vpos = (mainMenu_vpos > 0)
-								? mainMenu_vpos - 1
-								: 5;
+							mainMenu_vpos = (mainMenu_vpos + 5) % 6;
 						else if (right)
 							mainMenu_vpos = (mainMenu_vpos + 1) % 6;
+						break;
+					case MAIN_MENU_ENTRY_SCREEN_SCALE:
+						if (left)
+							mainMenu_setScale(mainMenu_scale - 5, 0);
+						else if (right)
+							mainMenu_setScale(mainMenu_scale + 5, 0);
 						break;
 					case MAIN_MENU_ENTRY_SAVE_DISKS:
 						if (left || right)
@@ -527,12 +546,15 @@ static void unraise_mainMenu()
 
 int run_mainMenu()
 {
-	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	int ret=1;
 
 #if defined(AUTO_RUN) || defined(AUTO_FRAMERATE) || defined(AUTO_PROFILER)
 	return 1;
 #else
-static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
+
+	static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
+	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	N3DS_SetScalingDirect(1.0f, 1.0f, 0);
 
 	extern char uae4all_image_file[];
 
@@ -553,18 +575,21 @@ static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 			case MAIN_MENU_ENTRY_SAVED_STATES:
 #ifndef NO_SAVE_MENU
 				run_menuSave(mainMenu_savepos? MODE_SAVE : MODE_LOAD);
-				if (savestate_state == STATE_DORESTORE || savestate_state == STATE_DOSAVE)
-					return 1; /* leave, returning to the emulation */
+				if (savestate_state == STATE_DORESTORE || savestate_state == STATE_DOSAVE) {
+					ret=1; /* leave, returning to the emulation */
+					goto bail;
+				}
 #endif
 				break;
 			case MAIN_MENU_ENTRY_LOAD:
 				run_menuDfSel();
 				break;
 			case MAIN_MENU_ENTRY_RESET_EMULATION:
-				return 2; /* leave, resetting */
-				/* Fall through */
+				ret=2; /* leave, resetting */
+				goto bail;
 			case MAIN_MENU_ENTRY_RETURN_TO_EMULATION:
-				return 1; /* leave, returning to the emulation */
+				ret=1; /* leave, returning to the emulation */
+				goto bail;
 			case MAIN_MENU_ENTRY_UPDATE:
 				if (!check_update()) break;
 				/* Fall through */
@@ -576,5 +601,27 @@ static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 		}
 	}
 #endif
+bail:
 	SDL_EnableKeyRepeat(0, 0);
+	mainMenu_applyScale();
+	return ret;
+}
+
+void mainMenu_applyScale() {
+	float f = mainMenu_scale == 100 ? 1.0f : ((float)mainMenu_scale/100.0f);
+	N3DS_SetScalingDirect(f, f, 0);
+}
+
+void mainMenu_setScale(int scale, int apply) {
+	if (scale < 100) scale=100;
+	if (scale > 200) scale=200;
+	if (scale != mainMenu_scale) {
+		mainMenu_scale = scale;
+		if (apply) {
+			mainMenu_applyScale();
+			char buf[32];
+			snprintf(buf,32,"Scale %d%%",scale);
+			gui_set_message(buf,1000);
+		}
+	}
 }

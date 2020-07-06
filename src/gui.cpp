@@ -106,6 +106,10 @@ void loadConfigBuf(char *s)
 				sscanf(arg, "%d", &mainMenu_frameskip);
 			else if(!strcmp(line, "SCREEN_POS"))
 				sscanf(arg, "%d", &mainMenu_vpos);
+			else if(!strcmp(line, "SCREEN_SCALE")) {
+				sscanf(arg, "%d", &mainMenu_scale);
+				mainMenu_setScale(mainMenu_scale, 1);
+			}
 			else if(!strcmp(line, "SAVE_DISKS"))
 				sscanf(arg, "%d", &mainMenu_autosave);
 			else if(!strcmp(line, "MOUSE_SENSITIVITY"))
@@ -178,6 +182,7 @@ char *getSnapshotConfig() {
 	char *fmt = "THROTTLE %d\n"
 		"FRAMESKIP %d\n"
 		"SCREEN_POS %d\n"
+		"SCREEN_SCALE %d\n"
 		"SAVE_DISKS %d\n"
 		"MOUSE_SENSITIVITY %d\n"
 		"CPAD_MODE %d\n"
@@ -191,12 +196,12 @@ char *getSnapshotConfig() {
 		"KEYMAPPINGS %s\n";
 	
 	char *s = uae3ds_mapping_savebuf();
-	int len = strlen(fmt)+11*4+1+strlen(s);
-	char *r = (char*)malloc(len);
-	snprintf(r, len, fmt,
+	char *r;
+	asprintf(&r, fmt,
 		mainMenu_throttle,
 		mainMenu_frameskip,
 		mainMenu_vpos,
+		mainMenu_scale,
 		mainMenu_autosave,
 		mainMenu_msens,
 		mainMenu_cpad,
@@ -523,11 +528,9 @@ static void inc_throttle(int sgn)
 */
 
 //static int in_goMenu=0;
-extern "C" void N3DS_SetScalingDirect(float x, float y, int permanent);
 
 void gui_handle_events (SDL_Event *e)
 {
-	static int scale = 100;
 	char buf[50];
 	
 	int v,t = e->type;
@@ -578,17 +581,12 @@ void gui_handle_events (SDL_Event *e)
 			}
 			break;
 		case DS_LEFT3:
-			if (v) scale += 10;
+			if (v)
+				mainMenu_setScale(mainMenu_scale + 5, 1);
+			break;
 		case DS_RIGHT3:
-			if (v) {
-				scale -= 5;
-				if (scale < 100) scale=100;
-				if (scale > 200) scale=200;
-				float f = scale==100 ? 1.0f : ((float)scale/100.0f);
-				N3DS_SetScalingDirect(f, f, 0);
-				snprintf(buf,50,"Scale %d%%",scale);
-				gui_set_message(buf,1000);
-			}
+			if (v)
+				mainMenu_setScale(mainMenu_scale - 5, 1);
 			break;
 		case DS_SELECT:
 			if (v) goMenu();

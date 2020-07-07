@@ -364,7 +364,7 @@ static char *dl_and_unzip_url_to(char *url, char *dir) {
 
 				// unzip file
 				for (i = 0; i < zdir_count; i++) {
-					len = asprintf(&p, "%s/%s", dir, zdir[i]);
+					len = asprintf(&p, "%s%s", dir, zdir[i]);
 					zf = zip_fopen(za, zdir[i], 0);
 					if (zf) {
 						mkpath(p);

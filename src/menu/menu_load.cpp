@@ -149,7 +149,7 @@ static int checkFiles(void)
 
 static int getFiles(const char *dir)
 {
-	int i,j;
+	int i;
 	DIR *d;
 	text_dir_num_files_index=0;
 	text_dir_num_files=0;
@@ -329,6 +329,8 @@ static int key_loadMenu(int *c)
 	int end=0;
 	int left=0, right=0, up=0, down=0, hit0=0, hit1=0, hit2=0;
 	SDL_Event event;
+	int x,y,i;
+	static unsigned int poscache[256]={0};
 
 	while (SDL_PollEvent(&event) > 0)
 	{
@@ -379,11 +381,20 @@ static int key_loadMenu(int *c)
 			{
 				if ((text_dir_files[text_dir_num_files_index].d_type==4)||(!strcmp((char *)&text_dir_files[text_dir_num_files_index].d_name,"."))||(!strcmp((char *)&text_dir_files[text_dir_num_files_index].d_name,"..")))
 				{
-					char *tmp=(char *)calloc(1,512);
-					strcpy(tmp,text_dir_files[text_dir_num_files_index].d_name);
+					// store cursor position
+					for (i=0, y=0; last_directory[i] && y<255; i++) if (last_directory[i]=='/') ++y;
+					poscache[y]= text_dir_num_files_index + (min_in_dir<<16);
+
+					char *tmp=strdup(text_dir_files[text_dir_num_files_index].d_name);
 					if (getFiles(tmp))
 						end=-1;
 					free(tmp);
+					// recall cursor pos if going up directory
+					for (i=0, x=0; last_directory[i] && y<255; i++) if (last_directory[i]=='/') ++x;
+					if (x < y) {
+						text_dir_num_files_index=poscache[x] & 0xffff;
+						min_in_dir=poscache[x]>>16;
+					}
 				}
 				else
 				{

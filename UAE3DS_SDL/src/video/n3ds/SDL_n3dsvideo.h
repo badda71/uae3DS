@@ -42,6 +42,7 @@ struct SDL_PrivateVideoData {
 	float l2,r2,t2,b2; // GPU source window for the bottom part of the video buffer
 	float scalex,scaley; // scaling factors
 	float scalex2,scaley2; // scaling factors
+	int yoffset;
 
 // framebuffer data
     int w, h; // width and height of the video buffer

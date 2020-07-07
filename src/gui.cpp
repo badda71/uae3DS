@@ -105,11 +105,9 @@ void loadConfigBuf(char *s)
 			else if(!strcmp(line, "FRAMESKIP"))
 				sscanf(arg, "%d", &mainMenu_frameskip);
 			else if(!strcmp(line, "SCREEN_POS"))
-				sscanf(arg, "%d", &mainMenu_vpos);
-			else if(!strcmp(line, "SCREEN_SCALE")) {
+				sscanf(arg, "%d", &mainMenu_vpos_total);
+			else if(!strcmp(line, "SCREEN_SCALE"))
 				sscanf(arg, "%d", &mainMenu_scale);
-				mainMenu_setScale(mainMenu_scale, 1);
-			}
 			else if(!strcmp(line, "SAVE_DISKS"))
 				sscanf(arg, "%d", &mainMenu_autosave);
 			else if(!strcmp(line, "MOUSE_SENSITIVITY"))
@@ -144,6 +142,7 @@ void loadConfigBuf(char *s)
 		}
 		line = strtok_r(NULL, "\n", &saveptr);
 	}
+	mainMenu_adjustVposScale(0,0,1);
 }
 
 void loadConfig()
@@ -200,7 +199,7 @@ char *getSnapshotConfig() {
 	asprintf(&r, fmt,
 		mainMenu_throttle,
 		mainMenu_frameskip,
-		mainMenu_vpos,
+		mainMenu_vpos_total,
 		mainMenu_scale,
 		mainMenu_autosave,
 		mainMenu_msens,
@@ -531,8 +530,6 @@ static void inc_throttle(int sgn)
 
 void gui_handle_events (SDL_Event *e)
 {
-	char buf[50];
-	
 	int v,t = e->type;
 	if ((v=(t == SDL_KEYDOWN)) || t == SDL_KEYUP) {
 		switch (e->key.keysym.sym) {
@@ -567,14 +564,9 @@ void gui_handle_events (SDL_Event *e)
 		case DS_RIGHT1:
 			emulated_right=v; break;
 		case DS_UP3:
-			if (v) mainMenu_vpos += 2;
 		case DS_DOWN3:
 			if (v) {
-				mainMenu_vpos -= 1;
-				if (mainMenu_vpos > 5) mainMenu_vpos=5;
-				if (mainMenu_vpos < 0) mainMenu_vpos=0;
-				snprintf(buf,50,"VPOS %d",mainMenu_vpos*8);
-				gui_set_message(buf,1000);
+				mainMenu_adjustVposScale(e->key.keysym.sym == DS_UP3 ? 1 : -1, 0, 1);
 				getChanges();
 				check_all_prefs();
 			    notice_screen_contents_lost();
@@ -582,11 +574,11 @@ void gui_handle_events (SDL_Event *e)
 			break;
 		case DS_LEFT3:
 			if (v)
-				mainMenu_setScale(mainMenu_scale + 5, 1);
+				mainMenu_adjustVposScale(0, -5, 1);
 			break;
 		case DS_RIGHT3:
 			if (v)
-				mainMenu_setScale(mainMenu_scale - 5, 1);
+				mainMenu_adjustVposScale(0, 5, 1);
 			break;
 		case DS_SELECT:
 			if (v) goMenu();

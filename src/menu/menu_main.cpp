@@ -33,11 +33,7 @@ static const char *text_str_keymap="Key mappings";
 static const char *text_str_keymap1="Add";
 static const char *text_str_keymap2="Delete";
 static const char *text_str_keymap3="List";
-static const char *text_str_8="8";
-static const char *text_str_16="16";
 static const char *text_str_20="20";
-static const char *text_str_24="24";
-static const char *text_str_32="32";
 static const char *text_str_40="40";
 static const char *text_str_60="60";
 static const char *text_str_80="80";
@@ -77,6 +73,8 @@ enum MainMenuEntry {
 };
 
 int mainMenu_vpos=0;
+int mainMenu_yoffset=0;
+int mainMenu_vpos_total=0;
 int mainMenu_throttle=0;
 int mainMenu_frameskip=-1;
 int mainMenu_autosave=-1;
@@ -97,6 +95,7 @@ int mainMenu_locked_drags=0;
 static int save_ok=0;
 
 extern "C" void N3DS_SetScalingDirect(float x, float y, int permanent);
+extern "C" void N3DS_SetYOffset(int x);
 
 static void draw_mainMenu(enum MainMenuEntry c)
 {
@@ -211,42 +210,17 @@ static void draw_mainMenu(enum MainMenuEntry c)
 
 	write_text_pos(col, row, text_str_vpos);
 	column = col+11*8;
-
-	if ((mainMenu_vpos == 0) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv_pos(column, row, text_str_0);
+	snprintf(buf, 32, "< %4d >", mainMenu_vpos_total * 8);
+	if (c == MAIN_MENU_ENTRY_SCREEN_POSITION && flash)
+		write_text_inv_pos(column, row, buf);
 	else
-		write_text_pos(column, row, text_str_0);
-	column += 8*(strlen(text_str_0) + 1);
-	if ((mainMenu_vpos == 1) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv_pos(column, row, text_str_8);
-	else
-		write_text_pos(column, row, text_str_8);
-	column += 8*(strlen(text_str_8) + 1);
-	if ((mainMenu_vpos == 2) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv_pos(column, row, text_str_16);
-	else
-		write_text_pos(column, row, text_str_16);
-	column += 8*(strlen(text_str_16) + 1);
-	if ((mainMenu_vpos == 3) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv_pos(column, row, text_str_24);
-	else
-		write_text_pos(column, row, text_str_24);
-	column += 8*(strlen(text_str_24) + 1);
-	if ((mainMenu_vpos == 4) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv_pos(column, row, text_str_32);
-	else
-		write_text_pos(column, row, text_str_32);
-	column += 8*(strlen(text_str_32) + 1);
-	if ((mainMenu_vpos == 5) && (c != MAIN_MENU_ENTRY_SCREEN_POSITION || flash))
-		write_text_inv_pos(column, row, text_str_40);
-	else
-		write_text_pos(column, row, text_str_40);
+		write_text_pos(column, row, buf);
 
 	row += 12;
 
 	write_text_pos(col, row, text_str_scale);
 	column = col+11*8;
-	snprintf(buf, 32, "%c %d%% %c", mainMenu_scale == 100?' ':'<', mainMenu_scale, mainMenu_scale == 200?' ':'>');
+	snprintf(buf, 32, "< %d%% >", mainMenu_scale);
 	if (c == MAIN_MENU_ENTRY_SCREEN_SCALE && flash)
 		write_text_inv_pos(column, row, buf);
 	else
@@ -447,15 +421,15 @@ static enum MainMenuEntry key_mainMenu(enum MainMenuEntry *sel)
 						break;
 					case MAIN_MENU_ENTRY_SCREEN_POSITION:
 						if (left)
-							mainMenu_vpos = (mainMenu_vpos + 5) % 6;
+							mainMenu_adjustVposScale(-1, 0, 0);
 						else if (right)
-							mainMenu_vpos = (mainMenu_vpos + 1) % 6;
+							mainMenu_adjustVposScale(1, 0, 0);
 						break;
 					case MAIN_MENU_ENTRY_SCREEN_SCALE:
 						if (left)
-							mainMenu_setScale(mainMenu_scale - 5, 0);
+							mainMenu_adjustVposScale(0, -5, 0);
 						else if (right)
-							mainMenu_setScale(mainMenu_scale + 5, 0);
+							mainMenu_adjustVposScale(0, 5, 0);
 						break;
 					case MAIN_MENU_ENTRY_SAVE_DISKS:
 						if (left || right)
@@ -554,7 +528,7 @@ int run_mainMenu()
 
 	static enum MainMenuEntry c = MAIN_MENU_ENTRY_LOAD;
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-	N3DS_SetScalingDirect(1.0f, 1.0f, 0);
+	mainMenu_resetVposScale();
 
 	extern char uae4all_image_file[];
 
@@ -603,25 +577,49 @@ int run_mainMenu()
 #endif
 bail:
 	SDL_EnableKeyRepeat(0, 0);
-	mainMenu_applyScale();
+	mainMenu_applyVposScale();
 	return ret;
 }
 
-void mainMenu_applyScale() {
-	float f = mainMenu_scale == 100 ? 1.0f : ((float)mainMenu_scale/100.0f);
-	N3DS_SetScalingDirect(f, f, 0);
+void mainMenu_adjustVposScale(int dvpos, int dscale, int apply) {
+	char buf[32] = {0};
+	mainMenu_scale += dscale;
+	mainMenu_vpos_total += dvpos;
+
+	if (mainMenu_scale < 100) mainMenu_scale=100;
+	if (mainMenu_scale > 200) mainMenu_scale=200;
+
+	int so = (((mainMenu_scale * 240) / 100) - 240) / 16;
+	if (mainMenu_vpos_total > 5 + so) mainMenu_vpos_total = 5 + so;
+	if (mainMenu_vpos_total < -so) mainMenu_vpos_total = -so;
+
+	if (mainMenu_vpos_total > 5) {
+		mainMenu_vpos = 5;
+		mainMenu_yoffset = -(mainMenu_vpos_total-5) * 8;
+	} else if (mainMenu_vpos_total < 0) {
+		mainMenu_vpos = 0;
+		mainMenu_yoffset = -mainMenu_vpos_total * 8;
+	} else {
+		mainMenu_vpos = mainMenu_vpos_total;
+		mainMenu_yoffset = 0;
+	}
+	if (apply) {
+		if (dvpos)
+			snprintf(buf,32,"VPOS %d",mainMenu_vpos_total * 8);
+		if (dscale)
+			snprintf(buf,32,"SCALE %d%%",mainMenu_scale);
+		if (*buf) gui_set_message(buf,1000);
+		mainMenu_applyVposScale();
+	}
 }
 
-void mainMenu_setScale(int scale, int apply) {
-	if (scale < 100) scale=100;
-	if (scale > 200) scale=200;
-	if (scale != mainMenu_scale) {
-		mainMenu_scale = scale;
-		if (apply) {
-			mainMenu_applyScale();
-			char buf[32];
-			snprintf(buf,32,"Scale %d%%",scale);
-			gui_set_message(buf,1000);
-		}
-	}
+void mainMenu_applyVposScale() {
+	float f = mainMenu_scale == 100 ? 1.0f : ((float)mainMenu_scale/100.0f);
+	N3DS_SetScalingDirect(f, f, 0);
+	N3DS_SetYOffset(mainMenu_yoffset);
+}
+
+void mainMenu_resetVposScale() {
+	N3DS_SetScalingDirect(1.0f, 1.0f, 0);
+	N3DS_SetYOffset(0);
 }

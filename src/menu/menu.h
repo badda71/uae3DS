@@ -103,7 +103,9 @@ int run_menuGame();
 int run_menuControl();
 
 extern int mainMenu_vpos;
+extern int mainMenu_vpos_total;
 extern int mainMenu_scale;
+extern int mainMenu_yoffset;
 extern int mainMenu_throttle;
 extern int mainMenu_frameskip;
 extern int mainMenu_autosave;
@@ -127,5 +129,6 @@ extern Uint32 menu_win1_color;			// window frame
 
 extern void menu_set_text_color(Uint32 c);
 extern void menu_restore_text_color();
-extern void mainMenu_setScale(int scale, int apply);
-extern void mainMenu_applyScale();
+extern void mainMenu_adjustVposScale(int dvpos, int dscale, int apply);
+extern void mainMenu_applyVposScale();
+extern void mainMenu_resetVposScale();

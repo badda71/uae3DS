@@ -76,6 +76,9 @@ void N3DS_PumpEvents(_THIS)
 {
 //	svcSleepThread(100000); // 0.1 ms
 	
+	// yield to background processes
+	svcSleepThread(1);
+
 	if (app_pause) return;
 	
 	if(!aptMainLoop())

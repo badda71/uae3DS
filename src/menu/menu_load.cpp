@@ -111,7 +111,7 @@ static void copyCompleteName(char *dest, int n)
 	}
 
 }
-
+/*
 static int checkFiles(void)
 {
 	char *buf=(char *)calloc(1,2046);
@@ -146,7 +146,7 @@ static int checkFiles(void)
 	free(buf);
 	return ret;
 }
-
+*/
 static int getFiles(const char *dir)
 {
 	int i;
@@ -212,6 +212,17 @@ static int getFiles(const char *dir)
 	}
 	text_dir_num_files=i;
 	qsort(text_dir_files, text_dir_num_files, sizeof(fichero), compare_names);
+
+	// check and set the index
+	char *p = df_num == DF_0 ? uae4all_image_file : uae4all_image_file2;
+	if (*p) {
+		for (i=0; i<text_dir_num_files; ++i) {
+			if (strcmp(p, text_dir_files[i].d_name) == 0) {
+				text_dir_num_files_index = i;
+				break;
+			}
+		}
+	}
 
 	return 0;
 }
@@ -486,11 +497,11 @@ int run_menuLoad(enum DiskOrder new_df_num)
 
 	df_num = new_df_num;
 
-	if (text_dir_files==NULL)
+//	if (text_dir_files==NULL)
 		end=getDefaultFiles();
-	else
-		if (checkFiles())
-			end=getDefaultFiles();
+//	else
+//		if (checkFiles())
+//			end=getDefaultFiles();
 
 //	text_dir_num_files_index=0;
 

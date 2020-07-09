@@ -370,9 +370,11 @@ char *uae3ds_mapping_savebuf()
 		if (keymaps[i][0]) ++count;
 	}
 	s=(char*)calloc(count*9+1, 1);
-	for (i=0; i<0x200; i++) {
-		if (keymaps[i][0]) {
-			sprintf(s+strlen(s),"%s%x", strlen(s)?"_":"", (i << 18) | ((keymaps[i][0] & 0x1ff) << 9) | (keymaps[i][1] & 0x1ff));
+	if (s) {
+		for (i=0; i<0x200; i++) {
+			if (keymaps[i][0]) {
+				sprintf(s+strlen(s),"%s%x", strlen(s)?"_":"", (i << 18) | ((keymaps[i][0] & 0x1ff) << 9) | (keymaps[i][1] & 0x1ff));
+			}
 		}
 	}
 	return s;

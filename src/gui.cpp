@@ -195,6 +195,7 @@ char *getSnapshotConfig() {
 		"KEYMAPPINGS %s\n";
 	
 	char *s = uae3ds_mapping_savebuf();
+	if (!s) return NULL;
 	char *r;
 	asprintf(&r, fmt,
 		mainMenu_throttle,
@@ -218,26 +219,26 @@ char *getSnapshotConfig() {
 
 void storeConfig()
 {
-	FILE *f;
-	char *config = (char *)malloc(strlen(config_dir) + strlen("/uae3DS.cfg") + 1);
+	FILE *f=NULL;
 	extern char last_directory[PATH_MAX];
+	char *s1=NULL, *s2=NULL, *config=NULL;
 
-	if(config == NULL)
-		return;
+
+	config = (char *)malloc(strlen(config_dir) + strlen("/uae3DS.cfg") + 1);
+	s1 = getSnapshotConfig();
+	s2 = menu_save_favorites();
+
+	if (!config || !s1 || !s2)
+		goto bail;
 
 	sprintf(config, "%s/uae3DS.cfg", config_dir);
-
 	f = fopen(config, "w");
 
 	if(f == NULL)
 	{
-		printf("Failed to open config file: \"%s\" for writing.\n", config);
-		free(config);
-		return;
+		write_log("Failed to open config file: \"%s\" for writing.\n", config);
+		goto bail;
 	}
-
-	char *s1 = getSnapshotConfig();
-	char *s2 = menu_save_favorites();
 
 	fprintf(f,
 		"%s"
@@ -245,16 +246,15 @@ void storeConfig()
 		s1,
 		s2
 	);
-	free(s1);
-	free(s2);
-
 	if(last_directory[0])
 	{
 		fprintf(f, "LAST_DIR %s\n", last_directory);
 	}
-
-	fclose(f);
-	free(config);
+bail:
+	if (f) fclose(f);
+	if (config) free(config);
+	if (s1) free(s1);
+	if (s2) free(s2);
 }
 
 static void getChanges(void)

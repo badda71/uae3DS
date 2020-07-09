@@ -279,6 +279,7 @@ static void unraise_dfMenu()
 }
 
 static char *dtitle = "Download Disk Image";
+static char c_task[64] = {0};
 
 static int progress_callback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
 {
@@ -297,7 +298,7 @@ static int progress_callback(void *clientp, curl_off_t dltotal, curl_off_t dlnow
 	char *bar="##############################";
 	char buf[512];
 	sprintf(buf, "%s\n\n%-30s\n%s / ",
-		"Downloading ...",
+		c_task,
 		bar+30-((dlnow * 30) / dltotal),
 		humanSize(dlnow));
 	strcat(buf,humanSize(dltotal));
@@ -310,22 +311,28 @@ static int mycmp(const void *a, const void *b) {
 	return strcasecmp(*((char**)a),*((char**)b));
 }
 
+#define BUFSIZE 64*1024
+
 static char *dl_and_unzip_url_to(char *url, char *dir) {
 	
 	char *ret = NULL, *p;
 	char fname[4096] = {0};
 	char iname[256] = {0};
-	char buf2[1024];
+	void *buf2;
 	char *exts[] = {".adf",".adz", ".zip", NULL};
 	char **zdir = NULL;
 	int i, len, zdir_count = 0;
 
+	if (!(buf2=malloc(BUFSIZE))) goto bail;
+
 	strcpy(fname, dir);
+	strcpy(c_task,"Downloading ...");
 	if (downloadFile(url, fname, progress_callback, MODE_AUTOFILE, exts)) {
 		ui_error(dtitle,"Error: %s", http_errbuf);
 	} else {
 		if (strcasecmp(fname+strlen(fname)-4, ".zip") == 0) {
 			// handle zip archive
+			u64 size=0;
 			struct zip *za;
 			struct zip_file *zf;
 			struct zip_stat sb;
@@ -336,11 +343,12 @@ static char *dl_and_unzip_url_to(char *url, char *dir) {
 				goto bail;
 			} else {
 				// read in the directory and sort
-				zdir = (char**)alloca(zip_get_num_entries(za, 0) * sizeof(char*));
+				zdir = (char**)malloc(zip_get_num_entries(za, 0) * sizeof(char*));
 				for (i = 0; i < zip_get_num_entries(za, 0); i++) {
 					if (zip_stat_index(za, i, 0, &sb) == 0) {
 						if (*(sb.name + strlen(sb.name) - 1) == '/') continue;
 						zdir[zdir_count++] = strdup(sb.name);
+						size += sb.size;
 					}
 				}
 				qsort(zdir, zdir_count, sizeof(char*), mycmp);
@@ -363,6 +371,7 @@ static char *dl_and_unzip_url_to(char *url, char *dir) {
 				strcpy(iname, zdir[i]);
 
 				// unzip file
+				u32 size2=0;
 				for (i = 0; i < zdir_count; i++) {
 					len = asprintf(&p, "%s%s", dir, zdir[i]);
 					zf = zip_fopen(za, zdir[i], 0);
@@ -370,7 +379,10 @@ static char *dl_and_unzip_url_to(char *url, char *dir) {
 						mkpath(p);
 						FILE *fd = fopen(p, "w");
 						if (fd) {
-							while ((len=zip_fread(zf, buf2, 1024))>0) {
+							while ((len=zip_fread(zf, buf2, BUFSIZE))>0) {
+								size2+=len;
+								snprintf(c_task,sizeof(c_task),"Extracting ...\n%.30s", zdir[i]);
+								progress_callback(NULL, size, size2, 0, 0);
 								fwrite(buf2, 1, len, fd);
 							}
 							fclose(fd);
@@ -387,9 +399,11 @@ static char *dl_and_unzip_url_to(char *url, char *dir) {
 		ret = strdup(fname);
 	}
 bail:
+	if (buf2) free(buf2);
 	if (zdir) {
 		for (i=0; i<zdir_count; i++)
 			if (zdir[i]) free(zdir[i]);
+		free(zdir);
 	}
 	return ret;
 }

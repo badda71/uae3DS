@@ -547,12 +547,12 @@ char *menu_save_favorites()
 {
 	int l=1;
 	char *p;
-	for (int i=0; favorites[i]!=NULL; ++i)
+	for (int i=0; i<NUM_FAV && favorites[i]!=NULL; ++i)
 		l += strlen(favorites[i])+1;
 	p=(char*)malloc(l);
 	if (!p) return NULL;
 	*p=0;
-	for (int i=0; favorites[i]!=NULL; ++i)
+	for (int i=0; i<NUM_FAV && favorites[i]!=NULL; ++i)
 		sprintf(p+strlen(p), "%s%s", i==0 ? "" : "|", favorites[i]);
 	return p;
 }

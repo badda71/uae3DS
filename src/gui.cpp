@@ -270,64 +270,33 @@ int gui_init (void)
 {
 //Se ejecuta justo despues del MAIN
     if (prSDLScreen==NULL)
-	prSDLScreen=SDL_SetVideoMode(400,240,16,VIDEO_FLAGS);
+		prSDLScreen=SDL_SetVideoMode(400,240,16,VIDEO_FLAGS);
     SDL_ShowCursor(SDL_DISABLE);
     SDL_JoystickEventState(SDL_IGNORE);
     SDL_JoystickOpen(0);
     if (prSDLScreen!=NULL)
     {
-	uae4all_image_file[0]=0;
-	uae4all_image_file2[0]=0;
-	init_text(1);
-	loadConfig();
-	// start menu as soon as possible
-	//run_mainMenu();
-	SDL_Event e;
-	e.type = SDL_KEYDOWN;
-	e.key.keysym.sym = (SDLKey)DS_SELECT;
-	e.key.keysym.mod = KMOD_MODE; // not mappable
-	SDL_PushEvent(&e);
-	e.type = SDL_KEYUP;
-	SDL_PushEvent(&e);
+		uae4all_image_file[0]=0;
+		uae4all_image_file2[0]=0;
+		init_text(1);
+		loadConfig();
+		// start menu as soon as possible
+		//run_mainMenu();
+		SDL_Event e;
+		e.type = SDL_KEYDOWN;
+		e.key.keysym.sym = (SDLKey)DS_SELECT;
+		e.key.keysym.mod = KMOD_MODE; // not mappable
+		SDL_PushEvent(&e);
+		e.type = SDL_KEYUP;
+		SDL_PushEvent(&e);
 
-	quit_text();
-	uae4all_pause_music();
-	getChanges();
-	check_all_prefs();
-	reset_frameskip();
-    black_screen_now();
-#ifdef DEBUG_FRAMERATE
-	uae4all_update_time();
-#endif
-#ifdef PROFILER_UAE4ALL
-	uae4all_prof_init();
-	uae4all_prof_add("M68K");			// 0
-	uae4all_prof_add("EVENTS");			// 1
-	uae4all_prof_add("HSync");			// 2
-	uae4all_prof_add("Copper");			// 3
-	uae4all_prof_add("Audio");			// 4
-	uae4all_prof_add("CIA");			// 5
-	uae4all_prof_add("Blitter");			// 6
-	uae4all_prof_add("Vsync");			// 7
-	uae4all_prof_add("update_fetch");		// 8
-	uae4all_prof_add("linetoscr");			// 9
-	uae4all_prof_add("do_long_fetch");		// 10
-	uae4all_prof_add("pfield_doline");		// 11
-	uae4all_prof_add("draw_sprites_ecs");		// 12
-	uae4all_prof_add("flush_block");		// 13
-	uae4all_prof_add("SET_INTERRUPT");		// 14
-/*
-	uae4all_prof_add("15");		// 15
-	uae4all_prof_add("16");		// 16
-	uae4all_prof_add("17");		// 17
-	uae4all_prof_add("18");		// 18
-	uae4all_prof_add("19");		// 19
-	uae4all_prof_add("20");		// 20
-	uae4all_prof_add("21");		// 21
-	uae4all_prof_add("22");		// 22
-*/
-#endif
-	return 0;
+		quit_text();
+		uae4all_pause_music();
+		getChanges();
+		check_all_prefs();
+		reset_frameskip();
+		black_screen_now();
+		return 0;
     }
     return -1;
 }
@@ -388,62 +357,29 @@ static void goMenu(void)
 		scr_backup = SDL_CreateRGBSurface(SDL_SWSURFACE, 320, 240, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 	SDL_BlitSurface(prSDLScreen, &(SDL_Rect){40,0,320,240}, scr_backup, NULL);
 
-#ifdef PROFILER_UAE4ALL
-   uae4all_prof_show();
-#endif
-#ifdef DEBUG_FRAMERATE
-   uae4all_show_time();
-#endif
-   init_text(0);
-   pause_sound();
-   menu_raise();
-   exitmode=run_mainMenu();
-   notice_screen_contents_lost();
-   resume_sound();
-   if ((!(strcmp(prefs_df[0],uae4all_image_file))) || ((!(strcmp(prefs_df[1],uae4all_image_file2)))))
-	   menu_unraise();
-   quit_text();
-#ifdef DREAMCAST
-   SDL_DC_EmulateKeyboard(SDL_FALSE);
-#endif
+	init_text(0);
+	pause_sound();
+	menu_raise();
+	exitmode=run_mainMenu();
+	notice_screen_contents_lost();
+	resume_sound();
+	if ((!(strcmp(prefs_df[0],uae4all_image_file))) || ((!(strcmp(prefs_df[1],uae4all_image_file2)))))
+		menu_unraise();
+	quit_text();
     getChanges();
 
     if (exitmode==1 || exitmode==2)
     {
-//    	    extern char *savestate_filename;
-#ifndef NO_SAVE_MENU
-//    	    extern int saveMenu_n_savestate;
-#endif
 	    if (strcmp(changed_df[0],uae4all_image_file))
 	    {
-            	strcpy(changed_df[0],uae4all_image_file);
+           	strcpy(changed_df[0],uae4all_image_file);
 	    	real_changed_df[0]=1;
 	    }
 	    if (strcmp(changed_df[1],uae4all_image_file2))
 	    {
-            	strcpy(changed_df[1],uae4all_image_file2);
+           	strcpy(changed_df[1],uae4all_image_file2);
 	    	real_changed_df[1]=1;
 	    }
-/*
-		strcpy(savestate_filename, SAVESTATE_PREFIX);
-		strcat(savestate_filename, uae4all_image_file[0] ? uae4all_image_file : "null");
-#ifndef NO_SAVE_MENU
-	    switch(saveMenu_n_savestate)
-    	    {
-	    	case 1:
-    			strcat(savestate_filename,"-1.asf");
-				break;
-	    	case 2:
-    			strcat(savestate_filename,"-2.asf");
-				break;
-	    	case 3:
-    			strcat(savestate_filename,"-3.asf");
-				break;
-	    	default: 
-    	   		strcat(savestate_filename,"-0.asf");
-    	    }
-#endif
-*/
     }
 
     if (exitmode==2)
@@ -451,22 +387,17 @@ static void goMenu(void)
 	    if (autosave!=mainMenu_autosave)
 	    {
 	    	prefs_df[0][0]=0;
-	   	prefs_df[1][0]=0;
+		   	prefs_df[1][0]=0;
 	    }
 	    black_screen_now();
 	    show_mhz();
 	    uae_reset ();
     }
     check_all_prefs();
+	reset_frameskip();
     gui_purge_events();
     black_screen_now();
     notice_screen_contents_lost();
-#ifdef DEBUG_FRAMERATE
-    uae4all_update_time();
-#endif
-#ifdef PROFILER_UAE4ALL
-    uae4all_prof_init();
-#endif
 }
 
 int nowSuperThrottle=0;
@@ -479,6 +410,7 @@ static void goSuperThrottle(void)
 		m68k_speed=1; //6;
 		changed_produce_sound=0;
 		changed_gfx_framerate=80;
+		reset_frameskip();
 		check_prefs_changed_cpu();
 		check_prefs_changed_audio();
 		check_prefs_changed_custom();
@@ -491,6 +423,7 @@ static void leftSuperThrottle(void)
 	if (nowSuperThrottle)
 	{
 		nowSuperThrottle=0;
+		reset_frameskip();
 		getChanges();
 		check_prefs_changed_cpu();
 		check_prefs_changed_audio();

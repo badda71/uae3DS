@@ -96,8 +96,6 @@ static int dblpf_ind1[256], dblpf_ind2[256];
 
 static int dblpf_2nd1[256], dblpf_2nd2[256];
 
-static int dblpfofs[] = { 0, 2, 4, 8, 16, 32, 64, 128 };
-
 static int sprite_offs[256];
 
 static uae_u32 clxtab[256];
@@ -151,7 +149,6 @@ uae_u8 line_data[(MAXVPOS + 1) * 2][MAX_PLANES * MAX_WORDS_PER_LINE * 2] UAE4ALL
 static int min_diwstart, max_diwstop;
 static int thisframe_y_adjust;
 static int thisframe_y_adjust_real, max_ypos_thisframe, min_ypos_for_screen;
-static int extra_y_adjust;
 
 /* A frame counter that forces a redraw after at least one skipped frame in
    interlace mode.  */
@@ -200,6 +197,7 @@ extern double uae4all_framerate;
 
 static Uint32 proximo_frameskip;
 extern int *tabla_ajuste;
+extern int nowSuperThrottle;
 
 void reset_frameskip()
 {
@@ -209,130 +207,49 @@ void reset_frameskip()
 static __inline__ void count_frame (void)
 {
     uae4all_numframes++;
-
-#ifdef AUTO_PROFILER
-    if (uae4all_numframes==AUTO_PROFILER)
-    {
-	    puts("PROFILER..."); fflush(stdout);
-	    prefs_gfx_framerate=0;
-#ifdef AUTO_PROFILER_SOUND
-	    changed_produce_sound=2;
-	    sound_default_evtime();
-	    check_prefs_changed_audio();
-#endif
-	    uae4all_prof_init();
-    }
-#ifdef MAX_AUTO_PROFILER
-    else if (uae4all_numframes==MAX_AUTO_PROFILER)
-    {
-	    uae4all_prof_show();
-	    exit(0);
-    }
-#endif
-
-#endif
-
-#ifdef DEBUG_FRAMERATE
-#ifdef AUTO_FRAMERATE
-    if (uae4all_numframes==AUTO_FRAMERATE)
-    {
-	    uae4all_frameskipped=0;
-	    prefs_gfx_framerate=-1;
-#ifdef AUTO_FRAMERATE_SOUND
-	    changed_produce_sound=2;
-	    sound_default_evtime();
-	    check_prefs_changed_audio();
-#endif
-    }
-    else if (uae4all_numframes>AUTO_FRAMERATE)
-    {
-	static Uint32 start_time=0;
-	static Uint32 start_numframes=0;
-
-	if (!start_time)
-	{
-		start_time=SDL_GetTicks();
-		start_numframes=uae4all_numframes;
-	}
-	else
-	{
-		Uint32 now=SDL_GetTicks();
-		if (now-start_time>=1000)
-		{
-			if (uae4all_framerate!=0.0)
-				uae4all_framerate=(uae4all_framerate+((double)(uae4all_numframes-start_numframes)))/2.0;
-			else
-				uae4all_framerate=(double)(uae4all_numframes-start_numframes);
-			start_time=now;
-			start_numframes=uae4all_numframes;
-		}
-	}
-	    
-    }
-#ifdef MAX_AUTO_FRAMERATE
-    if (uae4all_numframes==MAX_AUTO_FRAMERATE)
-    {
-	    uae4all_numframes-=AUTO_FRAMERATE;
-	    uae4all_show_time();
-	    exit(0);
-    }
-#endif
-#endif
-#endif
-    if (prefs_gfx_framerate>=0)
-    {
-    	framecnt++;
-    	if (framecnt > prefs_gfx_framerate)
-		framecnt = 0;
-#ifdef DEBUG_FRAMERATE
-	else
-		uae4all_frameskipped++;
-#endif
-    }
-    else
-    {
-	static int cuantos=0;
-
 	Uint32 ahora=SDL_GetTicks();
 	proximo_frameskip+=UMBRAL;
 
-#ifdef NO_THREADS
 	if (!produce_sound)
 		proximo_frameskip--;
 	else
 		proximo_frameskip+=(tabla_ajuste[uae4all_numframes%9]);
-#endif
-	if ((ahora-PARTIDA)>proximo_frameskip)
-	{	
-		cuantos++;
-		if (cuantos>5)
-		{
-			proximo_frameskip=ahora+2;
-			framecnt=0;
-			cuantos=0;
+
+    if (prefs_gfx_framerate>=0)
+    {
+    	framecnt++;
+    	if (framecnt > prefs_gfx_framerate)
+			goto noskip;
+    }
+    else
+    {
+		static int cuantos=0;
+
+		if ((ahora-PARTIDA)>proximo_frameskip)
+		{	
+			cuantos++;
+			if (cuantos>5)
+			{
+				proximo_frameskip=ahora+2;
+				framecnt=0;
+				cuantos=0;
+			}
+			else
+			{
+				framecnt=1;
+			}
 		}
 		else
 		{
-			framecnt=1;
-#ifdef DEBUG_FRAMERATE
-			uae4all_frameskipped++;
-#endif
+noskip:
+			if (!nowSuperThrottle && (ahora+PARTIDA)<proximo_frameskip)
+			{
+				SDL_Delay(proximo_frameskip-ahora-(PARTIDA/3)+1);
+				proximo_frameskip=SDL_GetTicks();
+			}
+			framecnt=0;
+			cuantos=0;
 		}
-	}
-	else
-	{
-		if ((ahora+PARTIDA)<proximo_frameskip)
-		{
-#ifdef _3DS
-			SDL_Delay(proximo_frameskip-ahora-(PARTIDA/3)+1);
-#else
-			SDL_Delay(proximo_frameskip-ahora);
-#endif
-			proximo_frameskip=SDL_GetTicks();
-		}
-		framecnt=0;
-		cuantos=0;
-	}
     }
 }
 
@@ -598,7 +515,6 @@ static __inline__ void draw_sprites_1 (struct sprite_entry *_GCCRES_ e, int dual
     uae_u16 *buf = spixels + e->first_pixel;
     uae_u8 *stbuf = spixstate.bytes + e->first_pixel;
     int pos, window_pos;
-    uae_u8 xor_val = (uae_u8)(dp_for_drawing->bplcon4 >> 8);
 
     buf -= e->pos;
     stbuf -= e->pos;
@@ -701,7 +617,6 @@ static void draw_sprites_normal_sp_lo_nat(struct sprite_entry *_GCCRES_ e)
     uae_u16 *buf = spixels + e->first_pixel;
     uae_u8 *stbuf = spixstate.bytes + e->first_pixel;
     int pos, window_pos;
-    uae_u8 xor_val = (uae_u8)(dp_for_drawing->bplcon4 >> 8);
 
     buf -= e->pos;
     stbuf -= e->pos;
@@ -743,7 +658,6 @@ static void draw_sprites_normal_dp_lo_nat(struct sprite_entry *_GCCRES_ e)
     uae_u16 *buf = spixels + e->first_pixel;
     uae_u8 *stbuf = spixstate.bytes + e->first_pixel;
     int pos, window_pos;
-    uae_u8 xor_val = (uae_u8)(dp_for_drawing->bplcon4 >> 8);
 
     buf -= e->pos;
     stbuf -= e->pos;
@@ -789,7 +703,6 @@ static void draw_sprites_normal_sp_lo_at(struct sprite_entry *_GCCRES_ e)
     uae_u16 *buf = spixels + e->first_pixel;
     uae_u8 *stbuf = spixstate.bytes + e->first_pixel;
     int pos, window_pos;
-    uae_u8 xor_val = (uae_u8)(dp_for_drawing->bplcon4 >> 8);
 
     buf -= e->pos;
     stbuf -= e->pos;
@@ -839,7 +752,6 @@ static void draw_sprites_normal_dp_lo_at(struct sprite_entry *_GCCRES_ e)
     uae_u16 *buf = spixels + e->first_pixel;
     uae_u8 *stbuf = spixstate.bytes + e->first_pixel;
     int pos, window_pos;
-    uae_u8 xor_val = (uae_u8)(dp_for_drawing->bplcon4 >> 8);
 
     buf -= e->pos;
     stbuf -= e->pos;
@@ -889,7 +801,6 @@ static void draw_sprites_normal_sp_hi_nat(struct sprite_entry *_GCCRES_ e)
     uae_u16 *buf = spixels + e->first_pixel;
     uae_u8 *stbuf = spixstate.bytes + e->first_pixel;
     int pos, window_pos;
-    uae_u8 xor_val = (uae_u8)(dp_for_drawing->bplcon4 >> 8);
 
     buf -= e->pos;
     stbuf -= e->pos;
@@ -935,7 +846,6 @@ static void draw_sprites_normal_dp_hi_nat(struct sprite_entry *_GCCRES_ e)
     uae_u16 *buf = spixels + e->first_pixel;
     uae_u8 *stbuf = spixstate.bytes + e->first_pixel;
     int pos, window_pos;
-    uae_u8 xor_val = (uae_u8)(dp_for_drawing->bplcon4 >> 8);
 
     buf -= e->pos;
     stbuf -= e->pos;
@@ -982,7 +892,6 @@ static void draw_sprites_normal_sp_hi_at(struct sprite_entry *_GCCRES_ e)
     uae_u16 *buf = spixels + e->first_pixel;
     uae_u8 *stbuf = spixstate.bytes + e->first_pixel;
     int pos, window_pos;
-    uae_u8 xor_val = (uae_u8)(dp_for_drawing->bplcon4 >> 8);
 
     buf -= e->pos;
     stbuf -= e->pos;
@@ -1033,7 +942,6 @@ static void draw_sprites_normal_dp_hi_at(struct sprite_entry *_GCCRES_ e)
     uae_u16 *buf = spixels + e->first_pixel;
     uae_u8 *stbuf = spixstate.bytes + e->first_pixel;
     int pos, window_pos;
-    uae_u8 xor_val = (uae_u8)(dp_for_drawing->bplcon4 >> 8);
 
     buf -= e->pos;
     stbuf -= e->pos;
@@ -2142,12 +2050,10 @@ void vsync_handle_redraw (int long_frame, int lof_changed)
 #if defined(USE_LINESTATE) || !defined(USE_ALL_LINES)
 void hsync_record_line_state (int lineno, int changed)
 {
-    char *state;
-
     if (framecnt != 0)
 	return;
 #ifdef USE_LINESTATE
-    state = linestate + lineno;
+    char *state = linestate + lineno;
 #ifdef USE_RASTER_DRAW
     changed += frame_redraw_necessary;
 #endif
@@ -2170,14 +2076,12 @@ void hsync_record_line_state (int lineno, int changed)
 
 void reset_drawing (void)
 {
-    int i;
-
     inhibit_frame = 0;
 
     max_diwstop = 0;
 
 #ifdef USE_LINESTATE
-    for (i = 0; i < sizeof linestate / sizeof *linestate; i++)
+    for (int i = 0; i < sizeof linestate / sizeof *linestate; i++)
 	linestate[i] = LINE_UNDECIDED;
 #endif
 

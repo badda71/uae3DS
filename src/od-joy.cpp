@@ -17,7 +17,7 @@
 #include "memory.h"
 #include "custom.h"
 #include "joystick.h"
-#include "SDL.h"
+#include "SDL/SDL.h"
 
 #define SDL_NumJoysticks(x) 0
 

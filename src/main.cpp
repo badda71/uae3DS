@@ -52,7 +52,7 @@ KOS_INIT_ROMDISK(romdisk);
 #include "menu.h"
 
 #ifdef USE_SDL
-#include "SDL.h"
+#include "SDL/SDL.h"
 #endif
 #ifdef DREAMCAST
 #include<SDL/SDL_dreamcast.h>
